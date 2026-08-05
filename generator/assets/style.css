@@ -249,3 +249,66 @@ details.faq p { margin: 10px 0 0; color: var(--grey-dark); }
 
 .skip-link { position: absolute; left: -999px; top: 0; background: var(--teal); color: #fff; padding: 10px 16px; z-index: 100; }
 .skip-link:focus { left: 8px; top: 8px; }
+
+/* ============================================================================
+   Imagery + client voices + female performance (added with photo curation)
+   ========================================================================== */
+
+/* Hero with background photo (home + female performance) */
+.hero { position: relative; overflow: hidden; }
+.hero--image .hero-bg {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; z-index: 0;
+}
+.hero--image::after {
+  content: ""; position: absolute; inset: 0; z-index: 1;
+  background: linear-gradient(90deg, rgba(15,15,15,0.94) 0%, rgba(15,15,15,0.80) 42%, rgba(15,15,15,0.48) 100%);
+}
+.hero--image .wrap { position: relative; z-index: 2; }
+
+/* Full-width photo strip (plans header banner) */
+.page-banner { position: relative; height: clamp(160px, 26vw, 280px); overflow: hidden; }
+.page-banner .banner-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* Full-width photo band between sections (coached / coaching) */
+.media-band { position: relative; height: clamp(220px, 38vw, 420px); overflow: hidden; }
+.media-band .media-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* Two-up feature (image + copy) */
+.feature-grid { display: grid; gap: 34px; grid-template-columns: 1fr; align-items: center; }
+@media (min-width: 820px) { .feature-grid { grid-template-columns: 1fr 1fr; } }
+.feature-media { border-radius: 14px; overflow: hidden; box-shadow: 0 14px 34px rgba(0,0,0,0.14); }
+.feature-media img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; display: block; }
+
+/* Tom portrait on About */
+.portrait { border-radius: 14px; overflow: hidden; margin: 0 0 22px; box-shadow: 0 14px 34px rgba(0,0,0,0.14); }
+.portrait img { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; display: block; }
+
+/* Results band over a photo (teal keeps brand + readability) */
+.results { position: relative; overflow: hidden; }
+.results--image .results-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
+.results--image::after { content: ""; position: absolute; inset: 0; z-index: 1; background: rgba(13,148,136,0.86); }
+.results--image .wrap { position: relative; z-index: 2; }
+
+/* Client voices / reviews band */
+.reviews { background: var(--black); color: #E7E7E7; }
+.reviews h2 { color: var(--white); }
+.reviews .rating { font-size: 1.05rem; margin: 0 0 6px; }
+.reviews .stars { color: #F5B301; letter-spacing: 2px; }
+.reviews-result { max-width: 62ch; font-size: 1.15rem; color: #E7E7E7; }
+.reviews-cta { margin-top: 24px; }
+
+.quote-grid { display: grid; gap: 20px; grid-template-columns: 1fr; margin-top: 24px; }
+@media (min-width: 780px) { .quote-grid { grid-template-columns: repeat(3, 1fr); } }
+.quote-card { margin: 0; background: var(--white); border: 1px solid var(--rule); border-radius: 12px; padding: 22px; text-align: left; }
+.quote-card blockquote { margin: 0; font-size: 1.02rem; color: var(--black); line-height: 1.5; }
+.quote-card blockquote::before { content: "\201C"; color: var(--teal); font-weight: 700; }
+.quote-card figcaption { margin-top: 14px; font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.85rem; color: var(--teal-dark); }
+
+/* Female-first cross-link on plan cards */
+.female-crosslink { margin: 4px 0 0; font-size: 0.82rem; }
+.female-crosslink a { font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 0.04em; color: var(--teal-dark); text-decoration: none; }
+.female-crosslink a:hover { text-decoration: underline; }
+
+/* Readable plain link on dark callouts */
+.link-plain.on-dark { color: var(--teal-soft); }

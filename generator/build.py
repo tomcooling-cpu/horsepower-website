@@ -114,6 +114,7 @@ def head(title, description, canonical, extra="") -> str:
 NAV = [
     ("Home", BASE_PATH + "/", "home"),
     ("Plans", BASE_PATH + "/plans/", "plans"),
+    ("Female Performance", BASE_PATH + "/female-performance/", "female"),
     ("Coached", BASE_PATH + "/coached/", "coached"),
     ("Coached by Tom", BASE_PATH + "/coaching/", "coaching"),
     ("About", BASE_PATH + "/about/", "about"),
@@ -188,11 +189,129 @@ def page(active, title, description, canonical, body, extra="") -> str:
     return head(title, description, canonical, extra) + header(active) + body + footer()
 
 
+# ── Imagery ──────────────────────────────────────────────────────────────────
+IMG_BASE = BASE_PATH + "/assets/img"
+
+# Descriptive alt text (no athlete surnames), keyed by derivative name.
+IMG_ALT = {
+    "hero-welsh-climb": "Two cyclists climbing a forested Welsh valley road under a big sky",
+    "alpine-hairpins": "A lone cyclist on a switchback mountain road high above an alpine valley",
+    "ironman-wales-finish": "An athlete crossing an Ironman finish line in Wales with arms wide",
+    "female-climb": "A cyclist in Horsepower kit climbing towards a snow-lined mountain pass",
+    "tri-rain": "A triathlete riding hard through the rain on a race course",
+    "camp-group": "A small group of cyclists riding together through an alpine village on a training camp",
+    "tom-portrait": "Tom Cooling, founder and head coach of Horsepower Coaching",
+    "female-tt": "A cyclist racing a time trial in an aero tuck on a country road",
+    "female-podium": "Three athletes celebrating on a race podium",
+    "female-trail": "A trail runner on a mountain path with an alpine range behind",
+}
+
+
+def img(name, cls="", lazy=True, extra=""):
+    """One <img> for derivative `name`; alt pulled from IMG_ALT (gate-checked)."""
+    alt = IMG_ALT[name]
+    c = f' class="{cls}"' if cls else ""
+    loading = ' loading="lazy" decoding="async"' if lazy else ' decoding="async"'
+    return f'<img src="{IMG_BASE}/{name}.jpg" alt="{esc(alt)}"{c}{loading}{extra}>'
+
+
+# ── Client voices / reviews ──────────────────────────────────────────────────
+# NOTE FOR TOM: no public Google Business profile for Horsepower Coaching could be
+# confirmed at build time. Supply the real values below to light up the reviews
+# band + per-page quotes site-wide, and the AggregateRating schema.
+#   1. GOOGLE_REVIEW_URL  -> your "read reviews" Google Maps / g.page link
+#   2. REVIEW_RATING + REVIEW_COUNT -> only set BOTH if they are the real profile
+#      numbers (they drive schema.org AggregateRating; never fabricate them)
+#   3. CLIENT_QUOTES -> real, attributable quotes. `tier` routes a quote to a page:
+#      "plans" | "coached" | "coaching" | "about" | "female" (or "" = home only).
+# Until CLIENT_QUOTES is filled, quote slots render nothing (no placeholder text
+# ships to the live site). The band still shows a real, published client result.
+GOOGLE_REVIEW_URL = ""                      # <- Tom: paste Google review link here
+REVIEW_RATING = None                        # e.g. 5.0  (real profile only)
+REVIEW_COUNT = None                         # e.g. 27   (real profile only)
+FB_REVIEWS_URL = "https://www.facebook.com/Horsepowercoaching/reviews"
+# Real, already-published client result (from horsepowercoaching.co.uk) used as the
+# band's honest anchor until Google quotes are supplied.
+CLIENT_RESULT_LINE = ("Coached athlete Maddison Shaddick led her age group at Ironman "
+                      "Wales by 45 minutes and finished 9th overall against the "
+                      "professional women.")
+CLIENT_QUOTES = [
+    # {"quote": "…", "name": "Sarah H.", "tier": "coached"},
+    # {"quote": "…", "name": "James P.", "tier": "plans"},
+    # {"quote": "…", "name": "Priya R.", "tier": "coaching"},
+]
+
+
+def _review_cta():
+    if GOOGLE_REVIEW_URL:
+        return f'<a class="btn on-dark ghost" href="{esc(GOOGLE_REVIEW_URL)}" rel="noopener" target="_blank">Read our reviews on Google</a>'
+    return f'<a class="btn on-dark ghost" href="{esc(FB_REVIEWS_URL)}" rel="noopener" target="_blank">Read what athletes say</a>'
+
+
+def _rating_html():
+    if REVIEW_RATING and REVIEW_COUNT:
+        stars = "★" * int(round(REVIEW_RATING))
+        return (f'<p class="rating"><span class="stars" aria-hidden="true">{stars}</span> '
+                f'<strong>{REVIEW_RATING:g}</strong> from {REVIEW_COUNT} reviews</p>')
+    return ""
+
+
+def quotes_for(tier):
+    return [q for q in CLIENT_QUOTES if q.get("tier") == tier]
+
+
+def quote_card(q):
+    return (f'<figure class="quote-card"><blockquote>{esc(q["quote"])}</blockquote>'
+            f'<figcaption>{esc(q.get("name", "Horsepower athlete"))}</figcaption></figure>')
+
+
+def quote_block(tier):
+    """A single relevant quote block for a page, or nothing if none supplied."""
+    qs = quotes_for(tier)
+    if not qs:
+        return ""
+    return f"""
+<section class="alt">
+  <div class="wrap">
+    <p class="eyebrow">In their words</p>
+    <div class="quote-grid">{''.join(quote_card(q) for q in qs[:1])}</div>
+  </div>
+</section>"""
+
+
+def reviews_band():
+    """Homepage client-voices band. Shows real result + review CTA; quotes if supplied."""
+    home_quotes = quotes_for("") + quotes_for("plans") + quotes_for("coached") + quotes_for("coaching")
+    cards = "".join(quote_card(q) for q in home_quotes[:3])
+    grid = f'<div class="quote-grid">{cards}</div>' if cards else ""
+    return f"""
+<section class="reviews">
+  <div class="wrap">
+    <p class="eyebrow" style="color:var(--teal-soft)">What athletes say</p>
+    <h2>Real athletes, real finish lines</h2>
+    {_rating_html()}
+    <p class="reviews-result">{esc(CLIENT_RESULT_LINE)}</p>
+    {grid}
+    <p class="reviews-cta">{_review_cta()}</p>
+  </div>
+</section>"""
+
+
+# The four live Female-First plan SKUs, cross-linked to the female performance page.
+FEMALE_FIRST_SLUGS = {
+    "female-first-70-3-training-plan",
+    "female-first-marathon-training-plan",
+    "female-first-olympic-triathlon-training-plan",
+    "female-first-century-training-plan",
+}
+
+
 # ── Pages ────────────────────────────────────────────────────────────────────
 def render_home(cat) -> str:
     total = cat["stats"]["total"]
     body = f"""<main id="main">
-<section class="hero">
+<section class="hero hero--image">
+  {img("hero-welsh-climb", cls="hero-bg", lazy=False)}
   <div class="wrap">
     <h1>{esc(HERO_HEADLINE)}</h1>
     <p class="lede">{esc(HERO_BODY)}</p>
@@ -230,11 +349,28 @@ def render_home(cat) -> str:
   </div>
 </section>
 
-<section class="results">
+<section class="alt feature-female">
+  <div class="wrap feature-grid">
+    <div class="feature-media">{img("female-tt")}</div>
+    <div class="feature-copy">
+      <p class="eyebrow">Female performance</p>
+      <h2>Female first, not female adapted.</h2>
+      <p class="section-intro">For too long, women have been handed training built for men and
+      told to make it fit. We do it the other way round. The plan is built for a female
+      athlete from the start, and when we coach you, the training reads what your body
+      actually did and adapts around your physiology, not an average.</p>
+      <p style="margin-top:20px"><a class="btn" href="{BASE_PATH}/female-performance/">See our female performance approach</a></p>
+    </div>
+  </div>
+</section>
+
+<section class="results results--image">
+  {img("ironman-wales-finish", cls="results-bg")}
   <div class="wrap">
     <p>{esc(RESULTS_LINE)}</p>
   </div>
 </section>
+{reviews_band()}
 
 <section class="alt">
   <div class="wrap">
@@ -273,6 +409,8 @@ def render_plans_index(cat) -> str:
     for p in plans:
         tier_tag = "" if p["tier"] == "Standard" else f'<span class="tag tier">{esc(p["tier"])}</span>'
         detail = f'{BASE_PATH}/plans/{p["slug"]}/'
+        female_link = (f'<p class="female-crosslink"><a href="{BASE_PATH}/female-performance/">Part of our female performance approach</a></p>'
+                       if p["slug"] in FEMALE_FIRST_SLUGS else "")
         cards.append(f"""<article class="plan-card"
   data-sport="{esc(p['sport'])}" data-category="{esc(p['category'])}"
   data-tier="{esc(p['tier'])}" data-weeks="{p['weeks']}" data-hours="{p['hours_per_week']}"
@@ -284,6 +422,7 @@ def render_plans_index(cat) -> str:
   </div>
   <h3><a href="{detail}">{esc(p['title'])}</a></h3>
   <p class="blurb">{esc(p['blurb'])}</p>
+  {female_link}
   <div class="meta">
     <span class="price">&pound;{p['price']:.2f}</span>
     <span class="weeks">{p['weeks']} wk &middot; ~{p['hours_per_week']:g} h/wk</span>
@@ -295,6 +434,7 @@ def render_plans_index(cat) -> str:
 </article>""")
 
     body = f"""<main id="main">
+<div class="page-banner">{img("alpine-hairpins", cls="banner-bg", lazy=False)}</div>
 <section class="alt" style="padding-bottom:24px">
   <div class="wrap">
     <p class="eyebrow">The plan library</p>
@@ -340,6 +480,15 @@ def render_plan_detail(cat, p) -> str:
                    "availability": "https://schema.org/InStock", "url": p["buy_url"]},
     }
     extra = f'<script type="application/ld+json">{json.dumps(ld)}</script>\n'
+    female_note = ""
+    if p["slug"] in FEMALE_FIRST_SLUGS:
+        female_note = f"""
+    <div class="callout" style="margin-top:26px">
+      <p class="eyebrow" style="color:var(--teal-soft)">Female first, not female adapted</p>
+      <p>This plan is part of our female performance approach: a programme built for a
+      female athlete from the start, with recovery-respecting structure and strength work
+      for long-term bone and tendon health. <a class="link-plain on-dark" href="{BASE_PATH}/female-performance/">See how we train female athletes</a>.</p>
+    </div>"""
     body = f"""<main id="main">
 <section class="plan-hero">
   <div class="wrap">
@@ -372,6 +521,7 @@ def render_plan_detail(cat, p) -> str:
     &nbsp; <a class="link-plain" href="{BASE_PATH}/plans/">Back to the library</a></p>
     <p style="margin-top:26px;color:var(--grey-mid)">Want it built around your life instead of off the shelf?
     <a href="{BASE_PATH}/coached/">See Coached</a>.</p>
+    {female_note}
   </div>
 </section>
 </main>"""
@@ -389,6 +539,8 @@ def render_coached(cat) -> str:
     <div class="cta-row"><a class="btn" href="{esc(CONTACT_URL)}">Apply for coaching</a></div>
   </div>
 </section>
+
+<div class="media-band">{img("tri-rain", cls="media-bg")}</div>
 
 <section>
   <div class="wrap">
@@ -429,6 +581,7 @@ def render_coached(cat) -> str:
     <p style="margin-top:18px"><a class="btn" href="{esc(CONTACT_URL)}">Apply for coaching</a></p>
   </div>
 </section>
+{quote_block("coached")}
 </main>"""
     desc = ("Coached by Horsepower, £85 a month. Your race, your hours, your plan, "
             "built block by block with real feedback on every session and a race "
@@ -447,6 +600,8 @@ def render_coaching(cat) -> str:
     <div class="cta-row"><a class="btn" href="{esc(CONTACT_URL)}">Ask about a place</a></div>
   </div>
 </section>
+
+<div class="media-band">{img("camp-group", cls="media-bg")}</div>
 
 <section>
   <div class="wrap content-grid two">
@@ -484,6 +639,7 @@ def render_coaching(cat) -> str:
     </div>
   </div>
 </section>
+{quote_block("coaching")}
 </main>"""
     desc = ("Coached by Tom, limited places. Everything in Coached plus Tom directly: "
             "calls when you need them, WhatsApp when it is urgent, and race-day "
@@ -524,6 +680,7 @@ def render_about(cat) -> str:
       ultra wins, training with Royal Marines and UKSF, and coaching elite performers.</p>
     </div>
     <div>
+      <figure class="portrait">{img("tom-portrait")}</figure>
       <div class="callout" style="background:var(--grey-bg);color:var(--black)">
         <h2 style="color:var(--black)">Qualifications</h2>
         <ul class="about-list">
@@ -547,12 +704,188 @@ def render_about(cat) -> str:
     </div>
   </div>
 </section>
+{quote_block("about")}
 </main>"""
     desc = ("Tom Cooling is an ex-elite triathlete, ultra-bike racer and FKT holder "
             "with over a decade coaching beginners to world-tour professionals across "
             "triathlon, ultra-bike and Haute Route racing.")
     return page("about", "About Tom Cooling | Horsepower Coaching", desc,
                 BASE_URL + "/about/", body)
+
+
+FEMALE_LEAD = "Female first, not female adapted."
+
+FEMALE_FAQ = [
+    ("What is female-specific endurance training?",
+     "It is training designed for a female athlete from the ground up, not a men's plan "
+     "with the numbers scaled down. It respects the physiological differences that shape "
+     "recovery, fuelling, strength needs and how training load is best spread across the week."),
+    ("Do Horsepower's off-the-shelf plans sync to my menstrual cycle?",
+     "No, and we will not claim they do. A downloadable plan cannot know where you are in "
+     "your cycle, so instead our Female-First plans use recovery-respecting structure and "
+     "dedicated strength work for bone and tendon health that benefit every female athlete. "
+     "Genuine cycle-aware training comes with coaching, where the plan adapts around you."),
+    ("What makes Horsepower's coaching cycle-aware?",
+     "When we coach you, we read the sessions you actually complete in the context of what "
+     "your body was doing, and we adapt the next block around your physiology, your symptoms "
+     "and your feedback. It is personalised to you, not a generic template."),
+    ("Which female-specific training plans does Horsepower offer?",
+     "Four Female-First plans are live now: 70.3, Olympic-distance triathlon, marathon and "
+     "century. Each is built for a female athlete targeting that specific event."),
+    ("Is female-specific training only for elite athletes?",
+     "No. The same approach that supports our racing athletes supports a first-timer. It is "
+     "about training the athlete in front of us properly, at every level and life stage."),
+]
+
+
+def render_female(cat) -> str:
+    fem = [p for p in cat["plans"] if p["slug"] in FEMALE_FIRST_SLUGS]
+    fem.sort(key=lambda p: p["title"])
+    plan_cards = "".join(f"""<article class="plan-card">
+    <div class="tags"><span class="tag">{esc(p['sport'])}</span><span class="tag tier">Female-First</span></div>
+    <h3><a href="{BASE_PATH}/plans/{p['slug']}/">{esc(p['title'])}</a></h3>
+    <p class="blurb">{esc(p['blurb'])}</p>
+    <div class="actions">
+      <a class="btn" href="{esc(p['buy_url'])}" rel="noopener" target="_blank">Buy on TrainingPeaks</a>
+      <a class="link-plain" href="{BASE_PATH}/plans/{p['slug']}/">Details</a>
+    </div>
+  </article>""" for p in fem)
+
+    faq_html = "".join(
+        f'<details class="faq"><summary>{esc(q)}</summary><p>{esc(a)}</p></details>'
+        for q, a in FEMALE_FAQ)
+    faq_ld = {
+        "@context": "https://schema.org", "@type": "FAQPage",
+        "mainEntity": [
+            {"@type": "Question", "name": q,
+             "acceptedAnswer": {"@type": "Answer", "text": a}}
+            for q, a in FEMALE_FAQ],
+    }
+    extra = f'<script type="application/ld+json">{json.dumps(faq_ld)}</script>\n'
+
+    body = f"""<main id="main">
+<section class="hero hero--image">
+  {img("female-climb", cls="hero-bg", lazy=False)}
+  <div class="wrap">
+    <p class="eyebrow" style="color:var(--teal-soft)">Female performance</p>
+    <h1>{esc(FEMALE_LEAD)}</h1>
+    <p class="lede">Endurance training was written for men and handed to women with the
+    numbers turned down. We do it the other way round. From the first session, the training
+    is built for a female athlete, and when we coach you it adapts around your physiology,
+    not an average.</p>
+    <div class="cta-row">
+      <a class="btn" href="{BASE_PATH}/coached/">Get coached</a>
+      <a class="btn on-dark ghost" href="#female-plans">See the plans</a>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap prose">
+    <h2>Why "female adapted" fails</h2>
+    <p>Most training plans, most research and most coaching were built around the male
+    athlete, then shrunk to fit everyone else. Women were trained as small men. That
+    ignores the things that actually shape how a female athlete responds to training:
+    how you recover, how you fuel, the strength work that protects your bones and tendons,
+    and how load is best distributed across your week. Turning a men's plan down is not
+    the same as building the right one.</p>
+    <h2>What female first actually means</h2>
+    <p>It means the plan starts from the female athlete, not from a template. It means
+    recovery-respecting structure so the work lands instead of grinding you down. It means
+    strength work built in for long-term bone and tendon health, not bolted on as an
+    afterthought. And it means being honest about what each level of support can and cannot do.</p>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="wrap feature-grid">
+    <div class="feature-copy">
+      <p class="eyebrow">The Female-First plan library</p>
+      <h2>Built for a female athlete, from session one</h2>
+      <p class="section-intro">Our Female-First plans are built for the female athlete targeting
+      a specific event. They use recovery-respecting structure and dedicated strength work for
+      bone and tendon health. What they do not do is claim to sync to your menstrual cycle: an
+      off-the-shelf plan cannot know where you are in yours, so we will not pretend it does.
+      That is what coaching is for.</p>
+    </div>
+    <div class="feature-media">{img("female-podium")}</div>
+  </div>
+</section>
+
+<section id="female-plans">
+  <div class="wrap">
+    <h2>Female-First training plans</h2>
+    <p class="section-intro">Four plans, each built for its event. One-off, delivered through TrainingPeaks.</p>
+    <div class="card-grid" style="margin-top:26px">{plan_cards}</div>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="wrap feature-grid">
+    <div class="feature-media">{img("female-trail")}</div>
+    <div class="feature-copy">
+      <p class="eyebrow">Coached and Coached by Tom</p>
+      <h2>Genuinely cycle-aware coaching</h2>
+      <p class="section-intro">This is where female-specific training gets personal. When we
+      coach you, the plan adapts around your physiology, and the feedback on every session
+      reads what your body actually did in context: your symptoms, your recovery, where you
+      are in your month. It is coaching that responds to you, week to week, rather than a plan
+      that assumes an average woman.</p>
+      <p style="margin-top:18px">Tom coaches with a particular emphasis on female-specific
+      performance development, drawn from years of working with female athletes from first
+      finish lines to the front of the race.</p>
+      <p style="margin-top:20px">
+        <a class="btn" href="{BASE_PATH}/coached/">How coaching works</a>
+        <a class="btn ghost" href="{BASE_PATH}/coaching/" style="margin-left:10px">Coached by Tom</a>
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="results results--image">
+  {img("ironman-wales-finish", cls="results-bg")}
+  <div class="wrap">
+    <p>Trained for her body, not an average. That is how female athletes get to the front.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap prose">
+    <h2>Female performance, answered</h2>
+    {faq_html}
+  </div>
+</section>
+
+<section class="alt">
+  <div class="wrap content-grid two">
+    <div>
+      <h2>Prefer it in an app?</h2>
+      <p>Domestiq is our companion app, built on the same female-first thinking and made to
+      bring cycle-aware endurance training to everyone. It complements the coaching here: if
+      you want the approach in your pocket, that is where to look.</p>
+      <p style="margin-top:16px"><a class="btn ghost" href="https://domestiq.cc" rel="noopener" target="_blank">Visit Domestiq</a></p>
+    </div>
+    <div>
+      <div class="callout">
+        <h2>Start with your body in mind</h2>
+        <p>Browse the Female-First plans, or get coached and have the training built around
+        your physiology, your event and your life.</p>
+        <p style="margin-top:18px">
+          <a class="btn on-dark ghost" href="#female-plans">See the plans</a>
+          <a class="btn" href="{BASE_PATH}/coached/" style="margin-left:10px">Get coached</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+{quote_block("female")}
+</main>"""
+    desc = ("Female-first endurance coaching and training plans: female-specific triathlon, "
+            "cycling and marathon training built for female athletes, with cycle-aware coaching. "
+            "Female first, not female adapted.")
+    return page("female",
+                "Female Performance Coaching | Female-Specific Triathlon, Cycling and Running Training | Horsepower Coaching",
+                desc, BASE_URL + "/female-performance/", body, extra)
 
 
 # ── Write + gates ────────────────────────────────────────────────────────────
@@ -571,13 +904,15 @@ def build():
         shutil.rmtree(SITE)
     os.makedirs(SITE)
 
-    # assets
-    shutil.copytree(os.path.join(HERE, "assets"), os.path.join(SITE, "assets"))
+    # assets (ship optimised derivatives in img/, but not the full-res img/src originals)
+    shutil.copytree(os.path.join(HERE, "assets"), os.path.join(SITE, "assets"),
+                    ignore=shutil.ignore_patterns("src"))
     open(os.path.join(SITE, ".nojekyll"), "w").close()
 
     written = {}
     write("index.html", render_home(cat), written)
     write("plans/index.html", render_plans_index(cat), written)
+    write("female-performance/index.html", render_female(cat), written)
     write("coached/index.html", render_coached(cat), written)
     write("coaching/index.html", render_coaching(cat), written)
     write("about/index.html", render_about(cat), written)
@@ -585,8 +920,8 @@ def build():
         write(f"plans/{p['slug']}/index.html", render_plan_detail(cat, p), written)
 
     # sitemap + robots
-    urls = [BASE_URL + "/", BASE_URL + "/plans/", BASE_URL + "/coached/",
-            BASE_URL + "/coaching/", BASE_URL + "/about/"]
+    urls = [BASE_URL + "/", BASE_URL + "/plans/", BASE_URL + "/female-performance/",
+            BASE_URL + "/coached/", BASE_URL + "/coaching/", BASE_URL + "/about/"]
     urls += [f"{BASE_URL}/plans/{p['slug']}/" for p in plans]
     today = date.today().isoformat()
     sm = ['<?xml version="1.0" encoding="UTF-8"?>',
@@ -668,6 +1003,40 @@ def run_gates(cat, written):
     if n_detail != n_live:
         errors.append(f"detail pages {n_detail} != live SKU count {n_live}")
 
+    # Gate 7: female performance page present + on-brand + AEO wiring.
+    fem = written.get("female-performance/index.html", "")
+    if not fem:
+        errors.append("female-performance page missing")
+    else:
+        if FEMALE_LEAD not in fem:
+            errors.append("female lead line missing from female-performance page")
+        if '"@type": "FAQPage"' not in fem:
+            errors.append("FAQPage schema missing from female-performance page")
+        for slug in FEMALE_FIRST_SLUGS:
+            if f"/plans/{slug}/" not in fem:
+                errors.append(f"female page missing link to plan {slug}")
+
+    # Gate 8: never fabricate rating markup (AggregateRating only if real numbers set).
+    if not (REVIEW_RATING and REVIEW_COUNT):
+        for path, content in written.items():
+            if "AggregateRating" in content:
+                errors.append(f"AggregateRating present without real review numbers in {path}")
+
+    # Gate 9: total shipped image weight under budget.
+    img_dir = os.path.join(SITE, "assets", "img")
+    img_bytes = 0
+    img_count = 0
+    if os.path.isdir(img_dir):
+        for f in os.listdir(img_dir):
+            if f.lower().endswith((".jpg", ".jpeg", ".png", ".webp")):
+                img_bytes += os.path.getsize(os.path.join(img_dir, f))
+                img_count += 1
+    if os.path.isdir(os.path.join(img_dir, "src")):
+        errors.append("full-res img/src originals leaked into shipped site/assets/img")
+    img_budget = 2.5 * 1024 * 1024
+    if img_bytes > img_budget:
+        errors.append(f"image weight {img_bytes/1024:.0f}KB exceeds 2.5MB budget")
+
     if errors:
         print("BUILD GATES FAILED:")
         for e in errors:
@@ -678,6 +1047,8 @@ def run_gates(cat, written):
     print(f"  - {len(VERBATIM_REQUIRED)} approved copy strings verified byte-exact")
     print(f"  - {len(html_pages)} pages: viewport + unique title + description + alt text")
     print(f"  - internal links resolve; {n_cards} cards == {n_live} live SKUs; {n_detail} detail pages")
+    print(f"  - female performance page: lead line + FAQPage schema + 4 plan links")
+    print(f"  - {img_count} images shipped, {img_bytes/1024:.0f}KB total (budget 2560KB); no fabricated ratings")
 
 
 if __name__ == "__main__":
