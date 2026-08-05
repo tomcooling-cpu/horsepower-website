@@ -213,8 +213,33 @@ def page(active, title, description, canonical, body, extra="") -> str:
 # ── Imagery ──────────────────────────────────────────────────────────────────
 IMG_BASE = BASE_PATH + "/assets/img"
 
-# Descriptive alt text (no athlete surnames), keyed by derivative name.
+# Descriptive alt text, keyed by derivative name. Honours-band entries carry
+# the athlete's real name (identity verified per file; Tom confirmed the Hannah
+# tape-break 2026-08-05). Everything else stays name-free.
 IMG_ALT = {
+    # drop-2026-08-05
+    "honours-hannah-wales": "Hannah Saitch breaking the tape to win Ironman Wales 2022",
+    "honours-madison-tt": "Madison Shaddick in a full aero tuck racing a time trial on her pink-wheeled TT bike",
+    "honours-naomi-swedeman": "Naomi Shinkins celebrating at the mountain-top Swedeman finish in a Horsepower cap",
+    "hero-tenby-swim": "Swimmers in wetsuits and pink caps charging into the sea at the Ironman Wales swim start at sunrise",
+    "hero-alpine-mist": "An empty hairpin road high on a misty alpine pass",
+    "hero-torridon-ridge": "Two runners crossing a rocky Torridon ridge under a brooding sky",
+    "tom-hill-climb": "Tom Cooling racing the National Hill Climb Championships in Horsepower kit",
+    "tom-alps-lead": "Tom Cooling on the front of a group climbing a tree-lined alpine road at the Haute Route Alps",
+    "tom-alps-finish": "Tom Cooling riding into the Haute Route Alps stage finish at Serre Chevalier",
+    "tom-dolomites-arch": "Tom Cooling riding through the timing arch at the Haute Route Dolomites with snowy peaks behind",
+    "tom-bottle-refill": "Tom Cooling refilling a bottle mid-ride in a Haute Route jersey",
+    "tom-swim-kaolinite": "Tom Cooling with his race number before the Kaolinite open-water swim race",
+    "tom-alps-signon": "Tom Cooling giving a thumbs up while holding his rider board at Haute Route Alps sign-on",
+    "coaching-support-roadside": "Tom Cooling in a Horsepower cap giving a thumbs up to a racing athlete from the roadside on the Ironman Wales bike course",
+    "coached-almere-finish": "A Horsepower athlete celebrating on the finish line at Challenge Almere-Amsterdam",
+    "coached-tenby-swim": "Swimmers in pink caps crossing Tenby harbour below pastel houses during the Ironman Wales swim",
+    "female-wales-podium": "The women's podium celebration at Ironman Wales with champagne mid-spray",
+    "female-montblanc-hike": "An athlete in a Horsepower cap hiking alpine switchbacks with the Mont Blanc massif in the distance",
+    "female-welsh-tt": "Hannah Saitch in an aero tuck during the Welsh 100 mile time trial championships",
+    "plans-izoard-trio": "Three cyclists rounding a hairpin below the rock pinnacles of the Col d'Izoard",
+    "plans-pyrenees-switchback": "A lone cyclist on a switchback gravel road high in the Pyrenees",
+    "plans-pyrenees-dawn": "Layered Pyrenean valleys in dawn mist",
     "hero-alps": "A cyclist climbing high above an alpine valley with a huge mountain panorama behind",
     "hero-welsh-climb": "Two cyclists climbing a forested Welsh valley road under a big sky",
     "alpine-ridge": "A lone cyclist on a hairpin road high in a vast alpine mountain range",
@@ -245,6 +270,29 @@ IMG_POS = {
     "female-podium": "50% 30%",          # the three athletes' faces
     "female-trail": "50% 54%",           # runner on the trail, centre
     "tom-portrait": "50% 30%",           # Tom's face
+    # drop-2026-08-05
+    "honours-hannah-wales": "47% 50%",   # Hannah centred under the tape in the 4/5 tile
+    "honours-madison-tt": "50% 42%",     # helmet to wheels, rider centred
+    "honours-naomi-swedeman": "60% 45%", # Naomi + raised arms right of the 2:21:10 clock
+    "hero-tenby-swim": "50% 55%",        # swimmers + sunrise water, Goscar Rock right
+    "hero-alpine-mist": "50% 55%",       # the hairpin low-centre
+    "hero-torridon-ridge": "50% 45%",    # runners on the quartzite crest
+    "tom-hill-climb": "50% 32%",         # Tom out of the saddle, upper third in wide crops
+    "tom-alps-lead": "50% 45%",          # Tom on the front of the bunch
+    "tom-alps-finish": "42% 52%",        # Tom left of centre, TAG Heuer arch behind
+    "tom-dolomites-arch": "50% 55%",     # rider in the arch, peaks above
+    "tom-bottle-refill": "50% 30%",      # Tom's face + bottle
+    "tom-swim-kaolinite": "50% 35%",     # Tom's face, race number lower
+    "tom-alps-signon": "46% 40%",        # Tom + the THOMAS 2044 board centred
+    "coaching-support-roadside": "50% 45%",  # Tom's thumbs up + the passing rider
+    "coached-almere-finish": "50% 35%",  # arms-up roar at the top of the frame
+    "coached-tenby-swim": "50% 60%",     # swim field low, pastel harbour houses above
+    "female-wales-podium": "50% 45%",    # the three podium steps
+    "female-montblanc-hike": "50% 55%",  # hiker on the switchbacks, massif behind
+    "female-welsh-tt": "60% 50%",        # Hannah aero-tucked right of centre
+    "plans-izoard-trio": "45% 60%",      # the trio low on the hairpin
+    "plans-pyrenees-switchback": "50% 55%",
+    "plans-pyrenees-dawn": "50% 50%",
 }
 
 # Verified from the live horsepowercoaching.co.uk contact page (not guessed).
@@ -273,21 +321,45 @@ IMG_DIMS = {
     "female-hero": (1500, 1001), "ironman-wales-finish": (1500, 1000),
     "coached-band": (1500, 999), "tom-gravel": (1400, 1050),
     "camp-group": (1400, 1050), "female-tt": (734, 1100),
-    "female-podium": (825, 1100), "female-trail": (825, 1100),
+    "female-podium": (825, 1100), "female-trail": (675, 900),
     "tom-portrait": (825, 1100),
+    # drop-2026-08-05
+    "honours-hannah-wales": (1100, 733),
+    "honours-madison-tt": (667, 1000),
+    "honours-naomi-swedeman": (1400, 1013),
+    "hero-tenby-swim": (1200, 802),
+    "hero-alpine-mist": (1200, 800),
+    "hero-torridon-ridge": (1200, 799),
+    "tom-hill-climb": (867, 1300),
+    "tom-alps-lead": (1000, 667),
+    "tom-alps-finish": (1000, 666),
+    "tom-dolomites-arch": (1000, 667),
+    "tom-bottle-refill": (667, 1000),
+    "tom-swim-kaolinite": (667, 1000),
+    "tom-alps-signon": (800, 533),
+    "coaching-support-roadside": (768, 1024),
+    "coached-almere-finish": (734, 1100),
+    "coached-tenby-swim": (1400, 931),
+    "female-wales-podium": (1200, 801),
+    "female-montblanc-hike": (750, 1000),
+    "female-welsh-tt": (1200, 801),
+    "plans-izoard-trio": (1200, 798),
+    "plans-pyrenees-switchback": (1200, 800),
+    "plans-pyrenees-dawn": (1200, 800),
 }
 
 
 def img(name, cls="", lazy=True, extra=""):
     """One <img> for derivative `name`; alt from IMG_ALT, object-position from
-    IMG_POS, intrinsic width/height from IMG_DIMS (all gate-checked)."""
+    IMG_POS, intrinsic width/height from IMG_DIMS (all gate-checked).
+    Derivatives ship as WebP (see make_derivatives.py)."""
     alt = IMG_ALT[name]
     c = f' class="{cls}"' if cls else ""
     loading = ' loading="lazy" decoding="async"' if lazy else ' decoding="async"'
     w, h = IMG_DIMS[name]
     dims = f' width="{w}" height="{h}"'
     style = f' style="object-position:{IMG_POS[name]}"' if name in IMG_POS else ""
-    return f'<img src="{IMG_BASE}/{name}.jpg" alt="{esc(alt)}"{c}{dims}{style}{loading}{extra}>'
+    return f'<img src="{IMG_BASE}/{name}.webp" alt="{esc(alt)}"{c}{dims}{style}{loading}{extra}>'
 
 
 # ── Client voices / reviews ──────────────────────────────────────────────────
@@ -707,12 +779,16 @@ def render_coached(cat) -> str:
   <div class="wrap">
     <h2>What you get for &pound;85 a month</h2>
     <p class="section-intro">{esc(TIER_COACHED_BODY)}</p>
-    <ol class="step-list">
-      <li><strong>We start with you</strong>A proper intake: your target event, your history, your week, your numbers and the hours you actually have.</li>
-      <li><strong>Your plan arrives block by block</strong>Built around your life and your event, three weeks at a time, so it stays current with how your training is actually going rather than a whole year written on day one.</li>
-      <li><strong>Feedback on every completed session</strong>We read the sessions you complete against what was asked, using your actual data, and tell you what it means and what happens next.</li>
-      <li><strong>A race plan before every start line</strong>Pacing, fuelling and strategy for your event, in your hands before you get there.</li>
-    </ol>
+    <div class="side-fig-grid">
+      <ol class="step-list">
+        <li><strong>We start with you</strong>A proper intake: your target event, your history, your week, your numbers and the hours you actually have.</li>
+        <li><strong>Your plan arrives block by block</strong>Built around your life and your event, three weeks at a time, so it stays current with how your training is actually going rather than a whole year written on day one.</li>
+        <li><strong>Feedback on every completed session</strong>We read the sessions you complete against what was asked, using your actual data, and tell you what it means and what happens next.</li>
+        <li><strong>A race plan before every start line</strong>Pacing, fuelling and strategy for your event, in your hands before you get there.</li>
+      </ol>
+      <figure class="photo-fig photo-fig--port">{img("coached-almere-finish")}
+        <figcaption>A Horsepower athlete finishing Challenge Almere-Amsterdam</figcaption></figure>
+    </div>
   </div>
 </section>
 
@@ -734,6 +810,8 @@ def render_coached(cat) -> str:
     </div>
   </div>
 </section>
+
+<div class="media-band">{img("coached-tenby-swim", cls="media-bg")}</div>
 
 <section>
   <div class="wrap">
@@ -806,12 +884,16 @@ def render_coaching(cat) -> str:
   <div class="wrap">
     <p class="eyebrow">How a month looks</p>
     <h2>The weekly rhythm</h2>
-    <ol class="step-list">
-      <li><strong>Your block lands</strong>Three weeks of training built around your life, calibrated to where your form is right now and where it needs to be to reach your dream goal, delivered to your TrainingPeaks account.</li>
-      <li><strong>You train, I stay close</strong>Every session tells you what to do and why. Message me any time you need to move something or talk it through. Contact is unlimited, so you are never left guessing between sessions.</li>
-      <li><strong>Read, analysed, fed back on</strong>I read the sessions you complete, analyse them against what was set using your actual data in TrainingPeaks and WKO5, and feed back on them. Feedback is a key part of the coaching journey, so each week you get a full round of feedback on everything you have completed.</li>
-      <li><strong>We talk, the plan moves</strong>Block by block video catch-ups, WhatsApp for general chat, and the next block reflects real life and your numbers as they move.</li>
-    </ol>
+    <div class="side-fig-grid">
+      <ol class="step-list">
+        <li><strong>Your block lands</strong>Three weeks of training built around your life, calibrated to where your form is right now and where it needs to be to reach your dream goal, delivered to your TrainingPeaks account.</li>
+        <li><strong>You train, I stay close</strong>Every session tells you what to do and why. Message me any time you need to move something or talk it through. Contact is unlimited, so you are never left guessing between sessions.</li>
+        <li><strong>Read, analysed, fed back on</strong>I read the sessions you complete, analyse them against what was set using your actual data in TrainingPeaks and WKO5, and feed back on them. Feedback is a key part of the coaching journey, so each week you get a full round of feedback on everything you have completed.</li>
+        <li><strong>We talk, the plan moves</strong>Block by block video catch-ups, WhatsApp for general chat, and the next block reflects real life and your numbers as they move.</li>
+      </ol>
+      <figure class="photo-fig photo-fig--port">{img("coaching-support-roadside")}
+        <figcaption>Trackside on the Ironman Wales bike course</figcaption></figure>
+    </div>
   </div>
 </section>
 
@@ -912,6 +994,8 @@ def render_about(cat) -> str:
       on the day that matters.</p>
     </div>
     <div class="about-side">
+      <figure class="photo-fig photo-fig--port">{img("tom-hill-climb")}
+        <figcaption>Racing the National Hill Climb Championships in Horsepower kit</figcaption></figure>
       <figure class="portrait">{img("tom-portrait")}</figure>
     </div>
   </div>
@@ -925,6 +1009,32 @@ def render_about(cat) -> str:
       <div class="cred"><h3>Sport science</h3><p>First Class BA and Master's Degree in Sport Science and Athlete Development.</p></div>
       <div class="cred"><h3>Breathwork</h3><p>Oxygen Advantage Advanced Breathwork Instructor qualification.</p></div>
       <div class="cred"><h3>Heat adaptation</h3><p>Accredited heat-training coach with applied experience in climate adaptation protocols.</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="eyebrow">Tom on the start line</p>
+    <h2>Racing it, not just coaching it</h2>
+    <p class="section-intro">The coaching is grounded in racing. Haute Route weeks in the Alps
+    and the Dolomites, the National Hill Climb Championships, open-water swim racing: the same
+    kind of preparation Horsepower athletes get, tested first-hand.</p>
+    <div class="about-gallery">
+      <figure class="photo-fig photo-fig--land">{img("tom-alps-lead")}
+        <figcaption>Haute Route Alps 2019</figcaption></figure>
+      <figure class="photo-fig photo-fig--land">{img("tom-alps-finish")}
+        <figcaption>Haute Route Alps 2019, Serre Chevalier stage finish</figcaption></figure>
+      <figure class="photo-fig photo-fig--land">{img("tom-dolomites-arch")}
+        <figcaption>Haute Route Dolomites 2019</figcaption></figure>
+    </div>
+    <div class="about-gallery">
+      <figure class="photo-fig photo-fig--port">{img("tom-bottle-refill")}
+        <figcaption>Between climbs at the Haute Route</figcaption></figure>
+      <figure class="photo-fig photo-fig--port">{img("tom-swim-kaolinite")}
+        <figcaption>Kaolinite open-water swim race, 2025</figcaption></figure>
+      <figure class="photo-fig photo-fig--port">{img("tom-alps-signon")}
+        <figcaption>Sign-on at the Haute Route Alps 2019</figcaption></figure>
     </div>
   </div>
 </section>
@@ -960,20 +1070,26 @@ FEMALE_LEAD = "Female first, not female adapted."
 # "50 mile TT course record" claim is deliberately excluded. Do NOT add results
 # that are not on Tom's list; the old Shaddick "45-minute lead / 9th overall"
 # line is a wrong claim and is gate-banned site-wide (gate 8d).
+# `img` is the athlete's own verified photo (drop-2026-08-05); a tile with no
+# img renders as a deliberate text tile. Never reuse another athlete's photo or
+# an unidentified one here: name-photo pairing is a hard factual rule.
+# Madison's 2025 supporting line is Tom's precision wording (2026-08-05): her
+# Ironman Wales 2025 win was as overall women's age group champion.
 FEMALE_HONOURS = [
-    {"name": "Hannah Saitch",
+    {"name": "Hannah Saitch", "img": "honours-hannah-wales",
      "lines": ["Ironman Wales 2022 champion",
                "The ROC Wales 2021 - 1st, bike course record",
                "XTRI Celtman 2021 - 3rd, bike course record",
                "Welsh 100 Mile Time Trial Championships 2023 - 1st",
                "XTRI Norseman 2022 - 3rd"]},
-    {"name": "Madison Shaddick",
+    {"name": "Madison Shaddick", "img": "honours-madison-tt",
      "lines": ["Ironman Wales 2025 champion",
+               "Overall women's age group champion, Ironman Wales 2025",
                "10th, Ironman World Championships Nice 2024",
                "Wales Middle and Long Distance Champion 2025",
                "Ironman Swansea 70.3 2024 - 1st age group, 2nd overall",
                "Cotswold 113 2024 - 1st, Cotswold 51 Fiver 2024 - 1st"]},
-    {"name": "Naomi Shinkins",
+    {"name": "Naomi Shinkins", "img": "honours-naomi-swedeman",
      "lines": ["XTRI Swedeman 2026 - 2nd",
                "XTRI Celtman 2025 - 3rd",
                "Slateman Triathlon 2024 - 1st",
@@ -1119,7 +1235,9 @@ def render_female(cat) -> str:
     women. Two of them, Hannah Saitch and Madison Shaddick, have won Ironman Wales outright, and every
     line below comes straight from their race results, not invented.</p>
     <div class="honours-grid">{"".join(
-      f'<div class="honour"><div class="honour-body"><h3 class="honour-name">{esc(h["name"])}</h3>'
+      f'<div class="honour{"" if h.get("img") else " honour--text"}">'
+      + (f'<div class="honour-media">{img(h["img"])}</div>' if h.get("img") else "")
+      + f'<div class="honour-body"><h3 class="honour-name">{esc(h["name"])}</h3>'
       f'<ul class="honour-stats">{"".join(f"<li>{esc(l)}</li>" for l in h["lines"])}</ul>'
       f'</div></div>' for h in FEMALE_HONOURS)}</div>
   </div>
@@ -1168,27 +1286,40 @@ def render_female(cat) -> str:
 # judges the actual thing. Current incumbent first, then Option A/B/C, each
 # labelled with its source filename. Tom picks; the live pages then change in
 # one place. Candidate lists are the only thing to edit when curating.
+# A candidate is a derivative name, or (derivative name, note) where the note
+# renders as an extra tag next to the option letter (e.g. "Recommended").
 BANNER_SLOTS = [
     {"id": "landing-hero", "kind": "hero", "name": "Landing hero",
      "where": "The home page hero, first thing every visitor sees.",
      "eyebrow": "", "headline": HERO_HEADLINE,
      "lede": ("Your first 70.3. Ironman Wales. Kona. A 100 mile TT. Whatever the dream is, "
               "Horsepower takes it as seriously as you do."),
-     "candidates": ["hero-alps", "hero-welsh-climb", "alpine-ridge", "ironman-wales-finish"]},
+     "candidates": ["hero-alps", "hero-welsh-climb", "alpine-ridge", "ironman-wales-finish",
+                    "hero-tenby-swim", "hero-alpine-mist", "hero-torridon-ridge"]},
     {"id": "coaching-top", "kind": "hero", "name": "Coached by Tom, top banner",
      "where": "The hero at the top of the Coached by Tom page.",
      "eyebrow": "Coached by Tom · £160 a month · Limited places",
      "headline": "A coach in your corner for all of it",
      "lede": ("Everything in Coached, plus me. Calls when you need them, WhatsApp when it is "
               "urgent, and a coach who knows your story, not just your data."),
-     "candidates": ["tom-gravel", "coached-band", "alpine-ridge", "camp-group"]},
+     "candidates": ["tom-gravel", "coached-band", "alpine-ridge", "camp-group",
+                    ("tom-hill-climb", "Recommended: Tom racing the National Hill Climb in HP kit"),
+                    "tom-alps-finish", "tom-alps-lead"]},
     {"id": "coaching-mid", "kind": "band", "name": "Coached by Tom, mid-page banner",
      "where": "The full-width band above the weekly rhythm section. Shipped live as "
               "alpine-ridge; the alternates below are here for you to override.",
      "candidates": ["alpine-ridge", "camp-group", "coached-band", "hero-welsh-climb"]},
+    {"id": "female-performance-banner", "kind": "hero", "name": "Female Performance hero",
+     "where": "The hero at the top of the Female Performance page.",
+     "eyebrow": "Female performance", "headline": FEMALE_LEAD,
+     "lede": ("Endurance training was written for men and handed to women with the numbers "
+              "turned down. We do it the other way round."),
+     "candidates": ["female-hero", "female-wales-podium", "female-montblanc-hike",
+                    "honours-naomi-swedeman", "female-welsh-tt"]},
     {"id": "plans-banner", "kind": "pagebanner", "name": "Plans banner",
      "where": "The full-width banner at the top of the plan library.",
-     "candidates": ["hero-welsh-climb", "alpine-ridge", "hero-alps", "coached-band"]},
+     "candidates": ["hero-welsh-climb", "alpine-ridge", "hero-alps", "coached-band",
+                    "plans-izoard-trio", "plans-pyrenees-switchback", "plans-pyrenees-dawn"]},
 ]
 
 
@@ -1223,15 +1354,17 @@ def render_options() -> str:
         render = _OPT_RENDER[slot["kind"]]
         cands = slot["candidates"]
         cards = []
-        for i, name in enumerate(cands):
+        for i, cand in enumerate(cands):
+            name, note = cand if isinstance(cand, tuple) else (cand, "")
             if i == 0:
                 tag, tagcls = "Current", "opt-tag opt-tag--current"
             else:
                 tag, tagcls = f"Option {chr(64 + i)}", "opt-tag"
+            note_html = f' <span class="opt-tag opt-tag--note">{esc(note)}</span>' if note else ""
             cards.append(
                 f'<div class="opt">'
                 f'<p class="opt-label"><span class="{tagcls}">{tag}</span> '
-                f'<code>{esc(name)}.jpg</code></p>'
+                f'<code>{esc(name)}.webp</code>{note_html}</p>'
                 f'<div class="opt-frame">{render(slot, name)}</div>'
                 f'</div>')
         blocks.append(

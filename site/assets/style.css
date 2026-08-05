@@ -544,3 +544,41 @@ section { padding: 64px 0; }
 .honour-stats li:first-child { border-top: 0; }
 .honour-stats li::before { content: "\2192"; position: absolute; left: 0; color: var(--teal-soft); font-weight: 700; }
 .honour-flag { margin-top: auto; padding-top: 12px; font-size: 0.82rem; color: #E0A400; font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 0.04em; }
+
+/* ============================================================================
+   WS-SITE6: real athlete photos (honours tiles, about gallery, coached figures)
+   ========================================================================== */
+
+/* Honours: a tile with no verified photo reads deliberate, not unfinished */
+.honour--text .honour-body { justify-content: center; min-height: 240px; }
+.honour--text .honour-name { font-size: 1.3rem; }
+.honour--text .honour-body::before {
+  content: ""; display: block; width: 44px; height: 4px; background: var(--teal);
+  border-radius: 2px; margin-bottom: 16px;
+}
+
+/* Captioned figures (about gallery, coached pages) */
+.photo-fig { margin: 0; border-radius: 14px; overflow: hidden;
+  box-shadow: 0 14px 34px rgba(0,0,0,0.14); background: var(--white);
+  border: 1px solid var(--rule); }
+/* height:auto beats the height="" presentational hint so aspect-ratio applies */
+.photo-fig img { width: 100%; height: auto; display: block; object-fit: cover; }
+.photo-fig figcaption { padding: 10px 14px; font-size: 0.85rem; color: var(--grey-mid); }
+.photo-fig--land img { aspect-ratio: 3 / 2; }
+.photo-fig--port img { aspect-ratio: 4 / 5; }
+
+/* About: racing gallery, a row of landscapes above a row of portraits */
+.about-gallery { display: grid; gap: 18px; grid-template-columns: 1fr; margin-top: 28px; }
+@media (min-width: 680px) { .about-gallery { grid-template-columns: repeat(3, 1fr); } }
+.about-gallery + .about-gallery { margin-top: 18px; }
+.about-side .photo-fig { max-width: 460px; margin: 0 auto 22px; }
+
+/* Coached / Coached by Tom: copy beside a tall support photo */
+.side-fig-grid { display: grid; gap: 34px; grid-template-columns: 1fr; align-items: start; }
+@media (min-width: 900px) { .side-fig-grid { grid-template-columns: 1.35fr 0.85fr; } }
+.side-fig-grid .photo-fig--port { max-width: 420px; }
+@media (max-width: 899px) { .side-fig-grid .photo-fig--port { margin: 0 auto; } }
+
+/* Options: note tag (flags a recommended pick) */
+.opt-tag--note { background: var(--teal-soft); color: var(--teal-dark);
+  border-color: var(--teal-soft); text-transform: none; letter-spacing: 0.02em; }

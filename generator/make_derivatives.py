@@ -12,23 +12,59 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 SRC = os.path.join(HERE, "assets", "img", "src")
 OUT = os.path.join(HERE, "assets", "img")
 
-# derivative name -> (source file, long-edge px, quality)
+# derivative name -> (source file, long-edge px, WebP quality)
+# Derivatives ship as WebP (universally supported; ~30% smaller than JPEG at
+# equal visual quality), which is what keeps 34 shipped images inside the budget.
+# Qualities are tuned as a set so the whole shipped image payload stays inside
+# the build gate's 3.5MB budget (gate 9); live hero/LCP slots get the most
+# bytes, /options/-only preview candidates the fewest.
 WIDE = 1500   # full-bleed heroes / banners / bands
 FEAT = 1100   # contained feature-media / portraits
+DROP = "drop-2026-08-05"
 JOBS = {
-    "hero-alps":            ("hero-alps.jpg",            WIDE, 78),
-    "hero-welsh-climb":     ("hero-welsh-climb.jpg",     WIDE, 78),
-    "female-hero":          ("female-hero.jpg",          WIDE, 80),
-    "ironman-wales-finish": ("ironman-wales-finish.jpg", WIDE, 80),
-    "coached-band":         ("coached-band.jpeg",        WIDE, 78),
-    "alpine-ridge":         ("alpine-hairpins.jpeg",     WIDE, 76),
-    "tom-gravel":           ("tom-gravel.jpeg",          1400, 78),
-    "camp-group":           ("camp-group.jpeg",          1400, 78),
-    "female-tt":            ("female-tt.jpeg",           FEAT, 82),
-    "female-podium":        ("female-podium.jpg",        FEAT, 82),
-    "female-trail":         ("female-trail.jpeg",        FEAT, 79),
-    "tom-portrait":         ("tom-portrait.jpeg",        FEAT, 82),
+    "hero-alps":            ("hero-alps.jpg",            WIDE, 74),
+    "hero-welsh-climb":     ("hero-welsh-climb.jpg",     WIDE, 62),
+    "female-hero":          ("female-hero.jpg",          WIDE, 72),
+    "ironman-wales-finish": ("ironman-wales-finish.jpg", WIDE, 76),
+    "coached-band":         ("coached-band.jpeg",        WIDE, 66),
+    "alpine-ridge":         ("alpine-hairpins.jpeg",     WIDE, 66),
+    "tom-gravel":           ("tom-gravel.jpeg",          1400, 58),
+    "camp-group":           ("camp-group.jpeg",          1400, 52),
+    "female-tt":            ("female-tt.jpeg",           FEAT, 80),
+    "female-podium":        ("female-podium.jpg",        FEAT, 80),
+    "female-trail":         ("female-trail.jpeg",        900, 58),
+    "tom-portrait":         ("tom-portrait.jpeg",        FEAT, 80),
+    # drop-2026-08-05: honours band (athlete identity verified per file)
+    "honours-hannah-wales":    (DROP + "/1_IRONMAN-Wales.jpg", FEAT, 78),
+    "honours-madison-tt":      (DROP + "/c6d78967-c9ca-457f-93f1-39d28e01c873.jpeg", 1000, 78),
+    # NOTE: the drop MANIFEST maps the Swedeman finish to 236452499.jpg, but that
+    # file is actually an unrelated ibex-statue descent shot; the real Swedeman
+    # finish (2:21:10 clock, HP cap, Zalari/Trimtex banners) is this file.
+    "honours-naomi-swedeman":  (DROP + "/298092795_5292343910802266_7997008599894872681_n.jpg", 1400, 78),
+    # drop-2026-08-05: banner candidates (/options/) + about/coached imagery
+    "hero-tenby-swim":         (DROP + "/alternate - 9.jpg", 1200, 58),
+    "hero-alpine-mist":        (DROP + "/top 5 - 2.jpg", 1200, 62),
+    "hero-torridon-ridge":     (DROP + "/f8380d24-01f9-4543-a1a9-988d2cc9797f.jpeg", 1200, 58),
+    "tom-hill-climb":          (DROP + "/athlete-race.jpg", 1300, 76),
+    "tom-alps-lead":           (DROP + "/1-HR-ALPS-2019RCL_4825.jpg", 1000, 56),
+    "tom-alps-finish":         (DROP + "/5-HR-ALPS-2019DSC_1620.jpg", 1000, 62),
+    "tom-dolomites-arch":      (DROP + "/2-hrdolo2019-rcl_d-453.jpg", 1000, 64),
+    "tom-bottle-refill":       (DROP + "/7901535e-2f91-4d53-b57a-1fb930e63529.jpeg", 1000, 76),
+    "tom-swim-kaolinite":      (DROP + "/kaolinite'25-037.jpg", 1000, 74),
+    # NOTE: ff9312d4 (pink-cap portrait) is skipped: it duplicates the existing
+    # tom-portrait source already live on the About rail.
+    "tom-alps-signon":         (DROP + "/9-HR-ALPS-2019ARN_4191.jpg", 800, 64),
+    "coaching-support-roadside": (DROP + "/a2cd6f11-54dd-4d8c-8e3a-cf0ddbc787c2.jpeg", 1100, 78),
+    "coached-almere-finish":   (DROP + "/773897ce-9f4e-4e72-916f-2aa6b00e1ca8.jpeg", 1100, 74),
+    "coached-tenby-swim":      (DROP + "/alternate - 13.jpg", 1400, 68),
+    "female-wales-podium":     (DROP + "/0_IRONMAN-Wales.jpg", 1200, 58),
+    "female-montblanc-hike":   (DROP + "/d78204b9-4429-404f-b1d6-45f5ce36e68a.jpeg", 1000, 52),
+    "female-welsh-tt":         (DROP + "/462639565_581577237629776_1513627609080372586_n.jpg", 1200, 66),
+    "plans-izoard-trio":       (DROP + "/eed1217f-0113-4798-9a88-e38932a2e93e.jpeg", 1200, 58),
+    "plans-pyrenees-switchback": (DROP + "/c0d36a66-7ae7-40d6-a2a6-2c1af2d4ef01.jpeg", 1200, 62),
+    "plans-pyrenees-dawn":     (DROP + "/597e93c5-7cb4-4990-b350-ba0250b120ba.jpeg", 1200, 68),
 }
+
 
 
 def main():
@@ -39,8 +75,8 @@ def main():
         scale = min(1.0, longedge / max(w, h))
         if scale < 1.0:
             im = im.resize((round(w * scale), round(h * scale)), Image.LANCZOS)
-        dst = os.path.join(OUT, name + ".jpg")
-        im.save(dst, "JPEG", quality=q, optimize=True, progressive=True)
+        dst = os.path.join(OUT, name + ".webp")
+        im.save(dst, "WEBP", quality=q, method=6)
         kb = os.path.getsize(dst) / 1024
         total += kb
         print(f"  {name:22s} {im.size[0]}x{im.size[1]:<5} {kb:6.0f}KB")
