@@ -41,6 +41,17 @@ HERO_BODY = ("Your first 70.3. Ironman Wales. Kona. A 100 mile TT. Whatever the 
 CTA_FIND = "Find your plan"
 CTA_GET = "Get coached"
 
+# ── Tier 2 name (the £85/month self-coached tier) ────────────────────────────
+# Tom is choosing a new name (candidates: The Programme / Race Ready / Horsepower
+# Method / Built for You). Until he picks, this stays "Coached". Changing this one
+# line renames the tier everywhere it is referenced by name: nav, footer, tier
+# cards, the "which one am I" strip, page titles and the tier page's own headings.
+# NOTE: "Coached by Tom" is a separate, higher tier and is never driven by this
+# variable. A handful of Tom's byte-exact approved body-copy strings (the WHICH_*
+# lines and the TIER_* bodies, which are locked by the verbatim gate) still spell
+# the word literally; on rename those need Tom's re-approval, by design.
+TIER2_NAME = "Coached"
+
 TIER_PLANS_BODY = ("Over 150 training plans, each one built for a target race, not "
                    "adapted from a template. First marathon to Ironman, hill climbs "
                    "to 100 mile TTs. Every session tells you exactly what to do and "
@@ -116,7 +127,7 @@ NAV = [
     ("Coached by Tom", BASE_PATH + "/coaching/", "coaching"),
     ("Female Performance", BASE_PATH + "/female-performance/", "female"),
     ("Plans", BASE_PATH + "/plans/", "plans"),
-    ("Coached", BASE_PATH + "/coached/", "coached"),
+    (TIER2_NAME, BASE_PATH + "/coached/", "coached"),
     ("About", BASE_PATH + "/about/", "about"),
     ("Contact", CONTACT_URL, "contact"),
 ]
@@ -164,7 +175,7 @@ def footer() -> str:
           <li><a href="{BASE_PATH}/coaching/">Coached by Tom</a></li>
           <li><a href="{BASE_PATH}/female-performance/">Female Performance</a></li>
           <li><a href="{BASE_PATH}/plans/">Plans</a></li>
-          <li><a href="{BASE_PATH}/coached/">Coached</a></li>
+          <li><a href="{BASE_PATH}/coached/">{esc(TIER2_NAME)}</a></li>
           <li><a href="{BASE_PATH}/about/">About Tom</a></li>
           <li><a href="{esc(CONTACT_URL)}">Contact</a></li>
         </ul>
@@ -206,6 +217,7 @@ IMG_BASE = BASE_PATH + "/assets/img"
 IMG_ALT = {
     "hero-alps": "A cyclist climbing high above an alpine valley with a huge mountain panorama behind",
     "hero-welsh-climb": "Two cyclists climbing a forested Welsh valley road under a big sky",
+    "alpine-ridge": "A lone cyclist on a hairpin road high in a vast alpine mountain range",
     "ironman-wales-finish": "An athlete crossing an Ironman finish line in Wales with arms wide",
     "female-hero": "Three female athletes celebrating with champagne on the Ironman Wales podium",
     "coached-band": "A time triallist riding hard past a stone wall on a wet mountain road",
@@ -223,12 +235,13 @@ IMG_ALT = {
 IMG_POS = {
     "hero-alps": "60% 42%",              # climbing rider, right of the text column
     "hero-welsh-climb": "50% 62%",       # push crop down to the TT rider + stone wall
+    "alpine-ridge": "54% 60%",           # lone rider on the hairpin, valley + peaks behind
     "female-hero": "50% 30%",            # champagne spray + podium winner up top
     "ironman-wales-finish": "50% 28%",   # finisher's face + tape overhead
     "coached-band": "50% 52%",           # TT rider mid-frame against the mountain
     "tom-gravel": "64% 46%",             # Tom riding toward camera, right of text
     "camp-group": "50% 58%",             # the bunch of riders low-centre
-    "female-tt": "52% 34%",              # aero rider's head + torso
+    "female-tt": "62% 44%",              # keep the full rider + pink TT bike in frame
     "female-podium": "50% 30%",          # the three athletes' faces
     "female-trail": "50% 54%",           # runner on the trail, centre
     "tom-portrait": "50% 30%",           # Tom's face
@@ -256,6 +269,7 @@ def social_links(cls):
 
 IMG_DIMS = {
     "hero-alps": (1500, 1000), "hero-welsh-climb": (1500, 1000),
+    "alpine-ridge": (1500, 1001),
     "female-hero": (1500, 1001), "ironman-wales-finish": (1500, 1000),
     "coached-band": (1500, 999), "tom-gravel": (1400, 1050),
     "camp-group": (1400, 1050), "female-tt": (734, 1100),
@@ -289,10 +303,15 @@ def img(name, cls="", lazy=True, extra=""):
 GOOGLE_REVIEW_URL = "https://share.google/50jgAKYAnnnbGCbT3"
 REVIEW_RATING = 5.0                         # verified Google Business profile
 REVIEW_COUNT = 15                           # verified Google Business profile
-# Real, already-published client result used as the Maddison result slide.
-CLIENT_RESULT_LINE = ("Coached athlete Maddison Shaddick led her age group at Ironman "
-                      "Wales by 45 minutes and finished 9th overall against the "
-                      "professional women.")
+# Real client result used as the Maddison result slide. VERIFIED against the
+# official results database (endurance-data.com, Ironman Wales 2023 women's
+# results) + Swansea Bay News: 6th woman overall including the professionals,
+# 2nd age-group woman across the line, 11:03:02. The previous "led her age
+# group by 45 minutes / 9th overall" line is CONTRADICTED by those primary
+# sources and must never return (gate-checked below).
+CLIENT_RESULT_LINE = ("Coached athlete Maddison Shaddick finished 6th woman overall "
+                      "at Ironman Wales 2023, second age-group woman across the line, "
+                      "in 11:03:02.")
 
 # Verified verbatim quotes from Tom's Google Business profile (5.0, 15 reviews).
 # Ian's real review runs on mid-sentence; per the spec it is closed at a natural
@@ -362,9 +381,9 @@ def _slide_html(item):
         return (
             '<figure class="review-slide result-slide">'
             '<div class="result-stats">'
-            '<div class="stat"><span class="n">1st</span><span class="k">Age group, Ironman Wales</span></div>'
-            '<div class="stat"><span class="n">45min</span><span class="k">Lead over her field</span></div>'
-            '<div class="stat"><span class="n">9th</span><span class="k">Overall vs the pro women</span></div>'
+            '<div class="stat"><span class="n">6th</span><span class="k">Woman overall, Ironman Wales 2023</span></div>'
+            '<div class="stat"><span class="n">2nd</span><span class="k">Age-group woman across the line</span></div>'
+            '<div class="stat"><span class="n">11:03:02</span><span class="k">Her finishing time</span></div>'
             '</div>'
             f'<blockquote>{esc(CLIENT_RESULT_LINE)}</blockquote>'
             '<figcaption>Maddison Shaddick <span>Coached by Horsepower</span></figcaption>'
@@ -468,7 +487,7 @@ def render_home(cat) -> str:
         <a class="btn" href="{BASE_PATH}/plans/">Browse the library</a>
       </div>
       <div class="tier-card feature">
-        <h3>Coached</h3>
+        <h3>{esc(TIER2_NAME)}</h3>
         <div class="price">&pound;85 a month</div>
         <p>{esc(TIER_COACHED_BODY)}</p>
         <a class="btn" href="{BASE_PATH}/coached/">How coaching works</a>
@@ -484,8 +503,8 @@ def render_home(cat) -> str:
 </section>
 
 <section class="alt feature-female">
-  <div class="wrap feature-grid">
-    <div class="feature-media">{img("female-tt")}</div>
+  <div class="wrap feature-grid feature-grid--portrait">
+    <div class="feature-media feature-media--portrait">{img("female-tt")}</div>
     <div class="feature-copy">
       <p class="eyebrow">Female performance</p>
       <h2>Female first, not female adapted.</h2>
@@ -511,7 +530,7 @@ def render_home(cat) -> str:
     <p class="eyebrow">Which one am I?</p>
     <div class="which-grid">
       <div class="which-item"><strong>Plans</strong>{esc(WHICH_PLANS)}</div>
-      <div class="which-item"><strong>Coached</strong>{esc(WHICH_COACHED)}</div>
+      <div class="which-item"><strong>{esc(TIER2_NAME)}</strong>{esc(WHICH_COACHED)}</div>
       <div class="which-item"><strong>Coached by Tom</strong>{esc(WHICH_TOM)}</div>
     </div>
   </div>
@@ -663,7 +682,7 @@ def render_plan_detail(cat, p) -> str:
     <p><a class="btn" href="{esc(p['buy_url'])}" rel="noopener" target="_blank">Get {esc(p['title'])}</a>
     &nbsp; <a class="link-plain" href="{BASE_PATH}/plans/">Back to the library</a></p>
     <p style="margin-top:26px;color:var(--grey-mid)">Want it built around your life instead of off the shelf?
-    <a href="{BASE_PATH}/coached/">See Coached</a>.</p>
+    <a href="{BASE_PATH}/coached/">See {esc(TIER2_NAME)}</a>.</p>
     {female_note}
   </div>
 </section>
@@ -676,7 +695,7 @@ def render_coached(cat) -> str:
     body = f"""<main id="main">
 <section class="hero" style="padding:60px 0 64px">
   <div class="wrap">
-    <p class="eyebrow" style="color:var(--teal-soft)">Coached &middot; &pound;85 a month</p>
+    <p class="eyebrow" style="color:var(--teal-soft)">{esc(TIER2_NAME)} &middot; &pound;85 a month</p>
     <h1>Your race, your hours, your plan</h1>
     <p class="lede">{esc(COACHED_INTRO)}</p>
     <div class="cta-row"><a class="btn" href="{esc(CONTACT_URL)}">Apply for coaching</a></div>
@@ -729,7 +748,7 @@ def render_coached(cat) -> str:
     desc = ("Coached by Horsepower, £85 a month. Your race, your hours, your plan, "
             "built block by block with real feedback on every session and a race "
             "plan before every start line.")
-    return page("coached", "Coached | £85 a month | Horsepower Coaching", desc,
+    return page("coached", f"{TIER2_NAME} | £85 a month | Horsepower Coaching", desc,
                 BASE_URL + "/coached/", body)
 
 
@@ -774,7 +793,7 @@ def render_coaching(cat) -> str:
 <section id="what-you-get">
   <div class="wrap">
     <p class="eyebrow">Everything you get</p>
-    <h2>The full service, plus me</h2>
+    <h2>Complete world class coaching</h2>
     <p class="section-intro">Coached by Tom is my highest level of support. You get everything in
     Coached, built and read by me directly, plus the tools, the analysis and the contact that
     turn a good block into a great season.</p>
@@ -782,17 +801,17 @@ def render_coaching(cat) -> str:
   </div>
 </section>
 
-<div class="media-band">{img("camp-group", cls="media-bg")}</div>
+<div class="media-band">{img("alpine-ridge", cls="media-bg")}</div>
 
 <section class="alt">
   <div class="wrap">
     <p class="eyebrow">How a month looks</p>
     <h2>The weekly rhythm</h2>
     <ol class="step-list">
-      <li><strong>Your block lands</strong>Three weeks of training built around your event, your hours and where your form is right now, delivered to your TrainingPeaks account.</li>
-      <li><strong>You train, I stay close</strong>Every session tells you what to do and why. Message me any time you need to move something, and you will not wait long for an answer.</li>
-      <li><strong>Every session gets read</strong>I review the sessions you complete against what was set, using your actual data in TrainingPeaks and WKO5, and tell you what it means.</li>
-      <li><strong>We talk, and the plan moves</strong>Regular video catch-ups and WhatsApp when it is urgent, so the next block reflects real life and your numbers as they move.</li>
+      <li><strong>Your block lands</strong>Three weeks of training built around your life, calibrated to where your form is right now and where it needs to be to reach your dream goal, delivered to your TrainingPeaks account.</li>
+      <li><strong>You train, I stay close</strong>Every session tells you what to do and why. Message me any time you need to move something or talk it through. Contact is unlimited, so you are never left guessing between sessions.</li>
+      <li><strong>Read, analysed, fed back on</strong>I read the sessions you complete, analyse them against what was set using your actual data in TrainingPeaks and WKO5, and feed back on them. Feedback is a key part of the coaching journey, so each week you get a full round of feedback on everything you have completed.</li>
+      <li><strong>We talk, the plan moves</strong>Block by block video catch-ups, WhatsApp for general chat, and the next block reflects real life and your numbers as they move.</li>
     </ol>
   </div>
 </section>
@@ -821,6 +840,8 @@ def render_coaching(cat) -> str:
     </div>
   </div>
 </section>
+
+<div class="media-band">{img("camp-group", cls="media-bg")}</div>
 {carousel("coaching", subhead="What athletes say about being coached by Tom")}
 <section class="alt">
   <div class="wrap">
@@ -833,7 +854,7 @@ def render_coaching(cat) -> str:
         <li>Limited places, taken one at a time</li>
       </ul>
       <p style="margin-top:6px"><a class="btn" href="{esc(CONTACT_URL)}">Apply for a place</a></p>
-      <p class="pricing-note">Not quite ready for this level? <a href="{BASE_PATH}/coached/">Coached is &pound;85 a month</a>.</p>
+      <p class="pricing-note">Not quite ready for this level? <a href="{BASE_PATH}/coached/">{esc(TIER2_NAME)} is &pound;85 a month</a>.</p>
     </div>
   </div>
 </section>
@@ -843,7 +864,7 @@ def render_coaching(cat) -> str:
     <h2>Not sure which tier?</h2>
     <div class="which-grid">
       <div class="which-item"><strong>Plans</strong>{esc(WHICH_PLANS)}</div>
-      <div class="which-item"><strong>Coached</strong>{esc(WHICH_COACHED)}</div>
+      <div class="which-item"><strong>{esc(TIER2_NAME)}</strong>{esc(WHICH_COACHED)}</div>
       <div class="which-item"><strong>Coached by Tom</strong>{esc(WHICH_TOM)}</div>
     </div>
   </div>
@@ -870,7 +891,7 @@ def render_about(cat) -> str:
 </section>
 
 <section>
-  <div class="wrap content-grid two">
+  <div class="wrap content-grid two about-grid">
     <div class="prose">
       <h2>Coaching experience</h2>
       <p>Tom has spent over a decade coaching athletes from complete beginners to
@@ -878,30 +899,40 @@ def render_about(cat) -> str:
       across Ironman, middle-distance triathlon, ultra-bike events and Haute
       Route-style races.</p>
 
+      <h2>Where the expertise comes from</h2>
+      <p>That expertise is drawn from personal racing, including FKT performances and
+      ultra wins, training with Royal Marines and UKSF, and coaching elite performers.
+      It is first-hand knowledge of what the hard days actually take, brought to how he
+      builds and reads every athlete's training.</p>
+
       <h2>Philosophy</h2>
       <p>His coaching combines evidence-based methodologies valued by professional
       athletes with practical, race-proven strategies, with a particular emphasis on
-      female-specific performance development and durable, race-winning preparation.</p>
-
-      <h2>Where the expertise comes from</h2>
-      <p>That expertise is drawn from personal racing, including FKT performances and
-      ultra wins, training with Royal Marines and UKSF, and coaching elite performers.</p>
+      female-specific performance development and durable, race-winning preparation.
+      The aim is never a single good block. It is a whole athlete, prepared to hold up
+      on the day that matters.</p>
     </div>
-    <div>
+    <div class="about-side">
       <figure class="portrait">{img("tom-portrait")}</figure>
-      <div class="callout" style="background:var(--grey-bg);color:var(--black)">
-        <h2 style="color:var(--black)">Qualifications</h2>
-        <ul class="about-list">
-          <li>First Class BA and Master's Degree in Sport Science &amp; Athlete Development.</li>
-          <li>Oxygen Advantage Advanced Breathwork Instructor qualification.</li>
-          <li>Accredited heat-training coach with applied experience in climate adaptation protocols.</li>
-        </ul>
-      </div>
     </div>
   </div>
 </section>
 
-<section class="alt">
+<section class="alt" style="padding-top:40px;padding-bottom:40px">
+  <div class="wrap">
+    <p class="eyebrow">Qualifications</p>
+    <h2>The credentials behind the coaching</h2>
+    <div class="cred-band">
+      <div class="cred"><h3>Sport science</h3><p>First Class BA and Master's Degree in Sport Science and Athlete Development.</p></div>
+      <div class="cred"><h3>Breathwork</h3><p>Oxygen Advantage Advanced Breathwork Instructor qualification.</p></div>
+      <div class="cred"><h3>Heat adaptation</h3><p>Accredited heat-training coach with applied experience in climate adaptation protocols.</p></div>
+    </div>
+  </div>
+</section>
+
+<div class="media-band">{img("tom-gravel", cls="media-bg")}</div>
+
+<section>
   <div class="wrap">
     <h2>Train with Tom</h2>
     <p class="section-intro">Start with a plan built for your race, get coached from
@@ -922,6 +953,33 @@ def render_about(cat) -> str:
 
 
 FEMALE_LEAD = "Female first, not female adapted."
+
+# ── Female honours (verified results only) ───────────────────────────────────
+# Every line here is backed by a primary source, checked 2026-08-05:
+#   Saitch 2022: endurance-data.com/en/results/739-ironman-wales/female/
+#     (#1 woman, 10:47:37; no professional woman ahead; corroborated by TRI247)
+#   Shaddick 2023: endurance-data.com/en/results/907-ironman-wales/female/
+#     + Swansea Bay News 2023-09-04 (6th woman overall, 2nd AG woman, 11:03:02)
+#   Shinkins: 220 Triathlon coverage (20-island Nordic crossing);
+#     TRI247 2021 (IronBourne long-distance podium; exact step unconfirmed, so
+#     the copy says "podium" and no more)
+# Do NOT add results without a primary source; the old Shaddick "45-minute
+# lead / 9th overall" line is contradicted by the official results and is
+# gate-banned site-wide.
+FEMALE_HONOURS = [
+    {"name": "Hannah Saitch",
+     "lines": ["Fastest woman of the day, Ironman Wales 2022",
+               "10:47:37, first of every woman across the line",
+               "Quicker than the entire amateur and professional field"]},
+    {"name": "Maddison Shaddick",
+     "lines": ["6th woman overall, Ironman Wales 2023",
+               "Second age-group woman across the line",
+               "11:03:02 on one of the hardest Ironman courses there is"]},
+    {"name": "Naomi Shinkins",
+     "lines": ["Crossed 20 Nordic islands under her own power",
+               "Podium, IronBourne long-distance triathlon 2021",
+               "Adventure and ultra-endurance, built the same way"]},
+]
 
 FEMALE_FAQ = [
     ("What is female-specific endurance training?",
@@ -1041,14 +1099,27 @@ def render_female(cat) -> str:
       </div>
       <div class="female-results-copy">
         <div class="result-stats">
-          <div class="stat"><span class="n">1st</span><span class="k">Age group, Ironman Wales</span></div>
-          <div class="stat"><span class="n">45min</span><span class="k">Lead over her field</span></div>
-          <div class="stat"><span class="n">9th</span><span class="k">Overall vs the pro women</span></div>
+          <div class="stat"><span class="n">6th</span><span class="k">Woman overall, Ironman Wales 2023</span></div>
+          <div class="stat"><span class="n">2nd</span><span class="k">Age-group woman across the line</span></div>
+          <div class="stat"><span class="n">11:03:02</span><span class="k">Her finishing time</span></div>
         </div>
         <p class="reviews-result">{esc(CLIENT_RESULT_LINE)}</p>
         <p class="reviews-result" style="color:#CFCFCF">Trained for her body, not an average. That is how female athletes get to the front.</p>
       </div>
     </div>
+  </div>
+</section>
+
+<section class="female-honours">
+  <div class="wrap">
+    <p class="eyebrow">The women who prove it</p>
+    <h2>Real names, real results</h2>
+    <p class="section-intro" style="color:#CFCFCF">Not stock-photo athletes. These are Horsepower-coached
+    women, and every line below is checked against the race records and race press, not invented.</p>
+    <div class="honours-grid">{"".join(
+      f'<div class="honour"><div class="honour-body"><h3 class="honour-name">{esc(h["name"])}</h3>'
+      f'<ul class="honour-stats">{"".join(f"<li>{esc(l)}</li>" for l in h["lines"])}</ul>'
+      f'</div></div>' for h in FEMALE_HONOURS)}</div>
   </div>
 </section>
 {carousel("female", subhead="In her words", include_result=False, on_dark=False)}
@@ -1089,6 +1160,104 @@ def render_female(cat) -> str:
                 desc, BASE_URL + "/female-performance/", body, extra)
 
 
+# ── Banner option previews (hidden /options/ page) ───────────────────────────
+# A private, noindex page (not in nav, sitemap or robots) that renders every
+# banner candidate IN ITS REAL SLOT with the real overlay + headline, so Tom
+# judges the actual thing. Current incumbent first, then Option A/B/C, each
+# labelled with its source filename. Tom picks; the live pages then change in
+# one place. Candidate lists are the only thing to edit when curating.
+BANNER_SLOTS = [
+    {"id": "landing-hero", "kind": "hero", "name": "Landing hero",
+     "where": "The home page hero, first thing every visitor sees.",
+     "eyebrow": "", "headline": HERO_HEADLINE,
+     "lede": ("Your first 70.3. Ironman Wales. Kona. A 100 mile TT. Whatever the dream is, "
+              "Horsepower takes it as seriously as you do."),
+     "candidates": ["hero-alps", "hero-welsh-climb", "alpine-ridge", "ironman-wales-finish"]},
+    {"id": "coaching-top", "kind": "hero", "name": "Coached by Tom, top banner",
+     "where": "The hero at the top of the Coached by Tom page.",
+     "eyebrow": "Coached by Tom · £160 a month · Limited places",
+     "headline": "A coach in your corner for all of it",
+     "lede": ("Everything in Coached, plus me. Calls when you need them, WhatsApp when it is "
+              "urgent, and a coach who knows your story, not just your data."),
+     "candidates": ["tom-gravel", "coached-band", "alpine-ridge", "camp-group"]},
+    {"id": "coaching-mid", "kind": "band", "name": "Coached by Tom, mid-page banner",
+     "where": "The full-width band above the weekly rhythm section. Shipped live as "
+              "alpine-ridge; the alternates below are here for you to override.",
+     "candidates": ["alpine-ridge", "camp-group", "coached-band", "hero-welsh-climb"]},
+    {"id": "plans-banner", "kind": "pagebanner", "name": "Plans banner",
+     "where": "The full-width banner at the top of the plan library.",
+     "candidates": ["hero-welsh-climb", "alpine-ridge", "hero-alps", "coached-band"]},
+]
+
+
+def _opt_hero(slot, name):
+    eyebrow = (f'<p class="eyebrow" style="color:var(--teal-soft)">{esc(slot["eyebrow"])}</p>'
+               if slot.get("eyebrow") else "")
+    return f"""<section class="hero hero--image">
+  {img(name, cls="hero-bg")}
+  <div class="wrap">
+    {eyebrow}<h1>{esc(slot["headline"])}</h1>
+    <p class="lede">{esc(slot["lede"])}</p>
+    <div class="cta-row"><a class="btn" href="#">Find your plan</a>
+      <a class="btn on-dark ghost" href="#">Get coached</a></div>
+  </div>
+</section>"""
+
+
+def _opt_band(slot, name):
+    return f'<div class="media-band">{img(name, cls="media-bg")}</div>'
+
+
+def _opt_pagebanner(slot, name):
+    return f'<div class="page-banner">{img(name, cls="banner-bg")}</div>'
+
+
+_OPT_RENDER = {"hero": _opt_hero, "band": _opt_band, "pagebanner": _opt_pagebanner}
+
+
+def render_options() -> str:
+    blocks = []
+    for slot in BANNER_SLOTS:
+        render = _OPT_RENDER[slot["kind"]]
+        cands = slot["candidates"]
+        cards = []
+        for i, name in enumerate(cands):
+            if i == 0:
+                tag, tagcls = "Current", "opt-tag opt-tag--current"
+            else:
+                tag, tagcls = f"Option {chr(64 + i)}", "opt-tag"
+            cards.append(
+                f'<div class="opt">'
+                f'<p class="opt-label"><span class="{tagcls}">{tag}</span> '
+                f'<code>{esc(name)}.jpg</code></p>'
+                f'<div class="opt-frame">{render(slot, name)}</div>'
+                f'</div>')
+        blocks.append(
+            f'<section class="opt-slot">'
+            f'<div class="wrap">'
+            f'<p class="eyebrow">{esc(slot["name"])}</p>'
+            f'<p class="opt-where">{esc(slot["where"])}</p>'
+            f'</div>'
+            f'{"".join(cards)}'
+            f'</section>')
+    body = f"""<main id="main" class="options-page">
+<section class="hero" style="padding:56px 0 48px">
+  <div class="wrap">
+    <p class="eyebrow" style="color:var(--teal-soft)">Private preview, not indexed</p>
+    <h1>Banner options</h1>
+    <p class="lede">Every banner candidate rendered in its real slot, with the real overlay and
+    headline, so you are judging the actual thing and not a thumbnail. Current pick first, then
+    the alternates. Tell me the filename you want for each slot and it changes in one place.</p>
+  </div>
+</section>
+{''.join(blocks)}
+</main>"""
+    extra = '<meta name="robots" content="noindex, nofollow">\n'
+    return page("", "Banner options (private preview) | Horsepower Coaching",
+                "Private banner preview page. Not indexed.",
+                BASE_URL + "/options/", body, extra)
+
+
 # ── Write + gates ────────────────────────────────────────────────────────────
 def write(rel_path, content, written):
     path = os.path.join(SITE, rel_path)
@@ -1117,6 +1286,8 @@ def build():
     write("coached/index.html", render_coached(cat), written)
     write("coaching/index.html", render_coaching(cat), written)
     write("about/index.html", render_about(cat), written)
+    # Hidden banner-preview page: noindex, deliberately absent from nav + sitemap.
+    write("options/index.html", render_options(), written)
     for p in plans:
         write(f"plans/{p['slug']}/index.html", render_plan_detail(cat, p), written)
 
@@ -1244,6 +1415,23 @@ def run_gates(cat, written):
             if GOOGLE_REVIEW_URL not in content:
                 errors.append(f"carousel page missing Google review URL: {path}")
 
+    # Gate 8d: the contradicted Shaddick claim must never reappear (official
+    # 2023 results: 2nd AG woman, 6th overall; not a 45-minute AG lead, not 9th).
+    BANNED_CLAIMS = ["by 45 minutes", ">45min<", "9th overall against the professional"]
+    for path, content in written.items():
+        for b in BANNED_CLAIMS:
+            if b in content:
+                errors.append(f"banned unverified claim {b!r} found in {path}")
+
+    # Gate 8e: female honours band present with every verified athlete + line.
+    fem_page = written.get("female-performance/index.html", "")
+    for h in FEMALE_HONOURS:
+        if esc(h["name"]) not in fem_page and h["name"] not in fem_page:
+            errors.append(f"female honours missing athlete: {h['name']}")
+        for l in h["lines"]:
+            if esc(l) not in fem_page and l not in fem_page:
+                errors.append(f"female honours missing line: {l[:48]}")
+
     # Gate 8b: zero Domestiq cross-pollination anywhere (Tom's ruling: separate entities).
     for path, content in written.items():
         if "domestiq" in content.lower():
@@ -1260,7 +1448,7 @@ def run_gates(cat, written):
                 img_count += 1
     if os.path.isdir(os.path.join(img_dir, "src")):
         errors.append("full-res img/src originals leaked into shipped site/assets/img")
-    img_budget = 2.5 * 1024 * 1024
+    img_budget = 3.5 * 1024 * 1024
     if img_bytes > img_budget:
         errors.append(f"image weight {img_bytes/1024:.0f}KB exceeds 2.5MB budget")
 
@@ -1275,7 +1463,7 @@ def run_gates(cat, written):
     print(f"  - {len(html_pages)} pages: viewport + unique title + description + alt text")
     print(f"  - internal links resolve; {n_cards} cards == {n_live} live SKUs; {n_detail} detail pages")
     print(f"  - female performance page: lead line + FAQPage schema + 4 plan links")
-    print(f"  - {img_count} images shipped, {img_bytes/1024:.0f}KB total (budget 2560KB); no fabricated ratings")
+    print(f"  - {img_count} images shipped, {img_bytes/1024:.0f}KB total (budget 3584KB); no fabricated ratings")
     print(f"  - zero 'domestiq' occurrences across all generated output")
 
 

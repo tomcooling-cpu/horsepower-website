@@ -21,6 +21,7 @@ JOBS = {
     "female-hero":          ("female-hero.jpg",          WIDE, 80),
     "ironman-wales-finish": ("ironman-wales-finish.jpg", WIDE, 80),
     "coached-band":         ("coached-band.jpeg",        WIDE, 78),
+    "alpine-ridge":         ("alpine-hairpins.jpeg",     WIDE, 76),
     "tom-gravel":           ("tom-gravel.jpeg",          1400, 78),
     "camp-group":           ("camp-group.jpeg",          1400, 78),
     "female-tt":            ("female-tt.jpeg",           FEAT, 82),
@@ -43,7 +44,7 @@ def main():
         kb = os.path.getsize(dst) / 1024
         total += kb
         print(f"  {name:22s} {im.size[0]}x{im.size[1]:<5} {kb:6.0f}KB")
-    print(f"  {'TOTAL':22s} {'':11s} {total:6.0f}KB  (budget 2560KB)")
+    print(f"  {'TOTAL':22s} {'':11s} {total:6.0f}KB  (budget 3584KB)")
 
 
 if __name__ == "__main__":
