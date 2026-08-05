@@ -145,6 +145,7 @@ section.alt { background: var(--grey-bg); }
 /* ---- Results line ---- */
 .results { background: var(--teal); color: var(--white); }
 .results p { font-size: clamp(1.2rem, 3vw, 1.8rem); font-family: 'Oswald', sans-serif; max-width: 26ch; margin: 0 auto; text-align: center; line-height: 1.25; }
+.results p.results-sub { font-family: inherit; font-size: 1rem; font-weight: 400; max-width: 46ch; margin: 16px auto 0; line-height: 1.5; opacity: 0.92; }
 
 /* ---- Which one strip ---- */
 .which-grid { display: grid; gap: 18px; grid-template-columns: 1fr; margin-top: 26px; }
@@ -528,7 +529,8 @@ section { padding: 64px 0; }
 .female-honours h2 { color: var(--white); }
 .female-honours .eyebrow { color: var(--teal-soft); }
 .honours-grid { display: grid; gap: 22px; grid-template-columns: 1fr; margin-top: 30px; }
-@media (min-width: 720px) { .honours-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 620px) { .honours-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1040px) { .honours-grid { grid-template-columns: repeat(4, 1fr); } }
 .honour {
   background: #171717; border: 1px solid #2a2a2a; border-radius: 14px; overflow: hidden;
   display: flex; flex-direction: column;

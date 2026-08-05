@@ -303,15 +303,13 @@ def img(name, cls="", lazy=True, extra=""):
 GOOGLE_REVIEW_URL = "https://share.google/50jgAKYAnnnbGCbT3"
 REVIEW_RATING = 5.0                         # verified Google Business profile
 REVIEW_COUNT = 15                           # verified Google Business profile
-# Real client result used as the Maddison result slide. VERIFIED against the
-# official results database (endurance-data.com, Ironman Wales 2023 women's
-# results) + Swansea Bay News: 6th woman overall including the professionals,
-# 2nd age-group woman across the line, 11:03:02. The previous "led her age
-# group by 45 minutes / 9th overall" line is CONTRADICTED by those primary
-# sources and must never return (gate-checked below).
-CLIENT_RESULT_LINE = ("Coached athlete Maddison Shaddick finished 6th woman overall "
-                      "at Ironman Wales 2023, second age-group woman across the line, "
-                      "in 11:03:02.")
+# Real client result used as the Madison Shaddick result slide. From Tom's
+# authoritative palmares, provided 2026-07-29: Madison won Ironman Wales 2025
+# outright and placed 10th at the Ironman World Championships in Nice 2024. The
+# earlier "led her age group by 45 minutes / 9th overall" line is a wrong claim
+# and must never return (gate 8d, below).
+CLIENT_RESULT_LINE = ("Coached athlete Madison Shaddick won Ironman Wales 2025, "
+                      "and placed 10th at the Ironman World Championships in Nice 2024.")
 
 # Verified verbatim quotes from Tom's Google Business profile (5.0, 15 reviews).
 # Ian's real review runs on mid-sentence; per the spec it is closed at a natural
@@ -352,7 +350,7 @@ VERIFIED_QUOTES = {
     "The sessions are tough but always enjoyable I would highly recommend him",
 }
 
-# The Maddison Shaddick result, rendered as a distinct slide in every carousel.
+# The Madison Shaddick result, rendered as a distinct slide in every carousel.
 MADDISON_SLIDE = {"kind": "result"}
 
 
@@ -381,12 +379,12 @@ def _slide_html(item):
         return (
             '<figure class="review-slide result-slide">'
             '<div class="result-stats">'
-            '<div class="stat"><span class="n">6th</span><span class="k">Woman overall, Ironman Wales 2023</span></div>'
-            '<div class="stat"><span class="n">2nd</span><span class="k">Age-group woman across the line</span></div>'
-            '<div class="stat"><span class="n">11:03:02</span><span class="k">Her finishing time</span></div>'
+            '<div class="stat"><span class="n">1st</span><span class="k">Woman, Ironman Wales 2025</span></div>'
+            '<div class="stat"><span class="n">10th</span><span class="k">Ironman World Championships, Nice 2024</span></div>'
+            '<div class="stat"><span class="n">1st AG</span><span class="k">Ironman Swansea 70.3 2024, 2nd overall</span></div>'
             '</div>'
             f'<blockquote>{esc(CLIENT_RESULT_LINE)}</blockquote>'
-            '<figcaption>Maddison Shaddick <span>Coached by Horsepower</span></figcaption>'
+            '<figcaption>Madison Shaddick <span>Coached by Horsepower</span></figcaption>'
             '</figure>')
     ctx = f' <span>{esc(item["context"])}</span>' if item.get("context") else ""
     return (f'<figure class="review-slide"><blockquote>{esc(item["quote"])}</blockquote>'
@@ -438,7 +436,7 @@ def carousel(page, heading="What athletes say", subhead="Real athletes, real fin
 def quote_block(page):
     """Per-page review carousel (light theme), or nothing if none for this page."""
     if not quotes_for(page):
-        # still show the Maddison result on female / coaching even without a page quote
+        # still show the Madison result on female / coaching even without a page quote
         if page not in ("female", "coaching", "coached"):
             return ""
     return carousel(page, heading="In their words",
@@ -446,7 +444,7 @@ def quote_block(page):
 
 
 def reviews_band():
-    """Homepage client-voices carousel: every quote plus the Maddison result."""
+    """Homepage client-voices carousel: every quote plus the Madison result."""
     return carousel("home")
 
 
@@ -521,6 +519,7 @@ def render_home(cat) -> str:
   {img("ironman-wales-finish", cls="results-bg")}
   <div class="wrap">
     <p>{esc(RESULTS_LINE)}</p>
+    <p class="results-sub">Two Ironman Wales titles among the women we coach, and Elly Blackwell winning the Outlaw Half in 2026, are recent lines on that list.</p>
   </div>
 </section>
 {reviews_band()}
@@ -954,31 +953,33 @@ def render_about(cat) -> str:
 
 FEMALE_LEAD = "Female first, not female adapted."
 
-# ── Female honours (verified results only) ───────────────────────────────────
-# Every line here is backed by a primary source, checked 2026-08-05:
-#   Saitch 2022: endurance-data.com/en/results/739-ironman-wales/female/
-#     (#1 woman, 10:47:37; no professional woman ahead; corroborated by TRI247)
-#   Shaddick 2023: endurance-data.com/en/results/907-ironman-wales/female/
-#     + Swansea Bay News 2023-09-04 (6th woman overall, 2nd AG woman, 11:03:02)
-#   Shinkins: 220 Triathlon coverage (20-island Nordic crossing);
-#     TRI247 2021 (IronBourne long-distance podium; exact step unconfirmed, so
-#     the copy says "podium" and no more)
-# Do NOT add results without a primary source; the old Shaddick "45-minute
-# lead / 9th overall" line is contradicted by the official results and is
-# gate-banned site-wide.
+# ── Female honours (Tom's authoritative palmares) ────────────────────────────
+# Every line below is taken verbatim from the results Tom provided 2026-07-29,
+# used exactly as written with no embellishment. Two of these women (Saitch
+# 2022, Shaddick 2025) have won Ironman Wales outright. The unconfirmed
+# "50 mile TT course record" claim is deliberately excluded. Do NOT add results
+# that are not on Tom's list; the old Shaddick "45-minute lead / 9th overall"
+# line is a wrong claim and is gate-banned site-wide (gate 8d).
 FEMALE_HONOURS = [
     {"name": "Hannah Saitch",
-     "lines": ["Fastest woman of the day, Ironman Wales 2022",
-               "10:47:37, first of every woman across the line",
-               "Quicker than the entire amateur and professional field"]},
-    {"name": "Maddison Shaddick",
-     "lines": ["6th woman overall, Ironman Wales 2023",
-               "Second age-group woman across the line",
-               "11:03:02 on one of the hardest Ironman courses there is"]},
+     "lines": ["Ironman Wales 2022 champion",
+               "The ROC Wales 2021 - 1st, bike course record",
+               "XTRI Celtman 2021 - 3rd, bike course record",
+               "Welsh 100 Mile Time Trial Championships 2023 - 1st",
+               "XTRI Norseman 2022 - 3rd"]},
+    {"name": "Madison Shaddick",
+     "lines": ["Ironman Wales 2025 champion",
+               "10th, Ironman World Championships Nice 2024",
+               "Wales Middle and Long Distance Champion 2025",
+               "Ironman Swansea 70.3 2024 - 1st age group, 2nd overall",
+               "Cotswold 113 2024 - 1st, Cotswold 51 Fiver 2024 - 1st"]},
     {"name": "Naomi Shinkins",
-     "lines": ["Crossed 20 Nordic islands under her own power",
-               "Podium, IronBourne long-distance triathlon 2021",
-               "Adventure and ultra-endurance, built the same way"]},
+     "lines": ["XTRI Swedeman 2026 - 2nd",
+               "XTRI Celtman 2025 - 3rd",
+               "Slateman Triathlon 2024 - 1st",
+               "Brutal Triathlon 2024 - 1st"]},
+    {"name": "Elly Blackwell",
+     "lines": ["Outlaw Half Triathlon 2026 champion"]},
 ]
 
 FEMALE_FAQ = [
@@ -1099,9 +1100,9 @@ def render_female(cat) -> str:
       </div>
       <div class="female-results-copy">
         <div class="result-stats">
-          <div class="stat"><span class="n">6th</span><span class="k">Woman overall, Ironman Wales 2023</span></div>
-          <div class="stat"><span class="n">2nd</span><span class="k">Age-group woman across the line</span></div>
-          <div class="stat"><span class="n">11:03:02</span><span class="k">Her finishing time</span></div>
+          <div class="stat"><span class="n">1st</span><span class="k">Woman, Ironman Wales 2025</span></div>
+          <div class="stat"><span class="n">10th</span><span class="k">Ironman World Championships, Nice 2024</span></div>
+          <div class="stat"><span class="n">1st AG</span><span class="k">Ironman Swansea 70.3 2024, 2nd overall</span></div>
         </div>
         <p class="reviews-result">{esc(CLIENT_RESULT_LINE)}</p>
         <p class="reviews-result" style="color:#CFCFCF">Trained for her body, not an average. That is how female athletes get to the front.</p>
@@ -1115,7 +1116,8 @@ def render_female(cat) -> str:
     <p class="eyebrow">The women who prove it</p>
     <h2>Real names, real results</h2>
     <p class="section-intro" style="color:#CFCFCF">Not stock-photo athletes. These are Horsepower-coached
-    women, and every line below is checked against the race records and race press, not invented.</p>
+    women. Two of them, Hannah Saitch and Madison Shaddick, have won Ironman Wales outright, and every
+    line below comes straight from their race results, not invented.</p>
     <div class="honours-grid">{"".join(
       f'<div class="honour"><div class="honour-body"><h3 class="honour-name">{esc(h["name"])}</h3>'
       f'<ul class="honour-stats">{"".join(f"<li>{esc(l)}</li>" for l in h["lines"])}</ul>'
@@ -1415,15 +1417,17 @@ def run_gates(cat, written):
             if GOOGLE_REVIEW_URL not in content:
                 errors.append(f"carousel page missing Google review URL: {path}")
 
-    # Gate 8d: the contradicted Shaddick claim must never reappear (official
-    # 2023 results: 2nd AG woman, 6th overall; not a 45-minute AG lead, not 9th).
+    # Gate 8d: the old wrong Shaddick claim must never reappear (it was never
+    # in Tom's authoritative palmares: not a 45-minute AG lead, not 9th overall).
     BANNED_CLAIMS = ["by 45 minutes", ">45min<", "9th overall against the professional"]
     for path, content in written.items():
         for b in BANNED_CLAIMS:
             if b in content:
                 errors.append(f"banned unverified claim {b!r} found in {path}")
 
-    # Gate 8e: female honours band present with every verified athlete + line.
+    # Gate 8e: female honours band carries exactly Tom's authoritative palmares
+    # (provided 2026-07-29): every athlete + every line present, byte-exact, and
+    # the two Ironman Wales champion headlines lead the band.
     fem_page = written.get("female-performance/index.html", "")
     for h in FEMALE_HONOURS:
         if esc(h["name"]) not in fem_page and h["name"] not in fem_page:
@@ -1431,6 +1435,10 @@ def run_gates(cat, written):
         for l in h["lines"]:
             if esc(l) not in fem_page and l not in fem_page:
                 errors.append(f"female honours missing line: {l[:48]}")
+    for required in ("Ironman Wales 2022 champion", "Ironman Wales 2025 champion",
+                     "Outlaw Half Triathlon 2026 champion"):
+        if required not in fem_page:
+            errors.append(f"female honours missing required headline: {required}")
 
     # Gate 8b: zero Domestiq cross-pollination anywhere (Tom's ruling: separate entities).
     for path, content in written.items():
