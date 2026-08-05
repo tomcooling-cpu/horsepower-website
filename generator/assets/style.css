@@ -66,7 +66,7 @@ a { color: var(--teal-dark); }
   max-width: var(--maxw);
   margin: 0 auto;
 }
-.brand img { height: 34px; width: auto; display: block; }
+.brand img { height: 42px; width: auto; display: block; }
 .nav-toggle {
   background: none; border: 1px solid #333; color: var(--white);
   font-size: 1.4rem; line-height: 1; padding: 6px 12px; border-radius: 6px; cursor: pointer;
@@ -239,7 +239,7 @@ details.faq p { margin: 10px 0 0; color: var(--grey-dark); }
 .site-footer { background: var(--black); color: #B8B8B8; padding: 48px 0 32px; margin-top: 20px; }
 .footer-grid { display: grid; gap: 30px; grid-template-columns: 1fr; }
 @media (min-width: 720px) { .footer-grid { grid-template-columns: 2fr 1fr 1fr; } }
-.site-footer img { height: 30px; margin-bottom: 14px; }
+.site-footer img.footer-logo { height: 64px; width: auto; display: block; margin-bottom: 16px; }
 .site-footer h4 { font-family: 'Oswald', sans-serif; text-transform: uppercase; color: var(--white); font-size: 0.9rem; letter-spacing: 0.06em; }
 .site-footer ul { list-style: none; padding: 0; margin: 0; }
 .site-footer li { margin-bottom: 8px; }
@@ -312,3 +312,64 @@ details.faq p { margin: 10px 0 0; color: var(--grey-dark); }
 
 /* Readable plain link on dark callouts */
 .link-plain.on-dark { color: var(--teal-soft); }
+
+/* ============================================================================
+   Quality pass: social icons, hero treatment, hover states, rhythm
+   ========================================================================== */
+
+/* Social icons (header + footer) */
+.header-social { display: flex; gap: 6px; align-items: center; }
+.footer-social { display: flex; gap: 8px; margin-top: 18px; }
+.social-icon {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 38px; height: 38px; border-radius: 50%;
+  color: var(--white); border: 1px solid #3a3a3a; text-decoration: none;
+  transition: border-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+.social-icon:hover { color: var(--teal); border-color: var(--teal); transform: translateY(-1px); }
+@media (max-width: 1080px) { .header-social { display: none; } }
+
+/* Hero: taller, calmer, more confident type; readable over photos */
+.hero { padding: 88px 0 96px; }
+.hero--image { min-height: 460px; display: flex; align-items: center; }
+.hero--image .wrap { width: 100%; }
+.hero--image::after {
+  background:
+    linear-gradient(90deg, rgba(15,15,15,0.92) 0%, rgba(15,15,15,0.72) 44%, rgba(15,15,15,0.28) 100%),
+    linear-gradient(0deg, rgba(15,15,15,0.55) 0%, rgba(15,15,15,0) 34%);
+}
+.hero h1 { text-shadow: 0 2px 18px rgba(0,0,0,0.35); }
+.hero .lede { text-shadow: 0 1px 10px rgba(0,0,0,0.45); }
+
+/* Consistent photo-band language: subtle dark edges on every full-width image */
+.page-banner::after, .media-band::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(0deg, rgba(15,15,15,0.28) 0%, rgba(15,15,15,0) 30% 70%, rgba(15,15,15,0.28) 100%);
+  pointer-events: none;
+}
+.page-banner, .media-band { isolation: isolate; }
+.page-banner { height: clamp(200px, 30vw, 340px); }
+.media-band { height: clamp(260px, 40vw, 460px); }
+
+/* Section rhythm */
+section { padding: 64px 0; }
+.results { padding: 72px 0; }
+
+/* Hover states: buttons + cards lift */
+.btn { transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease; }
+.btn:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(0,0,0,0.18); }
+.tier-card, .plan-card { transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease; }
+.tier-card:hover, .plan-card:hover { transform: translateY(-3px); box-shadow: 0 14px 30px rgba(0,0,0,0.10); }
+.plan-card:hover { border-color: var(--teal); }
+
+/* Reviews band: featured result stats */
+.result-feature { margin-top: 10px; }
+.result-stats { display: grid; gap: 16px; grid-template-columns: repeat(3, minmax(0,1fr)); max-width: 640px; margin: 18px 0 16px; }
+.result-stats .stat { border-left: 3px solid var(--teal); padding: 4px 0 4px 16px; }
+.result-stats .n { display: block; font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: clamp(1.4rem, 3vw, 2rem); color: var(--white); }
+.result-stats .k { display: block; font-size: 0.85rem; color: #B8B8B8; margin-top: 2px; }
+@media (max-width: 560px) { .result-stats { grid-template-columns: 1fr; } }
+
+/* Wide callout variant */
+.callout--wide { text-align: center; }
+.callout--wide p { max-width: 60ch; margin-left: auto; margin-right: auto; }

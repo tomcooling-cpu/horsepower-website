@@ -113,10 +113,10 @@ def head(title, description, canonical, extra="") -> str:
 
 NAV = [
     ("Home", BASE_PATH + "/", "home"),
-    ("Plans", BASE_PATH + "/plans/", "plans"),
-    ("Female Performance", BASE_PATH + "/female-performance/", "female"),
-    ("Coached", BASE_PATH + "/coached/", "coached"),
     ("Coached by Tom", BASE_PATH + "/coaching/", "coaching"),
+    ("Female Performance", BASE_PATH + "/female-performance/", "female"),
+    ("Plans", BASE_PATH + "/plans/", "plans"),
+    ("Coached", BASE_PATH + "/coached/", "coached"),
     ("About", BASE_PATH + "/about/", "about"),
     ("Contact", CONTACT_URL, "contact"),
 ]
@@ -138,6 +138,7 @@ def header(active) -> str:
     <nav class="site-nav" id="site-nav" aria-label="Primary">
       <ul>{''.join(items)}</ul>
     </nav>
+    <div class="header-social">{social_links("social-icon")}</div>
   </div>
 </header>
 <script>
@@ -153,21 +154,29 @@ def footer() -> str:
   <div class="wrap">
     <div class="footer-grid">
       <div>
-        <img src="{BASE_PATH}/assets/logo-white.png" alt="Horsepower Coaching" width="2041" height="803">
+        <img class="footer-logo" src="{BASE_PATH}/assets/logo-white.png" alt="Horsepower Coaching" width="2041" height="803">
         <p>Training plans and coaching built for your race, at the right dose, adjusted when life happens.</p>
+        <div class="footer-social">{social_links("social-icon")}</div>
       </div>
       <div>
         <h4>Train with us</h4>
         <ul>
+          <li><a href="{BASE_PATH}/coaching/">Coached by Tom</a></li>
+          <li><a href="{BASE_PATH}/female-performance/">Female Performance</a></li>
           <li><a href="{BASE_PATH}/plans/">Plans</a></li>
           <li><a href="{BASE_PATH}/coached/">Coached</a></li>
-          <li><a href="{BASE_PATH}/coaching/">Coached by Tom</a></li>
           <li><a href="{BASE_PATH}/about/">About Tom</a></li>
           <li><a href="{esc(CONTACT_URL)}">Contact</a></li>
         </ul>
       </div>
       <div>
-        <h4>More from Horsepower</h4>
+        <h4>Talk to us</h4>
+        <ul>
+          <li><a href="{WHATSAPP_URL}" rel="noopener" target="_blank">WhatsApp +44 7780 008724</a></li>
+          <li><a href="{INSTAGRAM_URL}" rel="noopener" target="_blank">Instagram @horsepower.coaching</a></li>
+          <li><a href="{esc(GOOGLE_REVIEW_URL)}" rel="noopener" target="_blank">Reviews on Google</a></li>
+        </ul>
+        <h4 style="margin-top:22px">More from Horsepower</h4>
         <ul>
           <li><a href="{EXISTING}/breathwork">Breathwork</a></li>
           <li><a href="{EXISTING}/wheelbuilding">Wheelbuilding</a></li>
@@ -194,17 +203,36 @@ IMG_BASE = BASE_PATH + "/assets/img"
 
 # Descriptive alt text (no athlete surnames), keyed by derivative name.
 IMG_ALT = {
+    "hero-alps": "A cyclist climbing high above an alpine valley with a huge mountain panorama behind",
     "hero-welsh-climb": "Two cyclists climbing a forested Welsh valley road under a big sky",
-    "alpine-hairpins": "A lone cyclist on a switchback mountain road high above an alpine valley",
     "ironman-wales-finish": "An athlete crossing an Ironman finish line in Wales with arms wide",
-    "female-climb": "A cyclist in Horsepower kit climbing towards a snow-lined mountain pass",
-    "tri-rain": "A triathlete riding hard through the rain on a race course",
-    "camp-group": "A small group of cyclists riding together through an alpine village on a training camp",
+    "female-hero": "Three female athletes celebrating with champagne on the Ironman Wales podium",
+    "coached-band": "A time triallist riding hard past a stone wall on a wet mountain road",
+    "tom-gravel": "A cyclist riding a white gravel road towards the camera under a big blue sky",
     "tom-portrait": "Tom Cooling, founder and head coach of Horsepower Coaching",
     "female-tt": "A cyclist racing a time trial in an aero tuck on a country road",
     "female-podium": "Three athletes celebrating on a race podium",
     "female-trail": "A trail runner on a mountain path with an alpine range behind",
 }
+
+# Verified from the live horsepowercoaching.co.uk contact page (not guessed).
+INSTAGRAM_URL = "https://www.instagram.com/horsepower.coaching"
+WHATSAPP_URL = "https://wa.me/447780008724"
+FACEBOOK_URL = "https://www.facebook.com/541277319653869"
+
+SVG_IG = ('<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" '
+          'stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/>'
+          '<circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.2" fill="currentColor" stroke="none"/></svg>')
+SVG_WA = ('<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">'
+          '<path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.3-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.6-6.1c-.3-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.3-.7.8-.8 1-.1.2-.3.2-.6.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4 0-.5.1-.7l.4-.5c.1-.2.1-.3 0-.5-.1-.2-.6-1.4-.8-1.9-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.3-.9.9-.9 2.2s.9 2.5 1.1 2.7c.1.2 1.8 2.8 4.4 3.9 2.6 1.1 2.6.7 3.1.7.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3z"/></svg>')
+SVG_FB = ('<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">'
+          '<path d="M13.5 21v-7h2.4l.4-3h-2.8V9.1c0-.9.3-1.5 1.6-1.5h1.3V4.9c-.2 0-1-.1-1.9-.1-1.9 0-3.2 1.2-3.2 3.3V11H9v3h2.3v7h2.2z"/></svg>')
+
+
+def social_links(cls):
+    return (f'<a class="{cls}" href="{INSTAGRAM_URL}" rel="noopener" target="_blank" aria-label="Horsepower Coaching on Instagram">{SVG_IG}</a>'
+            f'<a class="{cls}" href="{WHATSAPP_URL}" rel="noopener" target="_blank" aria-label="Message Horsepower Coaching on WhatsApp">{SVG_WA}</a>'
+            f'<a class="{cls}" href="{FACEBOOK_URL}" rel="noopener" target="_blank" aria-label="Horsepower Coaching on Facebook">{SVG_FB}</a>')
 
 
 def img(name, cls="", lazy=True, extra=""):
@@ -216,20 +244,18 @@ def img(name, cls="", lazy=True, extra=""):
 
 
 # ── Client voices / reviews ──────────────────────────────────────────────────
-# NOTE FOR TOM: no public Google Business profile for Horsepower Coaching could be
-# confirmed at build time. Supply the real values below to light up the reviews
-# band + per-page quotes site-wide, and the AggregateRating schema.
-#   1. GOOGLE_REVIEW_URL  -> your "read reviews" Google Maps / g.page link
-#   2. REVIEW_RATING + REVIEW_COUNT -> only set BOTH if they are the real profile
-#      numbers (they drive schema.org AggregateRating; never fabricate them)
-#   3. CLIENT_QUOTES -> real, attributable quotes. `tier` routes a quote to a page:
-#      "plans" | "coached" | "coaching" | "about" | "female" (or "" = home only).
-# Until CLIENT_QUOTES is filled, quote slots render nothing (no placeholder text
-# ships to the live site). The band still shows a real, published client result.
-GOOGLE_REVIEW_URL = ""                      # <- Tom: paste Google review link here
+# Tom's official Google share link (resolves to the verified Google Business
+# profile "Horsepower Coaching | Triathlon, Cycling and Endurance Coaching",
+# Clevedon). Used as every "Read our reviews on Google" CTA.
+#   - REVIEW_RATING + REVIEW_COUNT: set BOTH only with the real profile numbers
+#     (they drive schema.org AggregateRating; never fabricate them). Extraction
+#     was blocked by Google's JS surfaces at build time -> Tom to confirm.
+#   - CLIENT_QUOTES: verbatim Google review quotes + first-name attribution.
+#     `tier` routes a quote to a page: "plans" | "coached" | "coaching" |
+#     "about" | "female" ("" = home only). Empty entries render nothing.
+GOOGLE_REVIEW_URL = "https://share.google/50jgAKYAnnnbGCbT3"
 REVIEW_RATING = None                        # e.g. 5.0  (real profile only)
 REVIEW_COUNT = None                         # e.g. 27   (real profile only)
-FB_REVIEWS_URL = "https://www.facebook.com/Horsepowercoaching/reviews"
 # Real, already-published client result (from horsepowercoaching.co.uk) used as the
 # band's honest anchor until Google quotes are supplied.
 CLIENT_RESULT_LINE = ("Coached athlete Maddison Shaddick led her age group at Ironman "
@@ -243,9 +269,7 @@ CLIENT_QUOTES = [
 
 
 def _review_cta():
-    if GOOGLE_REVIEW_URL:
-        return f'<a class="btn on-dark ghost" href="{esc(GOOGLE_REVIEW_URL)}" rel="noopener" target="_blank">Read our reviews on Google</a>'
-    return f'<a class="btn on-dark ghost" href="{esc(FB_REVIEWS_URL)}" rel="noopener" target="_blank">Read what athletes say</a>'
+    return f'<a class="btn on-dark ghost" href="{esc(GOOGLE_REVIEW_URL)}" rel="noopener" target="_blank">Read our reviews on Google</a>'
 
 
 def _rating_html():
@@ -290,7 +314,14 @@ def reviews_band():
     <p class="eyebrow" style="color:var(--teal-soft)">What athletes say</p>
     <h2>Real athletes, real finish lines</h2>
     {_rating_html()}
-    <p class="reviews-result">{esc(CLIENT_RESULT_LINE)}</p>
+    <div class="result-feature">
+      <div class="result-stats">
+        <div class="stat"><span class="n">1st</span><span class="k">Age group, Ironman Wales</span></div>
+        <div class="stat"><span class="n">45min</span><span class="k">Lead over her field</span></div>
+        <div class="stat"><span class="n">9th</span><span class="k">Overall vs the pro women</span></div>
+      </div>
+      <p class="reviews-result">{esc(CLIENT_RESULT_LINE)}</p>
+    </div>
     {grid}
     <p class="reviews-cta">{_review_cta()}</p>
   </div>
@@ -311,7 +342,7 @@ def render_home(cat) -> str:
     total = cat["stats"]["total"]
     body = f"""<main id="main">
 <section class="hero hero--image">
-  {img("hero-welsh-climb", cls="hero-bg", lazy=False)}
+  {img("hero-alps", cls="hero-bg", lazy=False)}
   <div class="wrap">
     <h1>{esc(HERO_HEADLINE)}</h1>
     <p class="lede">{esc(HERO_BODY)}</p>
@@ -434,7 +465,7 @@ def render_plans_index(cat) -> str:
 </article>""")
 
     body = f"""<main id="main">
-<div class="page-banner">{img("alpine-hairpins", cls="banner-bg", lazy=False)}</div>
+<div class="page-banner">{img("hero-welsh-climb", cls="banner-bg", lazy=False)}</div>
 <section class="alt" style="padding-bottom:24px">
   <div class="wrap">
     <p class="eyebrow">The plan library</p>
@@ -540,7 +571,7 @@ def render_coached(cat) -> str:
   </div>
 </section>
 
-<div class="media-band">{img("tri-rain", cls="media-bg")}</div>
+<div class="media-band">{img("coached-band", cls="media-bg")}</div>
 
 <section>
   <div class="wrap">
@@ -595,13 +626,13 @@ def render_coaching(cat) -> str:
 <section class="hero" style="padding:60px 0 64px">
   <div class="wrap">
     <p class="eyebrow" style="color:var(--teal-soft)">Coached by Tom &middot; Limited places</p>
-    <h1>A coach in your corner for all of it</h1>
+    <h1>A coach in your corner for all&nbsp;of&nbsp;it</h1>
     <p class="lede">{esc(TIER_TOM_BODY)}</p>
     <div class="cta-row"><a class="btn" href="{esc(CONTACT_URL)}">Ask about a place</a></div>
   </div>
 </section>
 
-<div class="media-band">{img("camp-group", cls="media-bg")}</div>
+<div class="media-band">{img("tom-gravel", cls="media-bg")}</div>
 
 <section>
   <div class="wrap content-grid two">
@@ -765,7 +796,7 @@ def render_female(cat) -> str:
 
     body = f"""<main id="main">
 <section class="hero hero--image">
-  {img("female-climb", cls="hero-bg", lazy=False)}
+  {img("female-hero", cls="hero-bg", lazy=False)}
   <div class="wrap">
     <p class="eyebrow" style="color:var(--teal-soft)">Female performance</p>
     <h1>{esc(FEMALE_LEAD)}</h1>
@@ -857,24 +888,15 @@ def render_female(cat) -> str:
 </section>
 
 <section class="alt">
-  <div class="wrap content-grid two">
-    <div>
-      <h2>Prefer it in an app?</h2>
-      <p>Domestiq is our companion app, built on the same female-first thinking and made to
-      bring cycle-aware endurance training to everyone. It complements the coaching here: if
-      you want the approach in your pocket, that is where to look.</p>
-      <p style="margin-top:16px"><a class="btn ghost" href="https://domestiq.cc" rel="noopener" target="_blank">Visit Domestiq</a></p>
-    </div>
-    <div>
-      <div class="callout">
-        <h2>Start with your body in mind</h2>
-        <p>Browse the Female-First plans, or get coached and have the training built around
-        your physiology, your event and your life.</p>
-        <p style="margin-top:18px">
-          <a class="btn on-dark ghost" href="#female-plans">See the plans</a>
-          <a class="btn" href="{BASE_PATH}/coached/" style="margin-left:10px">Get coached</a>
-        </p>
-      </div>
+  <div class="wrap">
+    <div class="callout callout--wide">
+      <h2>Start with your body in mind</h2>
+      <p>Browse the Female-First plans, or get coached and have the training built around
+      your physiology, your event and your life.</p>
+      <p style="margin-top:18px">
+        <a class="btn on-dark ghost" href="#female-plans">See the plans</a>
+        <a class="btn" href="{BASE_PATH}/coached/" style="margin-left:10px">Get coached</a>
+      </p>
     </div>
   </div>
 </section>
@@ -1022,6 +1044,11 @@ def run_gates(cat, written):
             if "AggregateRating" in content:
                 errors.append(f"AggregateRating present without real review numbers in {path}")
 
+    # Gate 8b: zero Domestiq cross-pollination anywhere (Tom's ruling: separate entities).
+    for path, content in written.items():
+        if "domestiq" in content.lower():
+            errors.append(f'"domestiq" found in {path} (must be zero site-wide)')
+
     # Gate 9: total shipped image weight under budget.
     img_dir = os.path.join(SITE, "assets", "img")
     img_bytes = 0
@@ -1049,6 +1076,7 @@ def run_gates(cat, written):
     print(f"  - internal links resolve; {n_cards} cards == {n_live} live SKUs; {n_detail} detail pages")
     print(f"  - female performance page: lead line + FAQPage schema + 4 plan links")
     print(f"  - {img_count} images shipped, {img_bytes/1024:.0f}KB total (budget 2560KB); no fabricated ratings")
+    print(f"  - zero 'domestiq' occurrences across all generated output")
 
 
 if __name__ == "__main__":
