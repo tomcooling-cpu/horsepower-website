@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://tomcooling-cpu.github.io/horsepower-website/sitemap.xml
