@@ -21,6 +21,7 @@ OUT = os.path.join(HERE, "assets", "img")
 WIDE = 1500   # full-bleed heroes / banners / bands
 FEAT = 1100   # contained feature-media / portraits
 DROP = "drop-2026-08-05"
+NAOMI = "naomi-2026-08-05"   # Tom-confirmed Naomi Shinkins photos, 2026-08-05
 JOBS = {
     "hero-alps":            ("hero-alps.jpg",            WIDE, 74),
     "hero-welsh-climb":     ("hero-welsh-climb.jpg",     WIDE, 62),
@@ -36,15 +37,23 @@ JOBS = {
     "tom-portrait":         ("tom-portrait.jpeg",        FEAT, 80),
     # drop-2026-08-05: honours band (athlete identity verified per file)
     "honours-hannah-wales":    (DROP + "/1_IRONMAN-Wales.jpg", FEAT, 78),
-    "honours-madison-tt":      (DROP + "/c6d78967-c9ca-457f-93f1-39d28e01c873.jpeg", 1000, 78),
-    # NOTE: the drop MANIFEST maps the Swedeman finish to 236452499.jpg, but that
-    # file is actually an unrelated ibex-statue descent shot; the real Swedeman
-    # finish (2:21:10 clock, HP cap, Zalari/Trimtex banners) is this file.
-    "honours-naomi-swedeman":  (DROP + "/298092795_5292343910802266_7997008599894872681_n.jpg", 1400, 78),
+    # Madison's honours tile is the Ironman Wales 2025 finish chute (Tom's pick,
+    # 2026-08-05); source is small (~600px) so it ships at native resolution.
+    # Her TT shot stays in play as a /options/ female banner candidate.
+    "honours-madison-finish":  (DROP + "/top 5 - 5.jpg", 902, 80),
+    "honours-madison-tt":      (DROP + "/c6d78967-c9ca-457f-93f1-39d28e01c873.jpeg", 1000, 66),
+    # RETIRED (2026-08-05): the mountain-top 2:21:10 finish (298092795, with its
+    # near-duplicate 236452499) is no longer confidently identified as Naomi:
+    # her confirmed Swedeman 2026 kit (Precision paint-splatter top, black On
+    # vest, Precision cap) is entirely different. Identity unresolved, so it is
+    # out of every named/captioned slot and ships nowhere. Sources kept on disk.
+    # Naomi's tile is now her Tom-confirmed Swedeman 2026 finish (Irish flag).
+    "honours-naomi-flag":      (NAOMI + "/WhatsApp Image 2026-08-05 at 16.00.27 (3).jpeg", 1100, 76),
+    "female-naomi-tt":         (NAOMI + "/WhatsApp Image 2026-05-26 at 13.09.23.jpeg", 1200, 60),
     # drop-2026-08-05: banner candidates (/options/) + about/coached imagery
     "hero-tenby-swim":         (DROP + "/alternate - 9.jpg", 1200, 58),
-    "hero-alpine-mist":        (DROP + "/top 5 - 2.jpg", 1200, 62),
-    "hero-torridon-ridge":     (DROP + "/f8380d24-01f9-4543-a1a9-988d2cc9797f.jpeg", 1200, 58),
+    "hero-alpine-mist":        (DROP + "/top 5 - 2.jpg", 1200, 52),
+    "hero-torridon-ridge":     (DROP + "/f8380d24-01f9-4543-a1a9-988d2cc9797f.jpeg", 1200, 50),
     "tom-hill-climb":          (DROP + "/athlete-race.jpg", 1300, 76),
     "tom-alps-lead":           (DROP + "/1-HR-ALPS-2019RCL_4825.jpg", 1000, 56),
     "tom-alps-finish":         (DROP + "/5-HR-ALPS-2019DSC_1620.jpg", 1000, 62),
@@ -58,9 +67,9 @@ JOBS = {
     "coached-almere-finish":   (DROP + "/773897ce-9f4e-4e72-916f-2aa6b00e1ca8.jpeg", 1100, 74),
     "coached-tenby-swim":      (DROP + "/alternate - 13.jpg", 1400, 68),
     "female-wales-podium":     (DROP + "/0_IRONMAN-Wales.jpg", 1200, 58),
-    "female-montblanc-hike":   (DROP + "/d78204b9-4429-404f-b1d6-45f5ce36e68a.jpeg", 1000, 52),
+    "female-montblanc-hike":   (DROP + "/d78204b9-4429-404f-b1d6-45f5ce36e68a.jpeg", 850, 48),
     "female-welsh-tt":         (DROP + "/462639565_581577237629776_1513627609080372586_n.jpg", 1200, 66),
-    "plans-izoard-trio":       (DROP + "/eed1217f-0113-4798-9a88-e38932a2e93e.jpeg", 1200, 58),
+    "plans-izoard-trio":       (DROP + "/eed1217f-0113-4798-9a88-e38932a2e93e.jpeg", 1200, 50),
     "plans-pyrenees-switchback": (DROP + "/c0d36a66-7ae7-40d6-a2a6-2c1af2d4ef01.jpeg", 1200, 62),
     "plans-pyrenees-dawn":     (DROP + "/597e93c5-7cb4-4990-b350-ba0250b120ba.jpeg", 1200, 68),
 }

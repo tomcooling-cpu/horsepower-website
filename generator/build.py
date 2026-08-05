@@ -219,8 +219,10 @@ IMG_BASE = BASE_PATH + "/assets/img"
 IMG_ALT = {
     # drop-2026-08-05
     "honours-hannah-wales": "Hannah Saitch breaking the tape to win Ironman Wales 2022",
+    "honours-madison-finish": "Madison Shaddick finishing Ironman Wales 2025",
     "honours-madison-tt": "Madison Shaddick in a full aero tuck racing a time trial on her pink-wheeled TT bike",
-    "honours-naomi-swedeman": "Naomi Shinkins celebrating at the mountain-top Swedeman finish in a Horsepower cap",
+    "honours-naomi-flag": "Naomi Shinkins wrapped in the Irish flag after finishing second at Swedeman 2026",
+    "female-naomi-tt": "Naomi Shinkins time trialling in Horsepower Coaching kit",
     "hero-tenby-swim": "Swimmers in wetsuits and pink caps charging into the sea at the Ironman Wales swim start at sunrise",
     "hero-alpine-mist": "An empty hairpin road high on a misty alpine pass",
     "hero-torridon-ridge": "Two runners crossing a rocky Torridon ridge under a brooding sky",
@@ -272,8 +274,10 @@ IMG_POS = {
     "tom-portrait": "50% 30%",           # Tom's face
     # drop-2026-08-05
     "honours-hannah-wales": "47% 50%",   # Hannah centred under the tape in the 4/5 tile
+    "honours-madison-finish": "50% 28%", # Madison's face + hands high in the 4/5 tile
     "honours-madison-tt": "50% 42%",     # helmet to wheels, rider centred
-    "honours-naomi-swedeman": "60% 45%", # Naomi + raised arms right of the 2:21:10 clock
+    "honours-naomi-flag": "54% 40%",     # Naomi's face + draped flag centred in the 4/5 crop
+    "female-naomi-tt": "42% 45%",        # Naomi on the aero bars, left of centre
     "hero-tenby-swim": "50% 55%",        # swimmers + sunrise water, Goscar Rock right
     "hero-alpine-mist": "50% 55%",       # the hairpin low-centre
     "hero-torridon-ridge": "50% 45%",    # runners on the quartzite crest
@@ -325,8 +329,10 @@ IMG_DIMS = {
     "tom-portrait": (825, 1100),
     # drop-2026-08-05
     "honours-hannah-wales": (1100, 733),
+    "honours-madison-finish": (602, 902),
     "honours-madison-tt": (667, 1000),
-    "honours-naomi-swedeman": (1400, 1013),
+    "honours-naomi-flag": (1100, 734),
+    "female-naomi-tt": (1200, 800),
     "hero-tenby-swim": (1200, 802),
     "hero-alpine-mist": (1200, 800),
     "hero-torridon-ridge": (1200, 799),
@@ -1082,14 +1088,14 @@ FEMALE_HONOURS = [
                "XTRI Celtman 2021 - 3rd, bike course record",
                "Welsh 100 Mile Time Trial Championships 2023 - 1st",
                "XTRI Norseman 2022 - 3rd"]},
-    {"name": "Madison Shaddick", "img": "honours-madison-tt",
+    {"name": "Madison Shaddick", "img": "honours-madison-finish",
      "lines": ["Ironman Wales 2025 champion",
                "Overall women's age group champion, Ironman Wales 2025",
                "10th, Ironman World Championships Nice 2024",
                "Wales Middle and Long Distance Champion 2025",
                "Ironman Swansea 70.3 2024 - 1st age group, 2nd overall",
                "Cotswold 113 2024 - 1st, Cotswold 51 Fiver 2024 - 1st"]},
-    {"name": "Naomi Shinkins", "img": "honours-naomi-swedeman",
+    {"name": "Naomi Shinkins", "img": "honours-naomi-flag",
      "lines": ["XTRI Swedeman 2026 - 2nd",
                "XTRI Celtman 2025 - 3rd",
                "Slateman Triathlon 2024 - 1st",
@@ -1315,7 +1321,9 @@ BANNER_SLOTS = [
      "lede": ("Endurance training was written for men and handed to women with the numbers "
               "turned down. We do it the other way round."),
      "candidates": ["female-hero", "female-wales-podium", "female-montblanc-hike",
-                    "honours-naomi-swedeman", "female-welsh-tt"]},
+                    ("female-naomi-tt", "Naomi Shinkins time trialling in Horsepower kit"),
+                    ("honours-madison-tt", "Madison Shaddick on the TT bike"),
+                    "female-welsh-tt"]},
     {"id": "plans-banner", "kind": "pagebanner", "name": "Plans banner",
      "where": "The full-width banner at the top of the plan library.",
      "candidates": ["hero-welsh-climb", "alpine-ridge", "hero-alps", "coached-band",
