@@ -190,6 +190,7 @@ def footer() -> str:
     </div>
   </div>
 </footer>
+<script src="{BASE_PATH}/assets/carousel.js" defer></script>
 </body>
 </html>"""
 
@@ -213,6 +214,24 @@ IMG_ALT = {
     "female-tt": "A cyclist racing a time trial in an aero tuck on a country road",
     "female-podium": "Three athletes celebrating on a race podium",
     "female-trail": "A trail runner on a mountain path with an alpine range behind",
+    "camp-group": "A group of coached cyclists riding together through an alpine village",
+}
+
+# Art direction: object-position per derivative so the subject lands on a
+# rule-of-thirds power point inside its rendered window (verified by screenshot
+# at desktop 1440 + mobile 390). Full-frame downscales; cropping is done here.
+IMG_POS = {
+    "hero-alps": "60% 42%",              # climbing rider, right of the text column
+    "hero-welsh-climb": "50% 62%",       # push crop down to the TT rider + stone wall
+    "female-hero": "50% 30%",            # champagne spray + podium winner up top
+    "ironman-wales-finish": "50% 28%",   # finisher's face + tape overhead
+    "coached-band": "50% 52%",           # TT rider mid-frame against the mountain
+    "tom-gravel": "64% 46%",             # Tom riding toward camera, right of text
+    "camp-group": "50% 58%",             # the bunch of riders low-centre
+    "female-tt": "52% 34%",              # aero rider's head + torso
+    "female-podium": "50% 30%",          # the three athletes' faces
+    "female-trail": "50% 54%",           # runner on the trail, centre
+    "tom-portrait": "50% 30%",           # Tom's face
 }
 
 # Verified from the live horsepowercoaching.co.uk contact page (not guessed).
@@ -235,12 +254,26 @@ def social_links(cls):
             f'<a class="{cls}" href="{FACEBOOK_URL}" rel="noopener" target="_blank" aria-label="Horsepower Coaching on Facebook">{SVG_FB}</a>')
 
 
+IMG_DIMS = {
+    "hero-alps": (1500, 1000), "hero-welsh-climb": (1500, 1000),
+    "female-hero": (1500, 1001), "ironman-wales-finish": (1500, 1000),
+    "coached-band": (1500, 999), "tom-gravel": (1400, 1050),
+    "camp-group": (1400, 1050), "female-tt": (734, 1100),
+    "female-podium": (825, 1100), "female-trail": (825, 1100),
+    "tom-portrait": (825, 1100),
+}
+
+
 def img(name, cls="", lazy=True, extra=""):
-    """One <img> for derivative `name`; alt pulled from IMG_ALT (gate-checked)."""
+    """One <img> for derivative `name`; alt from IMG_ALT, object-position from
+    IMG_POS, intrinsic width/height from IMG_DIMS (all gate-checked)."""
     alt = IMG_ALT[name]
     c = f' class="{cls}"' if cls else ""
     loading = ' loading="lazy" decoding="async"' if lazy else ' decoding="async"'
-    return f'<img src="{IMG_BASE}/{name}.jpg" alt="{esc(alt)}"{c}{loading}{extra}>'
+    w, h = IMG_DIMS[name]
+    dims = f' width="{w}" height="{h}"'
+    style = f' style="object-position:{IMG_POS[name]}"' if name in IMG_POS else ""
+    return f'<img src="{IMG_BASE}/{name}.jpg" alt="{esc(alt)}"{c}{dims}{style}{loading}{extra}>'
 
 
 # ── Client voices / reviews ──────────────────────────────────────────────────
@@ -254,78 +287,148 @@ def img(name, cls="", lazy=True, extra=""):
 #     `tier` routes a quote to a page: "plans" | "coached" | "coaching" |
 #     "about" | "female" ("" = home only). Empty entries render nothing.
 GOOGLE_REVIEW_URL = "https://share.google/50jgAKYAnnnbGCbT3"
-REVIEW_RATING = None                        # e.g. 5.0  (real profile only)
-REVIEW_COUNT = None                         # e.g. 27   (real profile only)
-# Real, already-published client result (from horsepowercoaching.co.uk) used as the
-# band's honest anchor until Google quotes are supplied.
+REVIEW_RATING = 5.0                         # verified Google Business profile
+REVIEW_COUNT = 15                           # verified Google Business profile
+# Real, already-published client result used as the Maddison result slide.
 CLIENT_RESULT_LINE = ("Coached athlete Maddison Shaddick led her age group at Ironman "
                       "Wales by 45 minutes and finished 9th overall against the "
                       "professional women.")
+
+# Verified verbatim quotes from Tom's Google Business profile (5.0, 15 reviews).
+# Ian's real review runs on mid-sentence; per the spec it is closed at a natural
+# earlier point and never invented past it. Every string here must appear in
+# VERIFIED_QUOTES byte-exact (carousel-data gate).
 CLIENT_QUOTES = [
-    # {"quote": "…", "name": "Sarah H.", "tier": "coached"},
-    # {"quote": "…", "name": "James P.", "tier": "plans"},
-    # {"quote": "…", "name": "Priya R.", "tier": "coaching"},
+    {"name": "Ian Cheatle", "context": "Cycling athlete", "pages": ["coached"],
+     "quote": ("Tom is a great coach and has helped massively with my cycling, helping me "
+               "achieve results I wouldn't have thought possible previously.")},
+    {"name": "jc bastos", "context": "Ironman finisher, 11h13", "pages": ["coached", "coaching"],
+     "quote": ("I can't recommend Tom enough. Over the past year, the support, structure, "
+               "and guidance I received helped me progress massively and achieve my "
+               "Ironman goal, finishing in 11h13.")},
+    {"name": "Emma Needham", "context": "Multi-event athlete", "pages": ["female"],
+     "quote": ("Really enjoyed being coached by Horsepower Coaching. Tom really knows his "
+               "stuff and is easy to talk to. If ever I had any questions, Tom was always "
+               "quick to answer & provided detailed race plans for my various events. "
+               "Would highly recommend.")},
+    {"name": "Google review", "context": "70.3 athlete", "pages": ["coaching"],
+     "quote": "The dream was to finish a 70.3 before turning 50 with a personal best."},
+    {"name": "Google review", "context": "", "pages": [],
+     "quote": "The sessions are tough but always enjoyable I would highly recommend him"},
 ]
 
+# Canonical spec-verified quote strings; the carousel-data gate asserts every
+# CLIENT_QUOTES quote is one of these, byte-exact (no inventing or paraphrasing).
+VERIFIED_QUOTES = {
+    ("Tom is a great coach and has helped massively with my cycling, helping me "
+     "achieve results I wouldn't have thought possible previously."),
+    ("I can't recommend Tom enough. Over the past year, the support, structure, "
+     "and guidance I received helped me progress massively and achieve my "
+     "Ironman goal, finishing in 11h13."),
+    ("Really enjoyed being coached by Horsepower Coaching. Tom really knows his "
+     "stuff and is easy to talk to. If ever I had any questions, Tom was always "
+     "quick to answer & provided detailed race plans for my various events. "
+     "Would highly recommend."),
+    "The dream was to finish a 70.3 before turning 50 with a personal best.",
+    "The sessions are tough but always enjoyable I would highly recommend him",
+}
 
-def _review_cta():
-    return f'<a class="btn on-dark ghost" href="{esc(GOOGLE_REVIEW_URL)}" rel="noopener" target="_blank">Read our reviews on Google</a>'
+# The Maddison Shaddick result, rendered as a distinct slide in every carousel.
+MADDISON_SLIDE = {"kind": "result"}
+
+
+def _review_cta(cls="btn on-dark ghost"):
+    return (f'<a class="{cls}" href="{esc(GOOGLE_REVIEW_URL)}" rel="noopener" target="_blank">'
+            f'Read all {REVIEW_COUNT} reviews on Google</a>')
 
 
 def _rating_html():
     if REVIEW_RATING and REVIEW_COUNT:
         stars = "★" * int(round(REVIEW_RATING))
         return (f'<p class="rating"><span class="stars" aria-hidden="true">{stars}</span> '
-                f'<strong>{REVIEW_RATING:g}</strong> from {REVIEW_COUNT} reviews</p>')
+                f'<strong>{REVIEW_RATING:g}</strong> from {REVIEW_COUNT} Google reviews</p>')
     return ""
 
 
-def quotes_for(tier):
-    return [q for q in CLIENT_QUOTES if q.get("tier") == tier]
+def quotes_for(page):
+    """All quotes tagged for `page` ('home' returns every quote)."""
+    if page == "home":
+        return list(CLIENT_QUOTES)
+    return [q for q in CLIENT_QUOTES if page in q.get("pages", [])]
 
 
-def quote_card(q):
-    return (f'<figure class="quote-card"><blockquote>{esc(q["quote"])}</blockquote>'
-            f'<figcaption>{esc(q.get("name", "Horsepower athlete"))}</figcaption></figure>')
+def _slide_html(item):
+    if item.get("kind") == "result":
+        return (
+            '<figure class="review-slide result-slide">'
+            '<div class="result-stats">'
+            '<div class="stat"><span class="n">1st</span><span class="k">Age group, Ironman Wales</span></div>'
+            '<div class="stat"><span class="n">45min</span><span class="k">Lead over her field</span></div>'
+            '<div class="stat"><span class="n">9th</span><span class="k">Overall vs the pro women</span></div>'
+            '</div>'
+            f'<blockquote>{esc(CLIENT_RESULT_LINE)}</blockquote>'
+            '<figcaption>Maddison Shaddick <span>Coached by Horsepower</span></figcaption>'
+            '</figure>')
+    ctx = f' <span>{esc(item["context"])}</span>' if item.get("context") else ""
+    return (f'<figure class="review-slide"><blockquote>{esc(item["quote"])}</blockquote>'
+            f'<figcaption>{esc(item.get("name", "Horsepower athlete"))}{ctx}</figcaption></figure>')
 
 
-def quote_block(tier):
-    """A single relevant quote block for a page, or nothing if none supplied."""
-    qs = quotes_for(tier)
-    if not qs:
+_CAROUSEL_SEQ = [0]
+
+
+def carousel(page, heading="What athletes say", subhead="Real athletes, real finish lines",
+             on_dark=True, include_result=True):
+    """Accessible auto-advancing review carousel for `page`. Vanilla JS
+    (assets/carousel.js) drives auto-advance, arrows, dots, hover/focus pause."""
+    slides = list(quotes_for(page))
+    if include_result:
+        slides = slides + [MADDISON_SLIDE]
+    if not slides:
         return ""
+    _CAROUSEL_SEQ[0] += 1
+    cid = f"reviews-{_CAROUSEL_SEQ[0]}"
+    slide_html = "".join(
+        f'<li class="carousel-slide" role="group" aria-roledescription="slide" '
+        f'aria-label="{i + 1} of {len(slides)}">{_slide_html(s)}</li>'
+        for i, s in enumerate(slides))
+    dots = "".join(
+        f'<button class="carousel-dot" type="button" data-i="{i}" '
+        f'aria-label="Show review {i + 1}"></button>' for i in range(len(slides)))
+    single = " is-single" if len(slides) == 1 else ""
+    theme = "reviews" if on_dark else "reviews reviews--light"
     return f"""
-<section class="alt">
+<section class="{theme}">
   <div class="wrap">
-    <p class="eyebrow">In their words</p>
-    <div class="quote-grid">{''.join(quote_card(q) for q in qs[:1])}</div>
+    <p class="eyebrow"{' style="color:var(--teal-soft)"' if on_dark else ""}>{esc(heading)}</p>
+    <h2>{esc(subhead)}</h2>
+    {_rating_html()}
+    <div class="carousel{single}" id="{cid}" data-carousel aria-roledescription="carousel" aria-label="Athlete reviews">
+      <button class="carousel-arrow prev" type="button" aria-controls="{cid}-track" aria-label="Previous review">&#8249;</button>
+      <div class="carousel-viewport">
+        <ul class="carousel-track" id="{cid}-track" aria-live="polite">{slide_html}</ul>
+      </div>
+      <button class="carousel-arrow next" type="button" aria-controls="{cid}-track" aria-label="Next review">&#8250;</button>
+      <div class="carousel-dots" role="tablist" aria-label="Choose a review">{dots}</div>
+    </div>
+    <p class="reviews-cta">{_review_cta("btn on-dark ghost" if on_dark else "btn ghost")}</p>
   </div>
 </section>"""
+
+
+def quote_block(page):
+    """Per-page review carousel (light theme), or nothing if none for this page."""
+    if not quotes_for(page):
+        # still show the Maddison result on female / coaching even without a page quote
+        if page not in ("female", "coaching", "coached"):
+            return ""
+    return carousel(page, heading="In their words",
+                    subhead="What athletes say about Horsepower", on_dark=False)
 
 
 def reviews_band():
-    """Homepage client-voices band. Shows real result + review CTA; quotes if supplied."""
-    home_quotes = quotes_for("") + quotes_for("plans") + quotes_for("coached") + quotes_for("coaching")
-    cards = "".join(quote_card(q) for q in home_quotes[:3])
-    grid = f'<div class="quote-grid">{cards}</div>' if cards else ""
-    return f"""
-<section class="reviews">
-  <div class="wrap">
-    <p class="eyebrow" style="color:var(--teal-soft)">What athletes say</p>
-    <h2>Real athletes, real finish lines</h2>
-    {_rating_html()}
-    <div class="result-feature">
-      <div class="result-stats">
-        <div class="stat"><span class="n">1st</span><span class="k">Age group, Ironman Wales</span></div>
-        <div class="stat"><span class="n">45min</span><span class="k">Lead over her field</span></div>
-        <div class="stat"><span class="n">9th</span><span class="k">Overall vs the pro women</span></div>
-      </div>
-      <p class="reviews-result">{esc(CLIENT_RESULT_LINE)}</p>
-    </div>
-    {grid}
-    <p class="reviews-cta">{_review_cta()}</p>
-  </div>
-</section>"""
+    """Homepage client-voices carousel: every quote plus the Maddison result."""
+    return carousel("home")
 
 
 # The four live Female-First plan SKUs, cross-linked to the female performance page.
@@ -424,8 +527,17 @@ def render_home(cat) -> str:
 </main>"""
     desc = ("Training plans and coaching built for your target race, at the right "
             "dose, adjusted when life happens. Over 150 plans, plus coaching from £85 a month.")
+    org_ld = {
+        "@context": "https://schema.org", "@type": "Organization",
+        "name": "Horsepower Coaching", "url": BASE_URL + "/",
+        "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": f"{REVIEW_RATING:g}", "reviewCount": str(REVIEW_COUNT),
+            "bestRating": "5", "worstRating": "1"},
+    }
+    extra = f'<script type="application/ld+json">{json.dumps(org_ld)}</script>\n'
     return page("home", "Horsepower Coaching | Training plans and coaching for your race",
-                desc, BASE_URL + "/", body)
+                desc, BASE_URL + "/", body, extra)
 
 
 def _filter_options(plans, key):
@@ -621,46 +733,112 @@ def render_coached(cat) -> str:
                 BASE_URL + "/coached/", body)
 
 
+COACHED_BY_TOM_GET = [
+    ("A completely bespoke programme",
+     "Your whole training programme, built for you from the ground up and delivered through TrainingPeaks."),
+    ("In-depth training and progress analysis",
+     "Your training and progress analysed in depth with TrainingPeaks and WKO5, so decisions come from your data, not a hunch."),
+    ("Free TrainingPeaks Premium",
+     "A free TrainingPeaks Premium account for as long as we work together, so you see everything I see."),
+    ("Unlimited plan amendments",
+     "Change it as often as you need. When life or your form shifts, the plan shifts with it, no limits."),
+    ("Weekly session feedback",
+     "Feedback on your sessions every week, plus preparation tips for what is coming next."),
+    ("Unlimited contact",
+     "Instant messaging day to day and regular video catch-ups. You are never left guessing between sessions."),
+    ("Science-backed methodology",
+     "Evidence-led training including dedicated heat-preparation sessions when your race demands them."),
+    ("Advice on the whole race",
+     "Race craft, race prep, kit and equipment, nutrition and psychology. The parts of performance a training file alone cannot cover."),
+]
+
+
 def render_coaching(cat) -> str:
+    get_cards = "".join(
+        f'<div class="get-card"><h3>{esc(t)}</h3><p>{esc(d)}</p></div>'
+        for t, d in COACHED_BY_TOM_GET)
     body = f"""<main id="main">
-<section class="hero" style="padding:60px 0 64px">
+<section class="hero hero--image">
+  {img("tom-gravel", cls="hero-bg", lazy=False)}
   <div class="wrap">
-    <p class="eyebrow" style="color:var(--teal-soft)">Coached by Tom &middot; Limited places</p>
+    <p class="eyebrow" style="color:var(--teal-soft)">Coached by Tom &middot; &pound;160 a month &middot; Limited places</p>
     <h1>A coach in your corner for all&nbsp;of&nbsp;it</h1>
     <p class="lede">{esc(TIER_TOM_BODY)}</p>
-    <div class="cta-row"><a class="btn" href="{esc(CONTACT_URL)}">Ask about a place</a></div>
+    <div class="cta-row">
+      <a class="btn" href="{esc(CONTACT_URL)}">Ask about a place</a>
+      <a class="btn on-dark ghost" href="#what-you-get">See what you get</a>
+    </div>
   </div>
 </section>
 
-<div class="media-band">{img("tom-gravel", cls="media-bg")}</div>
+<section id="what-you-get">
+  <div class="wrap">
+    <p class="eyebrow">Everything you get</p>
+    <h2>The full service, plus me</h2>
+    <p class="section-intro">Coached by Tom is my highest level of support. You get everything in
+    Coached, built and read by me directly, plus the tools, the analysis and the contact that
+    turn a good block into a great season.</p>
+    <div class="get-grid">{get_cards}</div>
+  </div>
+</section>
+
+<div class="media-band">{img("camp-group", cls="media-bg")}</div>
+
+<section class="alt">
+  <div class="wrap">
+    <p class="eyebrow">How a month looks</p>
+    <h2>The weekly rhythm</h2>
+    <ol class="step-list">
+      <li><strong>Your block lands</strong>Three weeks of training built around your event, your hours and where your form is right now, delivered to your TrainingPeaks account.</li>
+      <li><strong>You train, I stay close</strong>Every session tells you what to do and why. Message me any time you need to move something, and you will not wait long for an answer.</li>
+      <li><strong>Every session gets read</strong>I review the sessions you complete against what was set, using your actual data in TrainingPeaks and WKO5, and tell you what it means.</li>
+      <li><strong>We talk, and the plan moves</strong>Regular video catch-ups and WhatsApp when it is urgent, so the next block reflects real life and your numbers as they move.</li>
+    </ol>
+  </div>
+</section>
 
 <section>
   <div class="wrap content-grid two">
-    <div>
-      <h2>Everything in Coached, plus Tom</h2>
-      <p>You get the full Coached service: your programme built block by block around
-      your life and your event, feedback on every session you complete, and a race
-      plan before every start line. On top of that you get Tom directly.</p>
-      <ul class="about-list">
-        <li>Calls when you need them, not on a fixed schedule you have to fill.</li>
-        <li>WhatsApp when it is urgent, the day before a race or the morning of.</li>
-        <li>Race-day strategy built together, not handed over.</li>
-        <li>A coach who knows your story, not just your data.</li>
-      </ul>
+    <div class="prose">
+      <p class="eyebrow">Race support</p>
+      <h2>A proper race plan, before every start line</h2>
+      <p>Before every event you get a race plan built for that day: pacing for the climbs and
+      the flats, a fuelling strategy you have rehearsed, heat and weather contingencies, and
+      the race craft that decides close finishes. These are the same detailed race-plan
+      documents our athletes have taken to Ironman Wales, long-course triathlon and the Haute
+      Route, not a paragraph of generic advice.</p>
+      <p>We build the strategy together, so on the day you are not hoping it goes well. You know
+      the plan, because it is yours.</p>
     </div>
     <div>
       <div class="callout">
         <h2>Why places are limited</h2>
-        <p>I keep this group small on purpose. If we are going to do it, we do it
-        properly, and that means I can only take on so many athletes at this level at
-        once. When it is full, it is full.</p>
+        <p>I keep this group small on purpose. If we are going to do it, we do it properly, and
+        that means I can only take on so many athletes at this level at once. When it is full,
+        it is full.</p>
         <p style="margin-top:18px"><a class="btn on-dark ghost" href="{esc(CONTACT_URL)}">Ask about a place</a></p>
       </div>
     </div>
   </div>
 </section>
-
+{carousel("coaching", subhead="What athletes say about being coached by Tom")}
 <section class="alt">
+  <div class="wrap">
+    <div class="pricing-card">
+      <p class="eyebrow">Coached by Tom</p>
+      <div class="pricing-figure"><span class="amount">&pound;160</span><span class="per">a month</span></div>
+      <ul class="pricing-points">
+        <li>No setup fee</li>
+        <li>Three-month minimum</li>
+        <li>Limited places, taken one at a time</li>
+      </ul>
+      <p style="margin-top:6px"><a class="btn" href="{esc(CONTACT_URL)}">Apply for a place</a></p>
+      <p class="pricing-note">Not quite ready for this level? <a href="{BASE_PATH}/coached/">Coached is &pound;85 a month</a>.</p>
+    </div>
+  </div>
+</section>
+
+<section>
   <div class="wrap">
     <h2>Not sure which tier?</h2>
     <div class="which-grid">
@@ -670,12 +848,11 @@ def render_coaching(cat) -> str:
     </div>
   </div>
 </section>
-{quote_block("coaching")}
 </main>"""
-    desc = ("Coached by Tom, limited places. Everything in Coached plus Tom directly: "
-            "calls when you need them, WhatsApp when it is urgent, and race-day "
-            "strategy built together.")
-    return page("coaching", "Coached by Tom | Limited places | Horsepower Coaching", desc,
+    desc = ("Coached by Tom, £160 a month, limited places. A bespoke TrainingPeaks programme, "
+            "in-depth WKO5 analysis, unlimited contact and amendments, weekly feedback and a "
+            "race plan before every start line, built and read by Tom directly.")
+    return page("coaching", "Coached by Tom | £160 a month | Horsepower Coaching", desc,
                 BASE_URL + "/coaching/", body)
 
 
@@ -830,41 +1007,21 @@ def render_female(cat) -> str:
 
 <section class="alt">
   <div class="wrap feature-grid">
-    <div class="feature-copy">
-      <p class="eyebrow">The Female-First plan library</p>
-      <h2>Built for a female athlete, from session one</h2>
-      <p class="section-intro">Our Female-First plans are built for the female athlete targeting
-      a specific event. They use recovery-respecting structure and dedicated strength work for
-      bone and tendon health. What they do not do is claim to sync to your menstrual cycle: an
-      off-the-shelf plan cannot know where you are in yours, so we will not pretend it does.
-      That is what coaching is for.</p>
-    </div>
-    <div class="feature-media">{img("female-podium")}</div>
-  </div>
-</section>
-
-<section id="female-plans">
-  <div class="wrap">
-    <h2>Female-First training plans</h2>
-    <p class="section-intro">Four plans, each built for its event. One-off, delivered through TrainingPeaks.</p>
-    <div class="card-grid" style="margin-top:26px">{plan_cards}</div>
-  </div>
-</section>
-
-<section class="alt">
-  <div class="wrap feature-grid">
     <div class="feature-media">{img("female-trail")}</div>
     <div class="feature-copy">
       <p class="eyebrow">Coached and Coached by Tom</p>
       <h2>Genuinely cycle-aware coaching</h2>
-      <p class="section-intro">This is where female-specific training gets personal. When we
-      coach you, the plan adapts around your physiology, and the feedback on every session
-      reads what your body actually did in context: your symptoms, your recovery, where you
-      are in your month. It is coaching that responds to you, week to week, rather than a plan
-      that assumes an average woman.</p>
-      <p style="margin-top:18px">Tom coaches with a particular emphasis on female-specific
-      performance development, drawn from years of working with female athletes from first
-      finish lines to the front of the race.</p>
+      <p class="section-intro">This is where female-specific training stops being a label and
+      gets personal. When we coach you, three things happen that a downloadable plan cannot do.</p>
+      <ul class="about-list">
+        <li><strong>The plan adapts around your physiology.</strong> Load, recovery and intensity are shaped to how you respond, not to an average athlete.</li>
+        <li><strong>Feedback reads your sessions in context.</strong> What your body actually did, alongside your reported symptoms, recovery and where you are in your cycle.</li>
+        <li><strong>Strength for bone and tendon is built in.</strong> Not bolted on, because long-term durability is part of performance, not separate from it.</li>
+      </ul>
+      <p style="margin-top:16px">We are honest about the limits: coaching is personalised week to
+      week, and we will never overclaim what it does. Tom coaches with a particular emphasis on
+      female-specific performance development, drawn from years of working with female athletes
+      from first finish lines to the front of the race.</p>
       <p style="margin-top:20px">
         <a class="btn" href="{BASE_PATH}/coached/">How coaching works</a>
         <a class="btn ghost" href="{BASE_PATH}/coaching/" style="margin-left:10px">Coached by Tom</a>
@@ -873,13 +1030,28 @@ def render_female(cat) -> str:
   </div>
 </section>
 
-<section class="results results--image">
-  {img("ironman-wales-finish", cls="results-bg")}
+<section class="female-results">
   <div class="wrap">
-    <p>Trained for her body, not an average. That is how female athletes get to the front.</p>
+    <p class="eyebrow" style="color:var(--teal-soft)">Female results, not female participation</p>
+    <h2>Trained for her body, and to the front of the race</h2>
+    <div class="female-results-grid">
+      <div class="female-results-media">
+        <figure class="feature-media">{img("female-podium")}</figure>
+        <figure class="feature-media">{img("ironman-wales-finish")}</figure>
+      </div>
+      <div class="female-results-copy">
+        <div class="result-stats">
+          <div class="stat"><span class="n">1st</span><span class="k">Age group, Ironman Wales</span></div>
+          <div class="stat"><span class="n">45min</span><span class="k">Lead over her field</span></div>
+          <div class="stat"><span class="n">9th</span><span class="k">Overall vs the pro women</span></div>
+        </div>
+        <p class="reviews-result">{esc(CLIENT_RESULT_LINE)}</p>
+        <p class="reviews-result" style="color:#CFCFCF">Trained for her body, not an average. That is how female athletes get to the front.</p>
+      </div>
+    </div>
   </div>
 </section>
-
+{carousel("female", subhead="In her words", include_result=False, on_dark=False)}
 <section>
   <div class="wrap prose">
     <h2>Female performance, answered</h2>
@@ -887,20 +1059,27 @@ def render_female(cat) -> str:
   </div>
 </section>
 
-<section class="alt">
+<section id="female-plans" class="alt">
   <div class="wrap">
-    <div class="callout callout--wide">
-      <h2>Start with your body in mind</h2>
-      <p>Browse the Female-First plans, or get coached and have the training built around
-      your physiology, your event and your life.</p>
+    <p class="eyebrow">The entry point</p>
+    <h2>Female-First training plans</h2>
+    <p class="section-intro">Start here. Four plans, each built for a female athlete targeting its
+    event, with recovery-respecting structure and dedicated strength work for bone and tendon
+    health. What they do not do is claim to sync to your menstrual cycle: an off-the-shelf plan
+    cannot know where you are in yours, so we will not pretend it does. That is what coaching
+    is for. One-off, delivered through TrainingPeaks.</p>
+    <div class="card-grid" style="margin-top:26px">{plan_cards}</div>
+    <div class="callout callout--wide" style="margin-top:34px">
+      <h2>Want it built around your body?</h2>
+      <p>Get coached and have the training adapt around your physiology, your event and your life,
+      with genuinely cycle-aware feedback on every session.</p>
       <p style="margin-top:18px">
-        <a class="btn on-dark ghost" href="#female-plans">See the plans</a>
+        <a class="btn on-dark ghost" href="{BASE_PATH}/coaching/">Coached by Tom</a>
         <a class="btn" href="{BASE_PATH}/coached/" style="margin-left:10px">Get coached</a>
       </p>
     </div>
   </div>
 </section>
-{quote_block("female")}
 </main>"""
     desc = ("Female-first endurance coaching and training plans: female-specific triathlon, "
             "cycling and marathon training built for female athletes, with cycle-aware coaching. "
@@ -1038,11 +1217,32 @@ def run_gates(cat, written):
             if f"/plans/{slug}/" not in fem:
                 errors.append(f"female page missing link to plan {slug}")
 
-    # Gate 8: never fabricate rating markup (AggregateRating only if real numbers set).
+    # Gate 8: never fabricate rating markup (AggregateRating only if real numbers set),
+    # and when present it must carry the real verified numbers, nothing invented.
     if not (REVIEW_RATING and REVIEW_COUNT):
         for path, content in written.items():
             if "AggregateRating" in content:
                 errors.append(f"AggregateRating present without real review numbers in {path}")
+    else:
+        home = written["index.html"]
+        if "AggregateRating" not in home:
+            errors.append("AggregateRating schema missing from home despite real numbers")
+        if f'"ratingValue": "{REVIEW_RATING:g}"' not in home or f'"reviewCount": "{REVIEW_COUNT}"' not in home:
+            errors.append("AggregateRating does not carry the verified rating/count")
+
+    # Gate 8c: carousel-data integrity. Every rendered review quote must be one of
+    # the spec-verified strings, byte-exact (no inventing, no paraphrase, no
+    # completing Ian's truncated sentence). Every review carousel that ships must
+    # link out to the real Google profile.
+    for q in CLIENT_QUOTES:
+        if q["quote"] not in VERIFIED_QUOTES:
+            errors.append(f"carousel quote not in verified set: {q['quote'][:48]}...")
+    for path, content in html_pages.items():
+        if 'data-carousel' in content:
+            if f"Read all {REVIEW_COUNT} reviews on Google" not in content:
+                errors.append(f"carousel page missing 'read all reviews' Google link: {path}")
+            if GOOGLE_REVIEW_URL not in content:
+                errors.append(f"carousel page missing Google review URL: {path}")
 
     # Gate 8b: zero Domestiq cross-pollination anywhere (Tom's ruling: separate entities).
     for path, content in written.items():
