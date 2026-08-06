@@ -214,15 +214,18 @@ def page(active, title, description, canonical, body, extra="") -> str:
 IMG_BASE = BASE_PATH + "/assets/img"
 
 # Descriptive alt text, keyed by derivative name. Honours-band entries carry
-# the athlete's real name (identity verified per file; Tom confirmed the Hannah
-# tape-break 2026-08-05). Everything else stays name-free.
+# the athlete's name as first name + surname initial (Tom's privacy ruling,
+# 2026-08-06: never a client's full name anywhere on the site; identity still
+# verified per file). Everything else stays name-free. Tom Cooling, as the
+# business owner, is the one exception and keeps his full name.
 IMG_ALT = {
     # drop-2026-08-05
-    "honours-hannah-wales": "Hannah Saitch breaking the tape to win Ironman Wales 2022",
-    "honours-madison-finish": "Madison Shaddick finishing Ironman Wales 2025",
-    "honours-madison-tt": "Madison Shaddick in a full aero tuck racing a time trial on her pink-wheeled TT bike",
-    "honours-naomi-flag": "Naomi Shinkins wrapped in the Irish flag after finishing second at Swedeman 2026",
-    "female-naomi-tt": "Naomi Shinkins time trialling in Horsepower Coaching kit",
+    "honours-hannah-wales": "Hannah S breaking the tape to win Ironman Wales 2022",
+    "honours-madison-finish": "Madison S finishing Ironman Wales 2025",
+    "honours-madison-tt": "Madison S in a full aero tuck racing a time trial on her pink-wheeled TT bike",
+    "honours-naomi-flag": "Naomi S wrapped in the Irish flag after finishing second at Swedeman 2026",
+    "honours-elly-outlaw": "Elly B finishing the Outlaw triathlon, arms out on the finish carpet",
+    "female-naomi-tt": "Naomi S time trialling in Horsepower Coaching kit",
     "hero-tenby-swim": "Swimmers in wetsuits and pink caps charging into the sea at the Ironman Wales swim start at sunrise",
     "hero-alpine-mist": "An empty hairpin road high on a misty alpine pass",
     "hero-torridon-ridge": "Two runners crossing a rocky Torridon ridge under a brooding sky",
@@ -238,7 +241,7 @@ IMG_ALT = {
     "coached-tenby-swim": "Swimmers in pink caps crossing Tenby harbour below pastel houses during the Ironman Wales swim",
     "female-wales-podium": "The women's podium celebration at Ironman Wales with champagne mid-spray",
     "female-montblanc-hike": "An athlete in a Horsepower cap hiking alpine switchbacks with the Mont Blanc massif in the distance",
-    "female-welsh-tt": "Hannah Saitch in an aero tuck during the Welsh 100 mile time trial championships",
+    "female-welsh-tt": "Hannah S in an aero tuck during the Welsh 100 mile time trial championships",
     "plans-izoard-trio": "Three cyclists rounding a hairpin below the rock pinnacles of the Col d'Izoard",
     "plans-pyrenees-switchback": "A lone cyclist on a switchback gravel road high in the Pyrenees",
     "plans-pyrenees-dawn": "Layered Pyrenean valleys in dawn mist",
@@ -277,6 +280,7 @@ IMG_POS = {
     "honours-madison-finish": "50% 28%", # Madison's face + hands high in the 4/5 tile
     "honours-madison-tt": "50% 42%",     # helmet to wheels, rider centred
     "honours-naomi-flag": "54% 40%",     # Naomi's face + draped flag centred in the 4/5 crop
+    "honours-elly-outlaw": "48% 50%",    # Elly + both outstretched arms centred in the 4/5 crop
     "female-naomi-tt": "42% 45%",        # Naomi on the aero bars, left of centre
     "hero-tenby-swim": "50% 55%",        # swimmers + sunrise water, Goscar Rock right
     "hero-alpine-mist": "50% 55%",       # the hairpin low-centre
@@ -332,6 +336,7 @@ IMG_DIMS = {
     "honours-madison-finish": (602, 902),
     "honours-madison-tt": (667, 1000),
     "honours-naomi-flag": (1100, 734),
+    "honours-elly-outlaw": (1100, 732),
     "female-naomi-tt": (1200, 800),
     "hero-tenby-swim": (1200, 802),
     "hero-alpine-mist": (1200, 800),
@@ -381,12 +386,13 @@ def img(name, cls="", lazy=True, extra=""):
 GOOGLE_REVIEW_URL = "https://share.google/50jgAKYAnnnbGCbT3"
 REVIEW_RATING = 5.0                         # verified Google Business profile
 REVIEW_COUNT = 15                           # verified Google Business profile
-# Real client result used as the Madison Shaddick result slide. From Tom's
+# Real client result used as the Madison S result slide. From Tom's
 # authoritative palmares, provided 2026-07-29: Madison won Ironman Wales 2025
 # outright and placed 10th at the Ironman World Championships in Nice 2024. The
 # earlier "led her age group by 45 minutes / 9th overall" line is a wrong claim
-# and must never return (gate 8d, below).
-CLIENT_RESULT_LINE = ("Coached athlete Madison Shaddick won Ironman Wales 2025, "
+# and must never return (gate 8d, below). Client names render as first name +
+# surname initial only (Tom's privacy ruling, 2026-08-06; gate 8f).
+CLIENT_RESULT_LINE = ("Coached athlete Madison S won Ironman Wales 2025, "
                       "and placed 10th at the Ironman World Championships in Nice 2024.")
 
 # Verified verbatim quotes from Tom's Google Business profile (5.0, 15 reviews).
@@ -394,14 +400,14 @@ CLIENT_RESULT_LINE = ("Coached athlete Madison Shaddick won Ironman Wales 2025, 
 # earlier point and never invented past it. Every string here must appear in
 # VERIFIED_QUOTES byte-exact (carousel-data gate).
 CLIENT_QUOTES = [
-    {"name": "Ian Cheatle", "context": "Cycling athlete", "pages": ["coached"],
+    {"name": "Ian C", "context": "Cycling athlete", "pages": ["coached"],
      "quote": ("Tom is a great coach and has helped massively with my cycling, helping me "
                "achieve results I wouldn't have thought possible previously.")},
-    {"name": "jc bastos", "context": "Ironman finisher, 11h13", "pages": ["coached", "coaching"],
+    {"name": "jc b", "context": "Ironman finisher, 11h13", "pages": ["coached", "coaching"],
      "quote": ("I can't recommend Tom enough. Over the past year, the support, structure, "
                "and guidance I received helped me progress massively and achieve my "
                "Ironman goal, finishing in 11h13.")},
-    {"name": "Emma Needham", "context": "Multi-event athlete", "pages": ["female"],
+    {"name": "Emma N", "context": "Multi-event athlete", "pages": ["female"],
      "quote": ("Really enjoyed being coached by Horsepower Coaching. Tom really knows his "
                "stuff and is easy to talk to. If ever I had any questions, Tom was always "
                "quick to answer & provided detailed race plans for my various events. "
@@ -428,7 +434,7 @@ VERIFIED_QUOTES = {
     "The sessions are tough but always enjoyable I would highly recommend him",
 }
 
-# The Madison Shaddick result, rendered as a distinct slide in every carousel.
+# The Madison S result, rendered as a distinct slide in every carousel.
 MADDISON_SLIDE = {"kind": "result"}
 
 
@@ -462,7 +468,7 @@ def _slide_html(item):
             '<div class="stat"><span class="n">1st AG</span><span class="k">Ironman Swansea 70.3 2024, 2nd overall</span></div>'
             '</div>'
             f'<blockquote>{esc(CLIENT_RESULT_LINE)}</blockquote>'
-            '<figcaption>Madison Shaddick <span>Coached by Horsepower</span></figcaption>'
+            '<figcaption>Madison S <span>Coached by Horsepower</span></figcaption>'
             '</figure>')
     ctx = f' <span>{esc(item["context"])}</span>' if item.get("context") else ""
     return (f'<figure class="review-slide"><blockquote>{esc(item["quote"])}</blockquote>'
@@ -597,7 +603,7 @@ def render_home(cat) -> str:
   {img("ironman-wales-finish", cls="results-bg")}
   <div class="wrap">
     <p>{esc(RESULTS_LINE)}</p>
-    <p class="results-sub">Two Ironman Wales titles among the women we coach, and Elly Blackwell winning the Outlaw Half in 2026, are recent lines on that list.</p>
+    <p class="results-sub">Two Ironman Wales titles among the women we coach, and Elly B's age group win at the Outlaw Half in 2026, are recent lines on that list.</p>
   </div>
 </section>
 {reviews_band()}
@@ -1071,37 +1077,43 @@ FEMALE_LEAD = "Female first, not female adapted."
 
 # ── Female honours (Tom's authoritative palmares) ────────────────────────────
 # Every line below is taken verbatim from the results Tom provided 2026-07-29,
-# used exactly as written with no embellishment. Two of these women (Saitch
-# 2022, Shaddick 2025) have won Ironman Wales outright. The unconfirmed
+# used exactly as written with no embellishment. Two of these women (Hannah S
+# 2022, Madison S 2025) have won Ironman Wales outright. The unconfirmed
 # "50 mile TT course record" claim is deliberately excluded. Do NOT add results
-# that are not on Tom's list; the old Shaddick "45-minute lead / 9th overall"
+# that are not on Tom's list; the old Madison S "45-minute lead / 9th overall"
 # line is a wrong claim and is gate-banned site-wide (gate 8d).
-# `img` is the athlete's own verified photo (drop-2026-08-05); a tile with no
-# img renders as a deliberate text tile. Never reuse another athlete's photo or
-# an unidentified one here: name-photo pairing is a hard factual rule.
+# Names render as first name + surname initial, no trailing period (Tom's
+# privacy ruling, 2026-08-06: never a client's full name anywhere on the site;
+# gate 8f bans the surnames site-wide). The palmares lines are untouched.
+# `img` is the athlete's own verified photo (drops 2026-08-05/06). Never reuse
+# another athlete's photo or an unidentified one here: name-photo pairing is a
+# hard factual rule.
 # Madison's 2025 supporting line is Tom's precision wording (2026-08-05): her
 # Ironman Wales 2025 win was as overall women's age group champion.
 FEMALE_HONOURS = [
-    {"name": "Hannah Saitch", "img": "honours-hannah-wales",
+    {"name": "Hannah S", "img": "honours-hannah-wales",
      "lines": ["Ironman Wales 2022 champion",
                "The ROC Wales 2021 - 1st, bike course record",
                "XTRI Celtman 2021 - 3rd, bike course record",
                "Welsh 100 Mile Time Trial Championships 2023 - 1st",
                "XTRI Norseman 2022 - 3rd"]},
-    {"name": "Madison Shaddick", "img": "honours-madison-finish",
+    {"name": "Madison S", "img": "honours-madison-finish",
      "lines": ["Ironman Wales 2025 champion",
                "Overall women's age group champion, Ironman Wales 2025",
                "10th, Ironman World Championships Nice 2024",
                "Wales Middle and Long Distance Champion 2025",
                "Ironman Swansea 70.3 2024 - 1st age group, 2nd overall",
                "Cotswold 113 2024 - 1st, Cotswold 51 Fiver 2024 - 1st"]},
-    {"name": "Naomi Shinkins", "img": "honours-naomi-flag",
+    {"name": "Naomi S", "img": "honours-naomi-flag",
      "lines": ["XTRI Swedeman 2026 - 2nd",
                "XTRI Celtman 2025 - 3rd",
                "Slateman Triathlon 2024 - 1st",
                "Brutal Triathlon 2024 - 1st"]},
-    {"name": "Elly Blackwell",
-     "lines": ["Outlaw Half Triathlon 2026 champion"]},
+    # Elly's tile photo: her Tom-confirmed Outlaw finish (drop 2026-08-06).
+    # Tom's correction 2026-08-06: her Outlaw Half 2026 result is an age group
+    # win, NOT the overall title; never present it as an overall win.
+    {"name": "Elly B", "img": "honours-elly-outlaw",
+     "lines": ["Outlaw Half Triathlon 2026 - age group winner"]},
 ]
 
 FEMALE_FAQ = [
@@ -1238,12 +1250,12 @@ def render_female(cat) -> str:
     <p class="eyebrow">The women who prove it</p>
     <h2>Real names, real results</h2>
     <p class="section-intro" style="color:#CFCFCF">Not stock-photo athletes. These are Horsepower-coached
-    women. Two of them, Hannah Saitch and Madison Shaddick, have won Ironman Wales outright, and every
+    women. Two of them, Hannah S and Madison S, have won Ironman Wales outright, and every
     line below comes straight from their race results, not invented.</p>
     <div class="honours-grid">{"".join(
-      f'<div class="honour{"" if h.get("img") else " honour--text"}">'
-      + (f'<div class="honour-media">{img(h["img"])}</div>' if h.get("img") else "")
-      + f'<div class="honour-body"><h3 class="honour-name">{esc(h["name"])}</h3>'
+      f'<div class="honour">'
+      f'<div class="honour-media">{img(h["img"])}</div>'
+      f'<div class="honour-body"><h3 class="honour-name">{esc(h["name"])}</h3>'
       f'<ul class="honour-stats">{"".join(f"<li>{esc(l)}</li>" for l in h["lines"])}</ul>'
       f'</div></div>' for h in FEMALE_HONOURS)}</div>
   </div>
@@ -1321,8 +1333,8 @@ BANNER_SLOTS = [
      "lede": ("Endurance training was written for men and handed to women with the numbers "
               "turned down. We do it the other way round."),
      "candidates": ["female-hero", "female-wales-podium", "female-montblanc-hike",
-                    ("female-naomi-tt", "Naomi Shinkins time trialling in Horsepower kit"),
-                    ("honours-madison-tt", "Madison Shaddick on the TT bike"),
+                    ("female-naomi-tt", "Naomi S time trialling in Horsepower kit"),
+                    ("honours-madison-tt", "Madison S on the TT bike"),
                     "female-welsh-tt"]},
     {"id": "plans-banner", "kind": "pagebanner", "name": "Plans banner",
      "where": "The full-width banner at the top of the plan library.",
@@ -1558,7 +1570,7 @@ def run_gates(cat, written):
             if GOOGLE_REVIEW_URL not in content:
                 errors.append(f"carousel page missing Google review URL: {path}")
 
-    # Gate 8d: the old wrong Shaddick claim must never reappear (it was never
+    # Gate 8d: the old wrong Madison S claim must never reappear (it was never
     # in Tom's authoritative palmares: not a 45-minute AG lead, not 9th overall).
     BANNED_CLAIMS = ["by 45 minutes", ">45min<", "9th overall against the professional"]
     for path, content in written.items():
@@ -1568,7 +1580,9 @@ def run_gates(cat, written):
 
     # Gate 8e: female honours band carries exactly Tom's authoritative palmares
     # (provided 2026-07-29): every athlete + every line present, byte-exact, and
-    # the two Ironman Wales champion headlines lead the band.
+    # the two Ironman Wales champion headlines lead the band. Athlete names are
+    # asserted as they render: first name + surname initial (gate 8f), straight
+    # from the FEMALE_HONOURS source of truth.
     fem_page = written.get("female-performance/index.html", "")
     for h in FEMALE_HONOURS:
         if esc(h["name"]) not in fem_page and h["name"] not in fem_page:
@@ -1577,9 +1591,23 @@ def run_gates(cat, written):
             if esc(l) not in fem_page and l not in fem_page:
                 errors.append(f"female honours missing line: {l[:48]}")
     for required in ("Ironman Wales 2022 champion", "Ironman Wales 2025 champion",
-                     "Outlaw Half Triathlon 2026 champion"):
+                     "Outlaw Half Triathlon 2026 - age group winner"):
         if required not in fem_page:
             errors.append(f"female honours missing required headline: {required}")
+
+    # Gate 8f: client-name privacy (Tom's ruling, 2026-08-06: "i dont mind
+    # Hannah S etc but not the full name"). Client and reviewer names render as
+    # first name + surname initial only, so no client surname may appear
+    # anywhere in the generated output. Tom Cooling, the business owner, is the
+    # one exemption and keeps his full name.
+    BANNED_SURNAMES = ["Saitch", "Shaddick", "Shinkins", "Blackwell",
+                       "Cheatle", "Needham", "bastos"]
+    for path, content in written.items():
+        low = content.lower()
+        for s in BANNED_SURNAMES:
+            if s.lower() in low:
+                errors.append(f"client surname {s!r} found in {path} "
+                              "(names must be first name + surname initial)")
 
     # Gate 8b: zero Domestiq cross-pollination anywhere (Tom's ruling: separate entities).
     for path, content in written.items():
@@ -1614,6 +1642,7 @@ def run_gates(cat, written):
     print(f"  - female performance page: lead line + FAQPage schema + 4 plan links")
     print(f"  - {img_count} images shipped, {img_bytes/1024:.0f}KB total (budget 3584KB); no fabricated ratings")
     print(f"  - zero 'domestiq' occurrences across all generated output")
+    print(f"  - zero client surnames across all generated output (first name + initial policy)")
 
 
 if __name__ == "__main__":

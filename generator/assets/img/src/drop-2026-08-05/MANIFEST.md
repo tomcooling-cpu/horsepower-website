@@ -55,7 +55,7 @@ Format: `filename` | subject | scene | orientation | quality | suggested slot(s)
 - `top 5 - 2.jpg` | subject: scenery/atmosphere | scene: misty high-alpine hairpin (Grossglockner-style), empty wet road, 5000px wide | orientation: landscape | quality: hero-grade | suggested slot(s): landing-hero (alt), plans-banner, atmosphere-band
 - `top 5 - 5.jpg` | subject: Madison S. | scene: IRONMAN Wales 2025 finish, bib "143 Princess" (F30-34), hands to face in disbelief, BRAV kit | orientation: portrait | quality: support (small file ~600px) | suggested slot(s): honours-madison
 
-## naomi-2026-08-05 (../naomi-2026-08-05/, Tom-confirmed Naomi Shinkins, 2026-08-05)
+## naomi-2026-08-05 (../naomi-2026-08-05/, Tom-confirmed Naomi S, 2026-08-05)
 
 - `WhatsApp Image 2026-05-26 at 13.09.23.jpeg` | subject: Naomi S. | scene: time trialling in Horsepower Coaching kit (blue jersey, sunset stripes), aero tuck on Cervelo, white Giro helmet, open road | orientation: landscape | quality: hero-grade | suggested slot(s): female-performance-banner, honours-naomi
 - `WhatsApp Image 2026-07-05 at 09.09.10.jpeg` | subject: Naomi S. | scene: Swedeman 2026 bike leg, forest road on the Cervelo | orientation: landscape | quality: hero-grade | suggested slot(s): female-performance-banner, atmosphere-band

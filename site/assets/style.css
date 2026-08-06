@@ -549,14 +549,6 @@ section { padding: 64px 0; }
    WS-SITE6: real athlete photos (honours tiles, about gallery, coached figures)
    ========================================================================== */
 
-/* Honours: a tile with no verified photo reads deliberate, not unfinished */
-.honour--text .honour-body { justify-content: center; min-height: 240px; }
-.honour--text .honour-name { font-size: 1.3rem; }
-.honour--text .honour-body::before {
-  content: ""; display: block; width: 44px; height: 4px; background: var(--teal);
-  border-radius: 2px; margin-bottom: 16px;
-}
-
 /* Captioned figures (about gallery, coached pages) */
 .photo-fig { margin: 0; border-radius: 14px; overflow: hidden;
   box-shadow: 0 14px 34px rgba(0,0,0,0.14); background: var(--white);

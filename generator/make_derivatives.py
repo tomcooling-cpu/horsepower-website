@@ -21,7 +21,7 @@ OUT = os.path.join(HERE, "assets", "img")
 WIDE = 1500   # full-bleed heroes / banners / bands
 FEAT = 1100   # contained feature-media / portraits
 DROP = "drop-2026-08-05"
-NAOMI = "naomi-2026-08-05"   # Tom-confirmed Naomi Shinkins photos, 2026-08-05
+NAOMI = "naomi-2026-08-05"   # Tom-confirmed Naomi S photos, 2026-08-05
 JOBS = {
     "hero-alps":            ("hero-alps.jpg",            WIDE, 74),
     "hero-welsh-climb":     ("hero-welsh-climb.jpg",     WIDE, 62),
@@ -49,11 +49,13 @@ JOBS = {
     # out of every named/captioned slot and ships nowhere. Sources kept on disk.
     # Naomi's tile is now her Tom-confirmed Swedeman 2026 finish (Irish flag).
     "honours-naomi-flag":      (NAOMI + "/WhatsApp Image 2026-08-05 at 16.00.27 (3).jpeg", 1100, 76),
+    # Elly's honours tile: her Tom-confirmed Outlaw finish (drop 2026-08-06).
+    "honours-elly-outlaw":     ("elly-outlaw-finish.jpeg", FEAT, 76),
     "female-naomi-tt":         (NAOMI + "/WhatsApp Image 2026-05-26 at 13.09.23.jpeg", 1200, 60),
     # drop-2026-08-05: banner candidates (/options/) + about/coached imagery
     "hero-tenby-swim":         (DROP + "/alternate - 9.jpg", 1200, 58),
-    "hero-alpine-mist":        (DROP + "/top 5 - 2.jpg", 1200, 52),
-    "hero-torridon-ridge":     (DROP + "/f8380d24-01f9-4543-a1a9-988d2cc9797f.jpeg", 1200, 50),
+    "hero-alpine-mist":        (DROP + "/top 5 - 2.jpg", 1200, 46),
+    "hero-torridon-ridge":     (DROP + "/f8380d24-01f9-4543-a1a9-988d2cc9797f.jpeg", 1200, 44),
     "tom-hill-climb":          (DROP + "/athlete-race.jpg", 1300, 76),
     "tom-alps-lead":           (DROP + "/1-HR-ALPS-2019RCL_4825.jpg", 1000, 56),
     "tom-alps-finish":         (DROP + "/5-HR-ALPS-2019DSC_1620.jpg", 1000, 62),
@@ -66,11 +68,11 @@ JOBS = {
     "coaching-support-roadside": (DROP + "/a2cd6f11-54dd-4d8c-8e3a-cf0ddbc787c2.jpeg", 1100, 78),
     "coached-almere-finish":   (DROP + "/773897ce-9f4e-4e72-916f-2aa6b00e1ca8.jpeg", 1100, 74),
     "coached-tenby-swim":      (DROP + "/alternate - 13.jpg", 1400, 68),
-    "female-wales-podium":     (DROP + "/0_IRONMAN-Wales.jpg", 1200, 58),
+    "female-wales-podium":     (DROP + "/0_IRONMAN-Wales.jpg", 1200, 52),
     "female-montblanc-hike":   (DROP + "/d78204b9-4429-404f-b1d6-45f5ce36e68a.jpeg", 850, 48),
     "female-welsh-tt":         (DROP + "/462639565_581577237629776_1513627609080372586_n.jpg", 1200, 66),
-    "plans-izoard-trio":       (DROP + "/eed1217f-0113-4798-9a88-e38932a2e93e.jpeg", 1200, 50),
-    "plans-pyrenees-switchback": (DROP + "/c0d36a66-7ae7-40d6-a2a6-2c1af2d4ef01.jpeg", 1200, 62),
+    "plans-izoard-trio":       (DROP + "/eed1217f-0113-4798-9a88-e38932a2e93e.jpeg", 1200, 45),
+    "plans-pyrenees-switchback": (DROP + "/c0d36a66-7ae7-40d6-a2a6-2c1af2d4ef01.jpeg", 1200, 54),
     "plans-pyrenees-dawn":     (DROP + "/597e93c5-7cb4-4990-b350-ba0250b120ba.jpeg", 1200, 68),
 }
 
