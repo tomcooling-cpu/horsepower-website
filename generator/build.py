@@ -829,7 +829,7 @@ def render_home(cat) -> str:
       </div>
       <div class="tier-card">
         <h3>Coached by Tom</h3>
-        <div class="price">Limited places</div>
+        <div class="price">&pound;160 a month</div>
         <p>{esc(TIER_TOM_BODY)}</p>
         <p>{esc(TIER_TOM_BODY_2)}</p>
         <a class="btn" href="{BASE_PATH}/coaching/">See if there is a place</a>
