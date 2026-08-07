@@ -22,6 +22,7 @@ WIDE = 1500   # full-bleed heroes / banners / bands
 FEAT = 1100   # contained feature-media / portraits
 DROP = "drop-2026-08-05"
 NAOMI = "naomi-2026-08-05"   # Tom-confirmed Naomi S photos, 2026-08-05
+ABOUT = "about-2026-08-07"   # Tom-confirmed race gallery photos, 2026-08-07
 JOBS = {
     "hero-alps":            ("hero-alps.jpg",            WIDE, 74),
     "hero-welsh-climb":     ("hero-welsh-climb.jpg",     WIDE, 62),
@@ -29,10 +30,15 @@ JOBS = {
     "ironman-wales-finish": ("ironman-wales-finish.jpg", WIDE, 76),
     "coached-band":         ("coached-band.jpeg",        WIDE, 66),
     "alpine-ridge":         ("alpine-hairpins.jpeg",     WIDE, 66),
-    "tom-gravel":           ("tom-gravel.jpeg",          1400, 58),
-    "camp-group":           ("camp-group.jpeg",          1400, 52),
-    "female-tt":            ("female-tt.jpeg",           FEAT, 80),
-    "female-podium":        ("female-podium.jpg",        FEAT, 80),
+    # RETIRED (WS-SITE9): tom-gravel (Tom: "dont use that picture"), camp-group
+    # ("disorganised group"), female-podium (results band removed) and
+    # coached-tenby-swim (swimmers not visible; replaced by hero-tenby-swim).
+    # Their old .webp files are deleted from assets/img so they stop shipping.
+    # female-tt (home "Female first" feature): the source frames Madison S in the
+    # right ~40% with empty road left, so she reads off-centre in the portrait
+    # tile. WS-SITE9: a centred crop of the SAME photo (Tom's ask, 1b). Optional
+    # 4th tuple element is a pixel crop box (left, top, right, bottom).
+    "female-tt":            ("female-tt.jpeg",           FEAT, 80, (466, 461, 1366, 1586)),
     "female-trail":         ("female-trail.jpeg",        900, 58),
     "tom-portrait":         ("tom-portrait.jpeg",        FEAT, 80),
     # drop-2026-08-05: honours band (athlete identity verified per file)
@@ -67,21 +73,32 @@ JOBS = {
     "tom-alps-signon":         (DROP + "/9-HR-ALPS-2019ARN_4191.jpg", 800, 64),
     "coaching-support-roadside": (DROP + "/a2cd6f11-54dd-4d8c-8e3a-cf0ddbc787c2.jpeg", 1100, 78),
     "coached-almere-finish":   (DROP + "/773897ce-9f4e-4e72-916f-2aa6b00e1ca8.jpeg", 1100, 74),
-    "coached-tenby-swim":      (DROP + "/alternate - 13.jpg", 1400, 68),
     "female-wales-podium":     (DROP + "/0_IRONMAN-Wales.jpg", 1200, 52),
     "female-montblanc-hike":   (DROP + "/d78204b9-4429-404f-b1d6-45f5ce36e68a.jpeg", 850, 48),
     "female-welsh-tt":         (DROP + "/462639565_581577237629776_1513627609080372586_n.jpg", 1200, 66),
     "plans-izoard-trio":       (DROP + "/eed1217f-0113-4798-9a88-e38932a2e93e.jpeg", 1200, 45),
     "plans-pyrenees-switchback": (DROP + "/c0d36a66-7ae7-40d6-a2a6-2c1af2d4ef01.jpeg", 1200, 54),
     "plans-pyrenees-dawn":     (DROP + "/597e93c5-7cb4-4990-b350-ba0250b120ba.jpeg", 1200, 68),
+    # about-2026-08-07: About "Racing it, not just coaching it" gallery. These
+    # render as small captioned tiles (~360px), so quality is tuned low to keep
+    # the whole shipped payload inside the gate-9 budget.
+    "about-brecon-titan":        (ABOUT + "/brecon-titan-finish.jpg", 1100, 56),
+    "about-dolomites-descender": (ABOUT + "/hr-dolomites-descender.jpg", 1000, 54),
+    "about-dolomites-cobbles":   (ABOUT + "/hr-dolomites-cobbles.jpg", 1000, 56),
+    "about-dolomites-pink-arch": (ABOUT + "/hr-dolomites-pink-arch.jpg", 900, 60),
+    "about-transpyrenees-night": (ABOUT + "/transpyrenees-finish-night.jpg", 1000, 66),
 }
 
 
 
 def main():
     total = 0
-    for name, (src, longedge, q) in sorted(JOBS.items()):
+    for name, spec in sorted(JOBS.items()):
+        src, longedge, q = spec[0], spec[1], spec[2]
+        crop = spec[3] if len(spec) > 3 else None
         im = Image.open(os.path.join(SRC, src)).convert("RGB")
+        if crop:
+            im = im.crop(crop)
         w, h = im.size
         scale = min(1.0, longedge / max(w, h))
         if scale < 1.0:

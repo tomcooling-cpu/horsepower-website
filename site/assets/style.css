@@ -574,3 +574,29 @@ section { padding: 64px 0; }
 /* Options: note tag (flags a recommended pick) */
 .opt-tag--note { background: var(--teal-soft); color: var(--teal-dark);
   border-color: var(--teal-soft); text-transform: none; letter-spacing: 0.02em; }
+
+/* ============================================================================
+   WS-SITE9: About Us reformat, 5-up qualifications, branded CTA, more-reviews
+   ========================================================================== */
+
+/* About Us hero: intro copy left, the head-shot portrait top-right (fills the
+   old dead white band so the top of the page reads balanced). */
+.about-hero { padding: 56px 0 60px; }
+.about-hero-grid { display: grid; gap: 34px; grid-template-columns: 1fr; align-items: center; }
+@media (min-width: 820px) { .about-hero-grid { grid-template-columns: 1.15fr 0.85fr; } }
+.about-hero-portrait { margin: 0; border-radius: 14px; overflow: hidden;
+  box-shadow: 0 18px 40px rgba(0,0,0,0.38); max-width: 400px; width: 100%;
+  justify-self: end; background: #1a1a1a; }
+.about-hero-portrait img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; display: block; }
+.about-hero-portrait figcaption { padding: 10px 14px; font-size: 0.85rem; color: #B9B9B9; }
+@media (max-width: 819px) { .about-hero-portrait { margin: 0 auto; justify-self: center; } }
+
+/* Qualifications: five credential cards flow cleanly (3 up, then 2). */
+.cred-band--five { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+
+/* About: photo-free branded CTA band (the china-clay quarry banner is retired). */
+.about-cta { border-top: 4px solid var(--teal); }
+
+/* Female reviews: the honest "more reviews on the way" placeholder slide. */
+.review-slide--more { border-style: dashed; border-color: var(--teal); background: var(--grey-bg); }
+.review-slide--more blockquote { color: var(--grey-dark); }

@@ -128,8 +128,7 @@ NAV = [
     ("Female Performance", BASE_PATH + "/female-performance/", "female"),
     ("Plans", BASE_PATH + "/plans/", "plans"),
     (TIER2_NAME, BASE_PATH + "/coached/", "coached"),
-    ("About", BASE_PATH + "/about/", "about"),
-    ("Contact", CONTACT_URL, "contact"),
+    ("About Us", BASE_PATH + "/about/", "about"),
 ]
 
 
@@ -138,7 +137,9 @@ def header(active) -> str:
     for label, href, key in NAV:
         cur = ' aria-current="page"' if key == active else ""
         items.append(f'<li><a href="{esc(href)}"{cur}>{esc(label)}</a></li>')
-    items.append(f'<li><a class="cta" href="{BASE_PATH}/plans/">{esc(CTA_FIND)}</a></li>')
+    # The single Contact CTA (teal button). Plan discovery lives on the "Plans"
+    # nav link, so the button points at Contact instead of duplicating Plans.
+    items.append(f'<li><a class="cta" href="{esc(CONTACT_URL)}">Contact</a></li>')
     return f"""<div class="teal-bar"></div>
 <header class="site-header">
   <div class="header-inner">
@@ -229,11 +230,16 @@ IMG_ALT = {
     "hero-tenby-swim": "Swimmers in wetsuits and pink caps charging into the sea at the Ironman Wales swim start at sunrise",
     "hero-alpine-mist": "An empty hairpin road high on a misty alpine pass",
     "hero-torridon-ridge": "Two runners crossing a rocky Torridon ridge under a brooding sky",
-    "tom-hill-climb": "Tom Cooling racing the National Hill Climb Championships in Horsepower kit",
+    "tom-hill-climb": "Tom Cooling racing the National Time Trial Championships in Horsepower kit",
     "tom-alps-lead": "Tom Cooling on the front of a group climbing a tree-lined alpine road at the Haute Route Alps",
     "tom-alps-finish": "Tom Cooling riding into the Haute Route Alps stage finish at Serre Chevalier",
     "tom-dolomites-arch": "Tom Cooling riding through the timing arch at the Haute Route Dolomites with snowy peaks behind",
-    "tom-bottle-refill": "Tom Cooling refilling a bottle mid-ride in a Haute Route jersey",
+    "tom-bottle-refill": "Tom Cooling refuelling during the Lost Dot TransPyrenees",
+    "about-brecon-titan": "Tom Cooling running through the finish arch to complete the Brecon Titan",
+    "about-dolomites-descender": "Tom Cooling descending a Dolomites pass below jagged peaks at the Haute Route Dolomites",
+    "about-dolomites-cobbles": "Tom Cooling riding across the cobbles at a Haute Route Dolomites stage start",
+    "about-dolomites-pink-arch": "Tom Cooling riding through the Haute Route Dolomites arch with snowy peaks behind",
+    "about-transpyrenees-night": "Tom Cooling greeted at the finish of the Lost Dot TransPyrenees at night",
     "tom-swim-kaolinite": "Tom Cooling with his race number before the Kaolinite open-water swim race",
     "tom-alps-signon": "Tom Cooling giving a thumbs up while holding his rider board at Haute Route Alps sign-on",
     "coaching-support-roadside": "Tom Cooling in a Horsepower cap giving a thumbs up to a racing athlete from the roadside on the Ironman Wales bike course",
@@ -271,7 +277,7 @@ IMG_POS = {
     "coached-band": "50% 52%",           # TT rider mid-frame against the mountain
     "tom-gravel": "64% 46%",             # Tom riding toward camera, right of text
     "camp-group": "50% 58%",             # the bunch of riders low-centre
-    "female-tt": "62% 44%",              # keep the full rider + pink TT bike in frame
+    "female-tt": "50% 45%",              # centred crop of Madison S (WS-SITE9 1b)
     "female-podium": "50% 30%",          # the three athletes' faces
     "female-trail": "50% 54%",           # runner on the trail, centre
     "tom-portrait": "50% 30%",           # Tom's face
@@ -290,6 +296,11 @@ IMG_POS = {
     "tom-alps-finish": "42% 52%",        # Tom left of centre, TAG Heuer arch behind
     "tom-dolomites-arch": "50% 55%",     # rider in the arch, peaks above
     "tom-bottle-refill": "50% 30%",      # Tom's face + bottle
+    "about-brecon-titan": "50% 40%",     # Tom central under the FINISH arch
+    "about-dolomites-descender": "50% 55%",  # descending rider low, peaks above
+    "about-dolomites-cobbles": "50% 45%",    # rider + Haute Route arch behind
+    "about-dolomites-pink-arch": "50% 50%",  # rider centred, arch cropped to portrait
+    "about-transpyrenees-night": "50% 32%",  # Tom's face upper in the 4/5 crop
     "tom-swim-kaolinite": "50% 35%",     # Tom's face, race number lower
     "tom-alps-signon": "46% 40%",        # Tom + the THOMAS 2044 board centred
     "coaching-support-roadside": "50% 45%",  # Tom's thumbs up + the passing rider
@@ -328,7 +339,7 @@ IMG_DIMS = {
     "alpine-ridge": (1500, 1001),
     "female-hero": (1500, 1001), "ironman-wales-finish": (1500, 1000),
     "coached-band": (1500, 999), "tom-gravel": (1400, 1050),
-    "camp-group": (1400, 1050), "female-tt": (734, 1100),
+    "camp-group": (1400, 1050), "female-tt": (880, 1100),
     "female-podium": (825, 1100), "female-trail": (675, 900),
     "tom-portrait": (825, 1100),
     # drop-2026-08-05
@@ -346,6 +357,11 @@ IMG_DIMS = {
     "tom-alps-finish": (1000, 666),
     "tom-dolomites-arch": (1000, 667),
     "tom-bottle-refill": (667, 1000),
+    "about-brecon-titan": (1100, 733),
+    "about-dolomites-descender": (1000, 667),
+    "about-dolomites-cobbles": (1000, 665),
+    "about-dolomites-pink-arch": (900, 600),
+    "about-transpyrenees-night": (750, 1000),
     "tom-swim-kaolinite": (667, 1000),
     "tom-alps-signon": (800, 533),
     "coaching-support-roadside": (768, 1024),
@@ -436,6 +452,11 @@ VERIFIED_QUOTES = {
 
 # The Madison S result, rendered as a distinct slide in every carousel.
 MADDISON_SLIDE = {"kind": "result"}
+# A clearly-styled "more reviews" state (WS-SITE9, 3d). The female carousel holds
+# every genuine female review in the repo (currently one, Emma N); rather than
+# fabricate testimonials, we append this honest placeholder so the carousel reads
+# as intentional and is ready to take the review screenshots Tom is sending.
+MORE_SLIDE = {"kind": "more"}
 
 
 def _review_cta(cls="btn on-dark ghost"):
@@ -459,6 +480,13 @@ def quotes_for(page):
 
 
 def _slide_html(item):
+    if item.get("kind") == "more":
+        return (
+            '<figure class="review-slide result-slide review-slide--more">'
+            '<blockquote>More reviews from the women we coach are on the way. In the '
+            'meantime, read what Horsepower athletes say on Google.</blockquote>'
+            '<figcaption>Horsepower Coaching <span>Verified Google reviews</span></figcaption>'
+            '</figure>')
     if item.get("kind") == "result":
         return (
             '<figure class="review-slide result-slide">'
@@ -479,12 +507,14 @@ _CAROUSEL_SEQ = [0]
 
 
 def carousel(page, heading="What athletes say", subhead="Real athletes, real finish lines",
-             on_dark=True, include_result=True):
+             on_dark=True, include_result=True, more_state=False):
     """Accessible auto-advancing review carousel for `page`. Vanilla JS
     (assets/carousel.js) drives auto-advance, arrows, dots, hover/focus pause."""
     slides = list(quotes_for(page))
     if include_result:
         slides = slides + [MADDISON_SLIDE]
+    if more_state:
+        slides = slides + [MORE_SLIDE]
     if not slides:
         return ""
     _CAROUSEL_SEQ[0] += 1
@@ -518,13 +548,16 @@ def carousel(page, heading="What athletes say", subhead="Real athletes, real fin
 
 
 def quote_block(page):
-    """Per-page review carousel (light theme), or nothing if none for this page."""
+    """Per-page review carousel (light theme), or nothing if none for this page.
+    Reviews-only: the Madison result slide is deliberately excluded here (Tom's
+    ruling for the Coached page, WS-SITE9) so this carousel reads as reviews."""
     if not quotes_for(page):
-        # still show the Madison result on female / coaching even without a page quote
+        # still show the carousel on female / coaching even without a page quote
         if page not in ("female", "coaching", "coached"):
             return ""
     return carousel(page, heading="In their words",
-                    subhead="What athletes say about Horsepower", on_dark=False)
+                    subhead="What athletes say about Horsepower", on_dark=False,
+                    include_result=False)
 
 
 def reviews_band():
@@ -546,7 +579,7 @@ def render_home(cat) -> str:
     total = cat["stats"]["total"]
     body = f"""<main id="main">
 <section class="hero hero--image">
-  {img("hero-alps", cls="hero-bg", lazy=False)}
+  {img("hero-alpine-mist", cls="hero-bg", lazy=False)}
   <div class="wrap">
     <h1>{esc(HERO_HEADLINE)}</h1>
     <p class="lede">{esc(HERO_BODY)}</p>
@@ -603,7 +636,7 @@ def render_home(cat) -> str:
   {img("ironman-wales-finish", cls="results-bg")}
   <div class="wrap">
     <p>{esc(RESULTS_LINE)}</p>
-    <p class="results-sub">Two Ironman Wales titles among the women we coach, and Elly B's age group win at the Outlaw Half in 2026, are recent lines on that list.</p>
+    <p class="results-sub">A proven track record of taking clients to the podium and to the finish line of the dream they started with.</p>
   </div>
 </section>
 {reviews_band()}
@@ -679,7 +712,7 @@ def render_plans_index(cat) -> str:
 </article>""")
 
     body = f"""<main id="main">
-<div class="page-banner">{img("hero-welsh-climb", cls="banner-bg", lazy=False)}</div>
+<div class="page-banner">{img("hero-alps", cls="banner-bg", lazy=False)}</div>
 <section class="alt" style="padding-bottom:24px">
   <div class="wrap">
     <p class="eyebrow">The plan library</p>
@@ -785,7 +818,7 @@ def render_coached(cat) -> str:
   </div>
 </section>
 
-<div class="media-band">{img("coached-band", cls="media-bg")}</div>
+<div class="media-band">{img("hero-torridon-ridge", cls="media-bg")}</div>
 
 <section>
   <div class="wrap">
@@ -823,7 +856,7 @@ def render_coached(cat) -> str:
   </div>
 </section>
 
-<div class="media-band">{img("coached-tenby-swim", cls="media-bg")}</div>
+<div class="media-band">{img("hero-tenby-swim", cls="media-bg")}</div>
 
 <section>
   <div class="wrap">
@@ -867,7 +900,7 @@ def render_coaching(cat) -> str:
         for t, d in COACHED_BY_TOM_GET)
     body = f"""<main id="main">
 <section class="hero hero--image">
-  {img("tom-gravel", cls="hero-bg", lazy=False)}
+  {img("tom-alps-finish", cls="hero-bg", lazy=False)}
   <div class="wrap">
     <p class="eyebrow" style="color:var(--teal-soft)">Coached by Tom &middot; &pound;160 a month &middot; Limited places</p>
     <h1>A coach in your corner for all&nbsp;of&nbsp;it</h1>
@@ -883,9 +916,11 @@ def render_coaching(cat) -> str:
   <div class="wrap">
     <p class="eyebrow">Everything you get</p>
     <h2>Complete world class coaching</h2>
-    <p class="section-intro">Coached by Tom is my highest level of support. You get everything in
-    Coached, built and read by me directly, plus the tools, the analysis and the contact that
-    turn a good block into a great season.</p>
+    <p class="section-intro">When only the best will do. This is the highest level of support
+    Horsepower offers, for the athlete who wants the coach in their corner: someone who
+    understands them and their training completely. In-depth analysis of every session, a
+    complete holistic approach across bike fit, race craft, fuelling and the mental side, and a
+    plan that is truly yours, built and read by me directly.</p>
     <div class="get-grid">{get_cards}</div>
   </div>
 </section>
@@ -934,7 +969,7 @@ def render_coaching(cat) -> str:
   </div>
 </section>
 
-<div class="media-band">{img("camp-group", cls="media-bg")}</div>
+<div class="media-band">{img("plans-izoard-trio", cls="media-bg")}</div>
 {carousel("coaching", subhead="What athletes say about being coached by Tom")}
 <section class="alt">
   <div class="wrap">
@@ -973,13 +1008,17 @@ def render_coaching(cat) -> str:
 def render_about(cat) -> str:
     # Bio content is VERBATIM from the current site; structure/order is presentation.
     body = f"""<main id="main">
-<section class="hero" style="padding:56px 0 60px">
-  <div class="wrap">
-    <p class="eyebrow" style="color:var(--teal-soft)">About Tom Cooling</p>
-    <h1>The coach behind Horsepower</h1>
-    <p class="lede">Tom Cooling is an ex-elite triathlete, seasoned ultra-bike racer
-    and FKT holder, with over a decade of coaching athletes from complete beginners to
-    world-tour level professionals.</p>
+<section class="hero about-hero">
+  <div class="wrap about-hero-grid">
+    <div class="about-hero-copy">
+      <p class="eyebrow" style="color:var(--teal-soft)">About Us</p>
+      <h1>The coach behind Horsepower</h1>
+      <p class="lede">Tom Cooling is an ex-elite triathlete, seasoned ultra-bike racer
+      and FKT holder, with over a decade of coaching athletes from complete beginners to
+      world-tour level professionals.</p>
+    </div>
+    <figure class="about-hero-portrait">{img("tom-portrait")}
+      <figcaption>Tom Cooling, founder and head coach of Horsepower Coaching</figcaption></figure>
   </div>
 </section>
 
@@ -1007,8 +1046,7 @@ def render_about(cat) -> str:
     </div>
     <div class="about-side">
       <figure class="photo-fig photo-fig--port">{img("tom-hill-climb")}
-        <figcaption>Racing the National Hill Climb Championships in Horsepower kit</figcaption></figure>
-      <figure class="portrait">{img("tom-portrait")}</figure>
+        <figcaption>National Time Trial Championships</figcaption></figure>
     </div>
   </div>
 </section>
@@ -1017,10 +1055,12 @@ def render_about(cat) -> str:
   <div class="wrap">
     <p class="eyebrow">Qualifications</p>
     <h2>The credentials behind the coaching</h2>
-    <div class="cred-band">
+    <div class="cred-band cred-band--five">
       <div class="cred"><h3>Sport science</h3><p>First Class BA and Master's Degree in Sport Science and Athlete Development.</p></div>
-      <div class="cred"><h3>Breathwork</h3><p>Oxygen Advantage Advanced Breathwork Instructor qualification.</p></div>
+      <div class="cred"><h3>Breathwork and freediving</h3><p>Oxygen Advantage Advanced Breathwork Instructor, and AIDA L4 Freediver.</p></div>
       <div class="cred"><h3>Heat adaptation</h3><p>Accredited heat-training coach with applied experience in climate adaptation protocols.</p></div>
+      <div class="cred"><h3>Extreme triathlon</h3><p>Core Temp and XTRI Extreme Triathlon Accredited Coach.</p></div>
+      <div class="cred"><h3>Mountain leadership</h3><p>BMC (British Mountaineering Council) Trained and Assessed Mountain Leader.</p></div>
     </div>
   </div>
 </section>
@@ -1030,30 +1070,28 @@ def render_about(cat) -> str:
     <p class="eyebrow">Tom on the start line</p>
     <h2>Racing it, not just coaching it</h2>
     <p class="section-intro">The coaching is grounded in racing. Haute Route weeks in the Alps
-    and the Dolomites, the National Hill Climb Championships, open-water swim racing: the same
-    kind of preparation Horsepower athletes get, tested first-hand.</p>
+    and the Dolomites, the Lost Dot TransPyrenees, the Brecon Titan: the same kind of
+    preparation Horsepower athletes get, tested first-hand.</p>
     <div class="about-gallery">
-      <figure class="photo-fig photo-fig--land">{img("tom-alps-lead")}
-        <figcaption>Haute Route Alps 2019</figcaption></figure>
-      <figure class="photo-fig photo-fig--land">{img("tom-alps-finish")}
-        <figcaption>Haute Route Alps 2019, Serre Chevalier stage finish</figcaption></figure>
-      <figure class="photo-fig photo-fig--land">{img("tom-dolomites-arch")}
-        <figcaption>Haute Route Dolomites 2019</figcaption></figure>
+      <figure class="photo-fig photo-fig--land">{img("about-brecon-titan")}
+        <figcaption>Brecon Titan</figcaption></figure>
+      <figure class="photo-fig photo-fig--land">{img("about-dolomites-descender")}
+        <figcaption>Haute Route Dolomites</figcaption></figure>
+      <figure class="photo-fig photo-fig--land">{img("about-dolomites-cobbles")}
+        <figcaption>Haute Route Dolomites</figcaption></figure>
     </div>
     <div class="about-gallery">
+      <figure class="photo-fig photo-fig--port">{img("about-transpyrenees-night")}
+        <figcaption>Lost Dot TransPyrenees</figcaption></figure>
+      <figure class="photo-fig photo-fig--port">{img("about-dolomites-pink-arch")}
+        <figcaption>Haute Route Dolomites</figcaption></figure>
       <figure class="photo-fig photo-fig--port">{img("tom-bottle-refill")}
-        <figcaption>Between climbs at the Haute Route</figcaption></figure>
-      <figure class="photo-fig photo-fig--port">{img("tom-swim-kaolinite")}
-        <figcaption>Kaolinite open-water swim race, 2025</figcaption></figure>
-      <figure class="photo-fig photo-fig--port">{img("tom-alps-signon")}
-        <figcaption>Sign-on at the Haute Route Alps 2019</figcaption></figure>
+        <figcaption>Lost Dot TransPyrenees</figcaption></figure>
     </div>
   </div>
 </section>
 
-<div class="media-band">{img("tom-gravel", cls="media-bg")}</div>
-
-<section>
+<section class="alt about-cta">
   <div class="wrap">
     <h2>Train with Tom</h2>
     <p class="section-intro">Start with a plan built for your race, get coached from
@@ -1069,7 +1107,7 @@ def render_about(cat) -> str:
     desc = ("Tom Cooling is an ex-elite triathlete, ultra-bike racer and FKT holder "
             "with over a decade coaching beginners to world-tour professionals across "
             "triathlon, ultra-bike and Haute Route racing.")
-    return page("about", "About Tom Cooling | Horsepower Coaching", desc,
+    return page("about", "About Us | Horsepower Coaching", desc,
                 BASE_URL + "/about/", body)
 
 
@@ -1100,6 +1138,7 @@ FEMALE_HONOURS = [
     {"name": "Madison S", "img": "honours-madison-finish",
      "lines": ["Ironman Wales 2025 champion",
                "Overall women's age group champion, Ironman Wales 2025",
+               "Welsh 100 Mile Time Trial Champion 2026",
                "10th, Ironman World Championships Nice 2024",
                "Wales Middle and Long Distance Champion 2025",
                "Ironman Swansea 70.3 2024 - 1st age group, 2nd overall",
@@ -1223,32 +1262,11 @@ def render_female(cat) -> str:
   </div>
 </section>
 
-<section class="female-results">
-  <div class="wrap">
-    <p class="eyebrow" style="color:var(--teal-soft)">Female results, not female participation</p>
-    <h2>Trained for her body, and to the front of the race</h2>
-    <div class="female-results-grid">
-      <div class="female-results-media">
-        <figure class="feature-media">{img("female-podium")}</figure>
-        <figure class="feature-media">{img("ironman-wales-finish")}</figure>
-      </div>
-      <div class="female-results-copy">
-        <div class="result-stats">
-          <div class="stat"><span class="n">1st</span><span class="k">Woman, Ironman Wales 2025</span></div>
-          <div class="stat"><span class="n">10th</span><span class="k">Ironman World Championships, Nice 2024</span></div>
-          <div class="stat"><span class="n">1st AG</span><span class="k">Ironman Swansea 70.3 2024, 2nd overall</span></div>
-        </div>
-        <p class="reviews-result">{esc(CLIENT_RESULT_LINE)}</p>
-        <p class="reviews-result" style="color:#CFCFCF">Trained for her body, not an average. That is how female athletes get to the front.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
 <section class="female-honours">
   <div class="wrap">
     <p class="eyebrow">The women who prove it</p>
     <h2>Real names, real results</h2>
+    <p style="color:var(--teal-soft);font-family:'Oswald',sans-serif;font-size:1.15rem;letter-spacing:0.04em;margin:6px 0 14px">Female results, not female participation.</p>
     <p class="section-intro" style="color:#CFCFCF">Not stock-photo athletes. These are Horsepower-coached
     women. Two of them, Hannah S and Madison S, have won Ironman Wales outright, and every
     line below comes straight from their race results, not invented.</p>
@@ -1260,7 +1278,7 @@ def render_female(cat) -> str:
       f'</div></div>' for h in FEMALE_HONOURS)}</div>
   </div>
 </section>
-{carousel("female", subhead="In her words", include_result=False, on_dark=False)}
+{carousel("female", subhead="In her words", include_result=False, on_dark=False, more_state=True)}
 <section>
   <div class="wrap prose">
     <h2>Female performance, answered</h2>
@@ -1308,25 +1326,29 @@ def render_female(cat) -> str:
 # renders as an extra tag next to the option letter (e.g. "Recommended").
 BANNER_SLOTS = [
     {"id": "landing-hero", "kind": "hero", "name": "Landing hero",
-     "where": "The home page hero, first thing every visitor sees.",
+     "where": "The home page hero, first thing every visitor sees. Ships live as "
+              "hero-alpine-mist; the alternates below are here for you to override.",
      "eyebrow": "", "headline": HERO_HEADLINE,
      "lede": ("Your first 70.3. Ironman Wales. Kona. A 100 mile TT. Whatever the dream is, "
               "Horsepower takes it as seriously as you do."),
-     "candidates": ["hero-alps", "hero-welsh-climb", "alpine-ridge", "ironman-wales-finish",
-                    "hero-tenby-swim", "hero-alpine-mist", "hero-torridon-ridge"]},
+     "candidates": ["hero-alpine-mist",
+                    ("hero-tenby-swim", "Alternate: Ironman Wales sunrise swim start"),
+                    ("hero-torridon-ridge", "Alternate: Torridon ridge runners"),
+                    "hero-alps", "hero-welsh-climb", "alpine-ridge", "ironman-wales-finish"]},
     {"id": "coaching-top", "kind": "hero", "name": "Coached by Tom, top banner",
-     "where": "The hero at the top of the Coached by Tom page.",
+     "where": "The hero at the top of the Coached by Tom page. Ships live as "
+              "tom-alps-finish; the alternates below are here for you to override.",
      "eyebrow": "Coached by Tom · £160 a month · Limited places",
      "headline": "A coach in your corner for all of it",
      "lede": ("Everything in Coached, plus me. Calls when you need them, WhatsApp when it is "
               "urgent, and a coach who knows your story, not just your data."),
-     "candidates": ["tom-gravel", "coached-band", "alpine-ridge", "camp-group",
-                    ("tom-hill-climb", "Recommended: Tom racing the National Hill Climb in HP kit"),
-                    "tom-alps-finish", "tom-alps-lead"]},
+     "candidates": ["tom-alps-finish",
+                    ("tom-hill-climb", "Alternate: Tom racing the National Time Trial Championships in HP kit"),
+                    "tom-alps-lead", "coached-band", "alpine-ridge"]},
     {"id": "coaching-mid", "kind": "band", "name": "Coached by Tom, mid-page banner",
      "where": "The full-width band above the weekly rhythm section. Shipped live as "
               "alpine-ridge; the alternates below are here for you to override.",
-     "candidates": ["alpine-ridge", "camp-group", "coached-band", "hero-welsh-climb"]},
+     "candidates": ["alpine-ridge", "coached-band", "hero-welsh-climb", "hero-torridon-ridge"]},
     {"id": "female-performance-banner", "kind": "hero", "name": "Female Performance hero",
      "where": "The hero at the top of the Female Performance page.",
      "eyebrow": "Female performance", "headline": FEMALE_LEAD,
@@ -1337,9 +1359,15 @@ BANNER_SLOTS = [
                     ("honours-madison-tt", "Madison S on the TT bike"),
                     "female-welsh-tt"]},
     {"id": "plans-banner", "kind": "pagebanner", "name": "Plans banner",
-     "where": "The full-width banner at the top of the plan library.",
-     "candidates": ["hero-welsh-climb", "alpine-ridge", "hero-alps", "coached-band",
-                    "plans-izoard-trio", "plans-pyrenees-switchback", "plans-pyrenees-dawn"]},
+     "where": "The full-width banner at the top of the plan library. Ships live as "
+              "hero-alps; the alternates below are here for you to override.",
+     "candidates": ["hero-alps", "plans-pyrenees-switchback", "plans-pyrenees-dawn",
+                    "plans-izoard-trio", "hero-welsh-climb", "alpine-ridge", "coached-band"]},
+    {"id": "coached-top", "kind": "band", "name": "Coached (£85), top banner",
+     "where": "The full-width band under the hero on the Coached page. Ships live as "
+              "hero-torridon-ridge; the alternates below are here for you to override.",
+     "candidates": ["hero-torridon-ridge", "alpine-ridge", "plans-pyrenees-switchback",
+                    "coached-band"]},
 ]
 
 
@@ -1591,6 +1619,7 @@ def run_gates(cat, written):
             if esc(l) not in fem_page and l not in fem_page:
                 errors.append(f"female honours missing line: {l[:48]}")
     for required in ("Ironman Wales 2022 champion", "Ironman Wales 2025 champion",
+                     "Welsh 100 Mile Time Trial Champion 2026",
                      "Outlaw Half Triathlon 2026 - age group winner"):
         if required not in fem_page:
             errors.append(f"female honours missing required headline: {required}")
