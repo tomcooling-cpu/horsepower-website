@@ -404,7 +404,8 @@ IMG_ALT = {
     "tom-hill-climb": "Tom Cooling racing the National Time Trial Championships in Horsepower kit",
     "tom-alps-lead": "Tom Cooling on the front of a group climbing a tree-lined alpine road at the Haute Route Alps",
     "tom-alps-finish": "Tom Cooling riding into the Haute Route Alps stage finish at Serre Chevalier",
-    "tom-dolomites-arch": "Tom Cooling riding through the timing arch at the Haute Route Dolomites with snowy peaks behind",
+    "coached-tom-dolomites-arch": "Tom Cooling racing through the Haute Route Dolomites finish arch",
+    "coaching-alpine-hairpin": "Sportive riders rounding an alpine hairpin towards the camera",
     "tom-bottle-refill": "Tom Cooling refuelling during the Lost Dot TransPyrenees",
     "about-brecon-titan": "Tom Cooling running through the finish arch to complete the Brecon Titan",
     "about-dolomites-descender": "Tom Cooling descending a Dolomites pass below jagged peaks at the Haute Route Dolomites",
@@ -465,7 +466,8 @@ IMG_POS = {
     "tom-hill-climb": "50% 32%",         # Tom out of the saddle, upper third in wide crops
     "tom-alps-lead": "50% 45%",          # Tom on the front of the bunch
     "tom-alps-finish": "42% 52%",        # Tom left of centre, TAG Heuer arch behind
-    "tom-dolomites-arch": "50% 55%",     # rider in the arch, peaks above
+    "coached-tom-dolomites-arch": "50% 46%",  # Tom + the timing arch held in the wide banner crop
+    "coaching-alpine-hairpin": "50% 58%",     # riders + road low-centre in the band
     "tom-bottle-refill": "50% 30%",      # Tom's face + bottle
     "about-brecon-titan": "50% 40%",     # Tom central under the FINISH arch
     "about-dolomites-descender": "50% 55%",  # descending rider low, peaks above
@@ -526,7 +528,8 @@ IMG_DIMS = {
     "tom-hill-climb": (867, 1300),
     "tom-alps-lead": (1000, 667),
     "tom-alps-finish": (1000, 666),
-    "tom-dolomites-arch": (1000, 667),
+    "coached-tom-dolomites-arch": (1600, 1067),
+    "coaching-alpine-hairpin": (1200, 798),
     "tom-bottle-refill": (667, 1000),
     "about-brecon-titan": (1100, 733),
     "about-dolomites-descender": (1000, 667),
@@ -875,7 +878,7 @@ def render_plans_index(cat) -> str:
 </article>""")
 
     body = f"""<main id="main">
-<div class="page-banner">{img("plans-pyrenees-switchback", cls="banner-bg", lazy=False)}</div>
+<div class="page-banner">{img("plans-izoard-trio", cls="banner-bg", lazy=False)}</div>
 <section class="alt" style="padding-bottom:24px">
   <div class="wrap">
     <p class="eyebrow">The plan library</p>
@@ -929,7 +932,7 @@ def render_plans_index(cat) -> str:
         collection, service])
     return page("plans", f"Training Plan Library | {total} plans built for your race | Horsepower Coaching",
                 desc, prod_url("/plans/"), body,
-                og_image_name="plans-pyrenees-switchback", extra=extra)
+                og_image_name="plans-izoard-trio", extra=extra)
 
 
 def render_plan_detail(cat, p) -> str:
@@ -1120,7 +1123,7 @@ def render_coaching(cat) -> str:
         for t, d in COACHED_BY_TOM_GET)
     body = f"""<main id="main">
 <section class="hero hero--image">
-  {img("tom-alps-finish", cls="hero-bg", lazy=False)}
+  {img("coached-tom-dolomites-arch", cls="hero-bg", lazy=False)}
   <div class="wrap">
     <p class="eyebrow" style="color:var(--teal-soft)">Coached by Tom &middot; &pound;160 a month &middot; Limited places</p>
     <h1>A coach in your corner for all&nbsp;of&nbsp;it</h1>
@@ -1189,7 +1192,7 @@ def render_coaching(cat) -> str:
   </div>
 </section>
 
-<div class="media-band">{img("plans-izoard-trio", cls="media-bg")}</div>
+<div class="media-band">{img("coaching-alpine-hairpin", cls="media-bg")}</div>
 {carousel("coaching", subhead="What athletes say about being coached by Tom")}
 <section class="alt">
   <div class="wrap">
@@ -1230,7 +1233,7 @@ def render_coaching(cat) -> str:
     extra = ld_script([
         breadcrumb_node([("Home", "/"), ("Coached by Tom", None)]), svc])
     return page("coaching", "Coached by Tom | £160 a month | Horsepower Coaching", desc,
-                prod_url("/coaching/"), body, og_image_name="tom-alps-finish", extra=extra)
+                prod_url("/coaching/"), body, og_image_name="coached-tom-dolomites-arch", extra=extra)
 
 
 def render_about(cat) -> str:
@@ -1569,12 +1572,13 @@ BANNER_SLOTS = [
                     "hero-alps", "hero-welsh-climb", "alpine-ridge", "ironman-wales-finish"]},
     {"id": "coaching-top", "kind": "hero", "name": "Coached by Tom, top banner",
      "where": "The hero at the top of the Coached by Tom page. Ships live as "
-              "tom-alps-finish; the alternates below are here for you to override.",
+              "coached-tom-dolomites-arch; the alternates below are here for you to override.",
      "eyebrow": "Coached by Tom · £160 a month · Limited places",
      "headline": "A coach in your corner for all of it",
      "lede": ("Everything in Coached, plus me. Calls when you need them, WhatsApp when it is "
               "urgent, and a coach who knows your story, not just your data."),
-     "candidates": ["tom-alps-finish",
+     "candidates": ["coached-tom-dolomites-arch",
+                    ("tom-alps-finish", "Alternate: Tom riding into the Haute Route Alps stage finish"),
                     ("tom-hill-climb", "Alternate: Tom racing the National Time Trial Championships in HP kit"),
                     "tom-alps-lead", "coached-band", "alpine-ridge"]},
     {"id": "coaching-mid", "kind": "band", "name": "Coached by Tom, mid-page banner",
@@ -1592,9 +1596,11 @@ BANNER_SLOTS = [
                     "female-welsh-tt"]},
     {"id": "plans-banner", "kind": "pagebanner", "name": "Plans banner",
      "where": "The full-width banner at the top of the plan library. Ships live as "
-              "plans-pyrenees-switchback; the alternates below are here for you to override.",
-     "candidates": ["plans-pyrenees-switchback", "hero-alps", "plans-pyrenees-dawn",
-                    "plans-izoard-trio", "hero-welsh-climb", "alpine-ridge", "coached-band"]},
+              "plans-izoard-trio; the alternates below are here for you to override.",
+     "candidates": ["plans-izoard-trio",
+                    ("plans-pyrenees-switchback", "Alternate: lone rider on a Pyrenean switchback"),
+                    ("hero-alps", "Alternate: cyclist climbing high above an alpine valley"),
+                    "plans-pyrenees-dawn", "hero-welsh-climb", "alpine-ridge", "coached-band"]},
     {"id": "coached-top", "kind": "band", "name": "Coached (£85), top banner",
      "where": "The full-width band under the hero on the Coached page. Ships live as "
               "hero-torridon-ridge; the alternates below are here for you to override.",
@@ -1974,10 +1980,11 @@ def run_gates(cat, written):
     if "/options/" in smx:
         errors.append("sitemap.xml must not list /options/")
 
-    # Gate 13: the live Plans page banner serves the Tom-approved switchback image.
+    # Gate 13: the live Plans page banner serves the Tom-chosen Izoard trio image
+    # (WS-SITE11b; previously plans-pyrenees-switchback).
     plans_idx = written.get("plans/index.html", "")
-    if 'class="page-banner"' in plans_idx and "plans-pyrenees-switchback.webp" not in plans_idx:
-        errors.append("plans page banner is not plans-pyrenees-switchback.webp")
+    if 'class="page-banner"' in plans_idx and "plans-izoard-trio.webp" not in plans_idx:
+        errors.append("plans page banner is not plans-izoard-trio.webp")
 
     # Gate 9: total shipped image weight under budget.
     img_dir = os.path.join(SITE, "assets", "img")

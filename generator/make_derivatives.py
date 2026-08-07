@@ -24,11 +24,11 @@ DROP = "drop-2026-08-05"
 NAOMI = "naomi-2026-08-05"   # Tom-confirmed Naomi S photos, 2026-08-05
 ABOUT = "about-2026-08-07"   # Tom-confirmed race gallery photos, 2026-08-07
 JOBS = {
-    "hero-alps":            ("hero-alps.jpg",            WIDE, 74),
-    "hero-welsh-climb":     ("hero-welsh-climb.jpg",     WIDE, 62),
+    "hero-alps":            ("hero-alps.jpg",            WIDE, 58),
+    "hero-welsh-climb":     ("hero-welsh-climb.jpg",     WIDE, 50),
     "female-hero":          ("female-hero.jpg",          WIDE, 72),
     "ironman-wales-finish": ("ironman-wales-finish.jpg", WIDE, 76),
-    "coached-band":         ("coached-band.jpeg",        WIDE, 66),
+    "coached-band":         ("coached-band.jpeg",        WIDE, 54),
     "alpine-ridge":         ("alpine-hairpins.jpeg",     WIDE, 66),
     # RETIRED (WS-SITE9): tom-gravel (Tom: "dont use that picture"), camp-group
     # ("disorganised group"), female-podium (results band removed) and
@@ -68,14 +68,21 @@ JOBS = {
     "hero-alpine-mist":        (DROP + "/top 5 - 2.jpg", 1200, 46),
     "hero-torridon-ridge":     (DROP + "/f8380d24-01f9-4543-a1a9-988d2cc9797f.jpeg", 1200, 44),
     "tom-hill-climb":          (DROP + "/athlete-race.jpg", 1300, 76),
-    "tom-alps-lead":           (DROP + "/1-HR-ALPS-2019RCL_4825.jpg", 1000, 56),
+    # tom-alps-lead / hero-welsh-climb / coached-band are /options/-only preview
+    # candidates (not live on any page), so their quality is tuned down here to
+    # buy budget for the two new WS-SITE11b live banners below (gate-9 rebalance).
+    "tom-alps-lead":           (DROP + "/1-HR-ALPS-2019RCL_4825.jpg", 1000, 46),
     "tom-alps-finish":         (DROP + "/5-HR-ALPS-2019DSC_1620.jpg", 1000, 62),
-    "tom-dolomites-arch":      (DROP + "/2-hrdolo2019-rcl_d-453.jpg", 1000, 64),
+    # WS-SITE11b: Tom-chosen Coached-by-Tom TOP banner. Haute Route Dolomites
+    # finish/timing arch (pink kit, snowy peaks, fisheye). Landscape banner
+    # derivative at ~1600px, quality-tuned to hold the gate-9 budget. Replaces the
+    # old, unused 1000px tom-dolomites-arch (deleted).
+    "coached-tom-dolomites-arch": (DROP + "/2-hrdolo2019-rcl_d-453.jpg", 1600, 54),
+    # WS-SITE11b: Coached-by-Tom mid-page media band. Sportive riders rounding an
+    # alpine hairpin toward camera. Replaces plans-izoard-trio on this page (which
+    # is now the Plans banner) so no photo appears on two pages.
+    "coaching-alpine-hairpin": (DROP + "/74bc0ff2-16b0-4952-b3d6-de86488a4fa8.jpeg", 1200, 54),
     "tom-bottle-refill":       (DROP + "/7901535e-2f91-4d53-b57a-1fb930e63529.jpeg", 1000, 76),
-    "tom-swim-kaolinite":      (DROP + "/kaolinite'25-037.jpg", 1000, 74),
-    # NOTE: ff9312d4 (pink-cap portrait) is skipped: it duplicates the existing
-    # tom-portrait source already live on the About rail.
-    "tom-alps-signon":         (DROP + "/9-HR-ALPS-2019ARN_4191.jpg", 800, 64),
     "coaching-support-roadside": (DROP + "/a2cd6f11-54dd-4d8c-8e3a-cf0ddbc787c2.jpeg", 1100, 78),
     "coached-almere-finish":   (DROP + "/773897ce-9f4e-4e72-916f-2aa6b00e1ca8.jpeg", 1100, 74),
     "female-wales-podium":     (DROP + "/0_IRONMAN-Wales.jpg", 1200, 52),
