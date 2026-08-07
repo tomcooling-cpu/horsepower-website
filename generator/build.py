@@ -55,16 +55,36 @@ def og_image_url(name: str) -> str:
 DEFAULT_OG_IMAGE = "ironman-wales-finish"   # landscape fallback social image
 
 # ── Approved copy (VERBATIM) ─────────────────────────────────────────────────
-HERO_HEADLINE = "Big goals are built from ordinary weeks done properly."
-HERO_BODY = ("Your first 70.3. Ironman Wales. Kona. A 100 mile TT. Whatever the dream "
-             "is, the road there isn't a secret session or a magic block. It's week "
-             "after week of the right training, done at the right dose, adjusted when "
-             "life happens. That's what Horsepower does. It's your dream. We take it "
-             "as seriously as you do.")
+# Tom's voice: first person, warm, direct, British, no-nonsense (WS-SITE12 de-AI
+# rewrite, 2026-08-07, in answer to Jo's "reads very AI" note). Do NOT "tidy"
+# these into neat "not X, Y" antitheses or rule-of-three triads; that is the tell
+# Jo flagged. The one deliberately-kept antithesis is the locked female headline
+# "Female first, not female adapted." (FEMALE_LEAD, below).
+HERO_HEADLINE = "Big goals are built from ordinary weeks, done properly."
+HERO_BODY = ("Your first 70.3. Ironman Wales. Kona. A 100 mile TT. Whatever your dream "
+             "is, getting there comes down to doing the right training week after week, "
+             "at the right dose, and adjusting when life gets in the way. That's what I "
+             "do, and I take your dream as seriously as you do.")
 CTA_FIND = "Find your plan"
 CTA_GET = "Get coached"
 
-# ── Tier 2 name (the £85/month self-coached tier) ────────────────────────────
+# Anti-AI band on the home page (copy A). Answers Jo's "reads very AI" note head on.
+HUMAN_HEADING = "Written by me. Not by a machine."
+HUMAN_BODY = ("Every plan on this site is built by me, Tom Cooling, using the same "
+              "approach I use with the athletes I coach one to one. When you get "
+              "feedback, it is me reading your session and telling you what I see, not "
+              "an algorithm writing a paragraph. This is proper coaching, from a proper "
+              "coach, honed over a decade of taking real athletes to real results.")
+
+# Female-first block (copy E). Home female feature + /female-performance/ intro.
+# The locked headline stays FEMALE_LEAD; this is the body that sits beneath it.
+FEMALE_FIRST_BODY = ("Most plans were built around male physiology and handed to women "
+                     "to get on with. I build them the other way round. Your plan starts "
+                     "from how a female athlete actually trains, adapts and recovers, and "
+                     "when I coach you it works around your cycle and your life, not an "
+                     "average that was never you.")
+
+# ── Tier 2 name (the £120/month self-coached tier) ───────────────────────────
 # Tom is choosing a new name (candidates: The Programme / Race Ready / Horsepower
 # Method / Built for You). Until he picks, this stays "Coached". Changing this one
 # line renames the tier everywhere it is referenced by name: nav, footer, tier
@@ -75,44 +95,59 @@ CTA_GET = "Get coached"
 # the word literally; on rename those need Tom's re-approval, by design.
 TIER2_NAME = "Coached"
 
-TIER_PLANS_BODY = ("Over 150 training plans, each one built for a target race, not "
-                   "adapted from a template. First marathon to Ironman, hill climbs "
-                   "to 100 mile TTs. Every session tells you exactly what to do and "
-                   "why, in plain language, with every target set as a percentage of "
-                   "your own numbers so the plan fits you and not an average.")
-TIER_COACHED_BODY = ("Your race, your hours, your plan. We build your programme block "
-                     "by block around your life and your target event, review every "
-                     "session you complete with real feedback from your actual data, "
-                     "and put a proper race plan in your hands before every start "
-                     "line. When your numbers move, the plan moves. No calls, no "
-                     "fluff, just the work and the why.")
-TIER_TOM_BODY = ("Everything in Coached, plus me. Calls when you need them, WhatsApp "
-                 "when it's urgent, race-day strategy built together, and a coach who "
-                 "knows your story, not just your data. I keep this group small on "
-                 "purpose. If we're going to do it, we do it properly.")
+# Plans tier (copy B). One block, reused on the home tier card and the /plans/ intro.
+TIER_PLANS_BODY = ("Built for your race, ready to start today. Pick from over 150 plans, "
+                   "every one written by me for a specific event and goal, delivered "
+                   "straight into TrainingPeaks. The same session design my coached "
+                   "athletes follow. For the rider who knows how to train and just wants "
+                   "a proven plan to follow.")
+
+# Coached tier (copy C), two paragraphs. Home tier card + the /coached/ page body.
+TIER_COACHED_BODY = ("A plan built for you, not pulled off a shelf. I write your "
+                     "programme myself, block by block, exactly the way I do for my "
+                     "fully coached athletes. At the end of each block I look at "
+                     "everything you have done, tell you what I see, and build the next "
+                     "block around where you actually are, not where the plan assumed "
+                     "you would be.")
+TIER_COACHED_BODY_2 = ("The only difference from full coaching is the contact. There are "
+                       "no catch-up calls and I am not on call day to day. The coaching "
+                       "that goes into the plan is identical. A real coach shaping your "
+                       "training around your life and your numbers, without the premium "
+                       "of unlimited access.")
+
+# Coached by Tom tier (copy D), two paragraphs. Home tier card + the /coaching/ hero.
+TIER_TOM_BODY = ("The full thing. One to one, bespoke, and as close as it gets to having "
+                 "a professional coach in your corner. I build your programme around your "
+                 "race, your life and your body, then I am with you the whole way: "
+                 "feedback every week, in depth analysis of the sessions that matter, and "
+                 "support across everything that decides the day, from pacing and "
+                 "fuelling to race craft, bike fit and the mental side.")
+TIER_TOM_BODY_2 = ("This is the coaching that has taken Horsepower athletes to Ironman "
+                   "titles, course records and finish lines they were told were beyond "
+                   "them. Places are limited, because there are only so many athletes I "
+                   "can coach this closely at once.")
 
 RESULTS_LINE = ("Ironman wins. 70.3 podiums. XTRI podiums. Haute Route podiums. Ultra "
-                "race wins. And a lot of first finish lines, which we're just as proud "
+                "race wins. And a lot of first finish lines, which I'm just as proud "
                 "of.")
 
 WHICH_PLANS = "Know what you're doing and want a proven route? Plans."
 WHICH_COACHED = "Want the plan built around your life, and someone reading your sessions? Coached."
 WHICH_TOM = "Chasing something big and want a coach in your corner for all of it? Coached by Tom."
 
-PLANS_INTRO = ("Built for your race, not for everyone's. A plan for the Fred Whitton "
-               "is not a plan for the London Marathon with the sports swapped. Every "
-               "plan in this library was built for its event: the climbing, the heat, "
-               "the distance, the specific thing that makes that day hard. Pick your "
-               "race, pick your level, and get to work.")
+# The /plans/ intro is copy B, reused verbatim from the home tier card.
+PLANS_INTRO = TIER_PLANS_BODY
 
-COACHED_INTRO = ("Your race, your hours, your plan, for £85 a month. Not a template "
-                 "with your name on it. A programme built around your life and your "
-                 "target event, with real feedback on the sessions you actually do.")
+COACHED_INTRO = ("The coaching that goes into my fully coached athletes' plans, written "
+                 "for you, for £120 a month. I build your programme block by block and "
+                 "give you real feedback on the sessions you actually do.")
 
 # Strings that must appear byte-exact in the built output (copy-verbatim gate).
 VERBATIM_REQUIRED = [
-    HERO_HEADLINE, HERO_BODY, TIER_PLANS_BODY, TIER_COACHED_BODY, TIER_TOM_BODY,
-    RESULTS_LINE, WHICH_PLANS, WHICH_COACHED, WHICH_TOM, PLANS_INTRO,
+    HERO_HEADLINE, HERO_BODY, HUMAN_HEADING, HUMAN_BODY, FEMALE_FIRST_BODY,
+    TIER_PLANS_BODY, TIER_COACHED_BODY, TIER_COACHED_BODY_2,
+    TIER_TOM_BODY, TIER_TOM_BODY_2, RESULTS_LINE,
+    WHICH_PLANS, WHICH_COACHED, WHICH_TOM, PLANS_INTRO,
 ]
 
 EM_DASH = "—"
@@ -345,7 +380,7 @@ def person_node():
 def service_node(name, description, path, monthly_price=None, low_price=None,
                  high_price=None, offer_count=None):
     """A coaching Service node. Prices are only ever stated where they are public
-    on the site (£39.99+ Plans, £85/mo Coached, £160/mo Coached by Tom)."""
+    on the site (£39.99+ Plans, £120/mo Coached, £160/mo Coached by Tom)."""
     node = {
         "@context": "https://schema.org", "@type": "Service",
         "serviceType": "Endurance coaching",
@@ -764,6 +799,16 @@ def render_home(cat) -> str:
   </div>
 </section>
 
+<section class="alt">
+  <div class="wrap">
+    <div class="callout callout--wide">
+      <p class="eyebrow" style="color:var(--teal-soft)">The Horsepower difference</p>
+      <h2>{esc(HUMAN_HEADING)}</h2>
+      <p>{esc(HUMAN_BODY)}</p>
+    </div>
+  </div>
+</section>
+
 <section>
   <div class="wrap">
     <p class="eyebrow">Three ways to train with Horsepower</p>
@@ -777,14 +822,16 @@ def render_home(cat) -> str:
       </div>
       <div class="tier-card feature">
         <h3>{esc(TIER2_NAME)}</h3>
-        <div class="price">&pound;85 a month</div>
+        <div class="price">&pound;120 a month</div>
         <p>{esc(TIER_COACHED_BODY)}</p>
+        <p>{esc(TIER_COACHED_BODY_2)}</p>
         <a class="btn" href="{BASE_PATH}/coached/">How coaching works</a>
       </div>
       <div class="tier-card">
         <h3>Coached by Tom</h3>
         <div class="price">Limited places</div>
         <p>{esc(TIER_TOM_BODY)}</p>
+        <p>{esc(TIER_TOM_BODY_2)}</p>
         <a class="btn" href="{BASE_PATH}/coaching/">See if there is a place</a>
       </div>
     </div>
@@ -797,11 +844,8 @@ def render_home(cat) -> str:
     <div class="feature-copy">
       <p class="eyebrow">Female performance</p>
       <h2>Female first, not female adapted.</h2>
-      <p class="section-intro">For too long, women have been handed training built for men and
-      told to make it fit. We do it the other way round. The plan is built for a female
-      athlete from the start, and when we coach you, the training reads what your body
-      actually did and adapts around your physiology, not an average.</p>
-      <p style="margin-top:20px"><a class="btn" href="{BASE_PATH}/female-performance/">See our female performance approach</a></p>
+      <p class="section-intro">{esc(FEMALE_FIRST_BODY)}</p>
+      <p style="margin-top:20px"><a class="btn" href="{BASE_PATH}/female-performance/">See how I train female athletes</a></p>
     </div>
   </div>
 </section>
@@ -810,7 +854,7 @@ def render_home(cat) -> str:
   {img("ironman-wales-finish", cls="results-bg")}
   <div class="wrap">
     <p>{esc(RESULTS_LINE)}</p>
-    <p class="results-sub">A proven track record of taking clients to the podium and to the finish line of the dream they started with.</p>
+    <p class="results-sub">Real athletes I've taken to the podium, and to the finish line of the dream they started with.</p>
   </div>
 </section>
 {reviews_band()}
@@ -829,13 +873,14 @@ def render_home(cat) -> str:
 <section>
   <div class="wrap">
     <h2>Over {total} plans, every one built for its event</h2>
-    <p class="section-intro">{esc(PLANS_INTRO)}</p>
+    <p class="section-intro">First marathon to Ironman, hill climbs to 100 mile TTs, every plan in
+    the library is written for one specific race and one specific goal. Find yours and get to work.</p>
     <p style="margin-top:22px"><a class="btn" href="{BASE_PATH}/plans/">{esc(CTA_FIND)}</a></p>
   </div>
 </section>
 </main>"""
-    desc = ("Training plans and coaching built for your target race, at the right "
-            "dose, adjusted when life happens. Over 150 plans, plus coaching from £85 a month.")
+    desc = ("Training plans and coaching built for your race, written by Tom Cooling. "
+            "Over 150 plans, plus coaching from £120 a month.")
     extra = ld_script([org_node(with_rating=True), website_node()])
     return page("home", "Horsepower Coaching | Training plans and coaching for your race",
                 desc, prod_url("/"), body, og_image_name="hero-alpine-mist", extra=extra)
@@ -1011,9 +1056,9 @@ COACHED_FAQ = [
      "That is the point of building it block by block instead of all at once."),
     ("Which sports do you coach?",
      "Triathlon across every distance, road and ultra running, and cycling from sportives to "
-     "ultra-distance. If you have a target event, we can build for it."),
+     "ultra-distance. If you have a target event, I can build for it."),
     ("Can I upgrade later?",
-     "Yes. If you want Tom directly, you can move to Coached by Tom when a place is open."),
+     "Yes. If you want me directly, you can move to Coached by Tom when a place is open."),
 ]
 
 
@@ -1025,8 +1070,8 @@ def render_coached(cat) -> str:
     body = f"""<main id="main">
 <section class="hero" style="padding:60px 0 64px">
   <div class="wrap">
-    <p class="eyebrow" style="color:var(--teal-soft)">{esc(TIER2_NAME)} &middot; &pound;85 a month</p>
-    <h1>Your race, your hours, your plan</h1>
+    <p class="eyebrow" style="color:var(--teal-soft)">{esc(TIER2_NAME)} &middot; &pound;120 a month</p>
+    <h1>A plan I build for you, block by block</h1>
     <p class="lede">{esc(COACHED_INTRO)}</p>
     <div class="cta-row"><a class="btn" href="{esc(CONTACT_URL)}">Apply for coaching</a></div>
   </div>
@@ -1036,13 +1081,14 @@ def render_coached(cat) -> str:
 
 <section>
   <div class="wrap">
-    <h2>What you get for &pound;85 a month</h2>
+    <h2>What you get for &pound;120 a month</h2>
     <p class="section-intro">{esc(TIER_COACHED_BODY)}</p>
+    <p class="section-intro">{esc(TIER_COACHED_BODY_2)}</p>
     <div class="side-fig-grid">
       <ol class="step-list">
-        <li><strong>We start with you</strong>A proper intake: your target event, your history, your week, your numbers and the hours you actually have.</li>
+        <li><strong>It starts with you</strong>A proper intake: your target event, your history, your week, your numbers and the hours you actually have.</li>
         <li><strong>Your plan arrives block by block</strong>Built around your life and your event, three weeks at a time, so it stays current with how your training is actually going rather than a whole year written on day one.</li>
-        <li><strong>Feedback on every completed session</strong>We read the sessions you complete against what was asked, using your actual data, and tell you what it means and what happens next.</li>
+        <li><strong>Feedback on every completed session</strong>I read the sessions you complete against what was asked, using your actual data, and tell you what it means and what happens next.</li>
         <li><strong>A race plan before every start line</strong>Pacing, fuelling and strategy for your event, in your hands before you get there.</li>
       </ol>
       <figure class="photo-fig photo-fig--port">{img("coached-almere-finish")}
@@ -1059,8 +1105,8 @@ def render_coached(cat) -> str:
     </div>
     <div>
       <div class="callout">
-        <h2>What it isn't</h2>
-        <p>It is not a template with your name on it, and it is not a scheduled weekly call. It is a programme built around your life and your event, with real feedback on the sessions you actually do. If you want a coach in your corner for all of it, look at Coached by Tom.</p>
+        <h2>Where it differs from full coaching</h2>
+        <p>There are no scheduled calls and I am not on call day to day. What you get is a programme I build around your life and your event, with real feedback on the sessions you actually do. If you want me in your corner for all of it, look at Coached by Tom.</p>
         <p style="margin-top:18px"><a class="btn on-dark ghost" href="{BASE_PATH}/coaching/">Coached by Tom</a></p>
       </div>
     </div>
@@ -1072,14 +1118,14 @@ def render_coached(cat) -> str:
 <section>
   <div class="wrap">
     <h2>Ready to start?</h2>
-    <p class="section-intro">Tell us about your event and your season and we will take it from there.</p>
+    <p class="section-intro">Tell me about your event and your season and I'll take it from there.</p>
     <p style="margin-top:18px"><a class="btn" href="{esc(CONTACT_URL)}">Apply for coaching</a></p>
   </div>
 </section>
 {quote_block("coached")}
 </main>"""
-    desc = ("Coached by Horsepower, £85 a month. Your race, your hours, your plan, built "
-            "block by block with real feedback on every session and a race plan for race day.")
+    desc = ("Coached by Tom Cooling, £120 a month. A plan I build for you block by block, "
+            "with real feedback on every session and a race plan for race day.")
     faq_ld = {
         "@context": "https://schema.org", "@type": "FAQPage",
         "mainEntity": [
@@ -1090,10 +1136,10 @@ def render_coached(cat) -> str:
         f"{TIER2_NAME} coaching",
         (f"{COACHED_INTRO} Built block by block around your life and target event, with real "
          "feedback on every completed session and a race plan before every start line."),
-        "/coached/", monthly_price="85.00")
+        "/coached/", monthly_price="120.00")
     extra = ld_script([
         breadcrumb_node([("Home", "/"), (TIER2_NAME, None)]), svc, faq_ld])
-    return page("coached", f"{TIER2_NAME} | £85 a month | Horsepower Coaching", desc,
+    return page("coached", f"{TIER2_NAME} | £120 a month | Horsepower Coaching", desc,
                 prod_url("/coached/"), body, og_image_name="hero-torridon-ridge", extra=extra)
 
 
@@ -1128,6 +1174,7 @@ def render_coaching(cat) -> str:
     <p class="eyebrow" style="color:var(--teal-soft)">Coached by Tom &middot; &pound;160 a month &middot; Limited places</p>
     <h1>A coach in your corner for all&nbsp;of&nbsp;it</h1>
     <p class="lede">{esc(TIER_TOM_BODY)}</p>
+    <p class="lede">{esc(TIER_TOM_BODY_2)}</p>
     <div class="cta-row">
       <a class="btn" href="{esc(CONTACT_URL)}">Ask about a place</a>
       <a class="btn on-dark ghost" href="#what-you-get">See what you get</a>
@@ -1139,11 +1186,10 @@ def render_coaching(cat) -> str:
   <div class="wrap">
     <p class="eyebrow">Everything you get</p>
     <h2>Complete world class coaching</h2>
-    <p class="section-intro">When only the best will do. This is the highest level of support
-    Horsepower offers, for the athlete who wants the coach in their corner: someone who
-    understands them and their training completely. In-depth analysis of every session, a
-    complete holistic approach across bike fit, race craft, fuelling and the mental side, and a
-    plan that is truly yours, built and read by me directly.</p>
+    <p class="section-intro">This is the highest level of support I offer, for the athlete who wants
+    a coach who understands them and their training completely. In-depth analysis of every session,
+    a holistic approach across bike fit, race craft, fuelling and the mental side, and a plan that's
+    truly yours, built and read by me.</p>
     <div class="get-grid">{get_cards}</div>
   </div>
 </section>
@@ -1205,7 +1251,7 @@ def render_coaching(cat) -> str:
         <li>Limited places, taken one at a time</li>
       </ul>
       <p style="margin-top:6px"><a class="btn" href="{esc(CONTACT_URL)}">Apply for a place</a></p>
-      <p class="pricing-note">Not quite ready for this level? <a href="{BASE_PATH}/coached/">{esc(TIER2_NAME)} is &pound;85 a month</a>.</p>
+      <p class="pricing-note">Not quite ready for this level? <a href="{BASE_PATH}/coached/">{esc(TIER2_NAME)} is &pound;120 a month</a>.</p>
     </div>
   </div>
 </section>
@@ -1244,9 +1290,9 @@ def render_about(cat) -> str:
     <div class="about-hero-copy">
       <p class="eyebrow" style="color:var(--teal-soft)">About Us</p>
       <h1>The coach behind Horsepower</h1>
-      <p class="lede">Tom Cooling is an ex-elite triathlete, seasoned ultra-bike racer
-      and FKT holder, with over a decade of coaching athletes from complete beginners to
-      world-tour level professionals.</p>
+      <p class="lede">I'm Tom Cooling: an ex-elite triathlete, seasoned ultra-bike racer
+      and FKT holder, and I've spent over a decade coaching athletes from complete beginners
+      to world-tour level professionals.</p>
     </div>
     <figure class="about-hero-portrait">{img("tom-portrait")}
       <figcaption>Tom Cooling, founder and head coach of Horsepower Coaching</figcaption></figure>
@@ -1257,23 +1303,21 @@ def render_about(cat) -> str:
   <div class="wrap content-grid two about-grid">
     <div class="prose">
       <h2>Coaching experience</h2>
-      <p>Tom has spent over a decade coaching athletes from complete beginners to
-      world-tour level professionals, and has guided competitors to wins and podiums
-      across Ironman, middle-distance triathlon, ultra-bike events and Haute
-      Route-style races.</p>
+      <p>I've spent over a decade coaching athletes from complete beginners to
+      world-tour level professionals, and taken them to wins and podiums across Ironman,
+      middle-distance triathlon, ultra-bike events and Haute Route-style races.</p>
 
-      <h2>Where the expertise comes from</h2>
-      <p>That expertise is drawn from personal racing, including FKT performances and
-      ultra wins, training with Royal Marines and UKSF, and coaching elite performers.
-      It is first-hand knowledge of what the hard days actually take, brought to how he
-      builds and reads every athlete's training.</p>
+      <h2>Where it comes from</h2>
+      <p>It comes from my own racing, including FKT performances and ultra wins, from
+      training alongside Royal Marines and UKSF, and from coaching elite performers. I
+      know first-hand what the hard days actually take, and that goes into how I build
+      and read every athlete's training.</p>
 
       <h2>Philosophy</h2>
-      <p>His coaching combines evidence-based methodologies valued by professional
-      athletes with practical, race-proven strategies, with a particular emphasis on
-      female-specific performance development and durable, race-winning preparation.
-      The aim is never a single good block. It is a whole athlete, prepared to hold up
-      on the day that matters.</p>
+      <p>I combine the evidence-based methods professional athletes rely on with practical,
+      race-proven strategy, with a particular emphasis on female-specific performance
+      development and durable, race-winning preparation. A single good block has never been
+      the point. What matters is a whole athlete, prepared to hold up on the day it counts.</p>
     </div>
     <div class="about-side">
       <figure class="photo-fig photo-fig--port">{img("tom-hill-climb")}
@@ -1326,7 +1370,7 @@ def render_about(cat) -> str:
   <div class="wrap">
     <h2>Train with Tom</h2>
     <p class="section-intro">Start with a plan built for your race, get coached from
-    £85 a month, or ask about a limited place with Tom directly.</p>
+    £120 a month, or ask about a limited place with me directly.</p>
     <div class="cta-row" style="margin-top:20px">
       <a class="btn" href="{BASE_PATH}/plans/">Browse plans</a>
       <a class="btn ghost" href="{BASE_PATH}/coached/">Get coached</a>
@@ -1395,20 +1439,20 @@ FEMALE_FAQ = [
      "with the numbers scaled down. It respects the physiological differences that shape "
      "recovery, fuelling, strength needs and how training load is best spread across the week."),
     ("Do Horsepower's off-the-shelf plans sync to my menstrual cycle?",
-     "No, and we will not claim they do. A downloadable plan cannot know where you are in "
-     "your cycle, so instead our Female-First plans use recovery-respecting structure and "
+     "No, and I won't claim they do. A downloadable plan cannot know where you are in "
+     "your cycle, so instead my Female-First plans use recovery-respecting structure and "
      "dedicated strength work for bone and tendon health that benefit every female athlete. "
      "Genuine cycle-aware training comes with coaching, where the plan adapts around you."),
     ("What makes Horsepower's coaching cycle-aware?",
-     "When we coach you, we read the sessions you actually complete in the context of what "
-     "your body was doing, and we adapt the next block around your physiology, your symptoms "
-     "and your feedback. It is personalised to you, not a generic template."),
+     "When I coach you, I read the sessions you actually complete in the context of what "
+     "your body was doing, and I adapt the next block around your physiology, your symptoms "
+     "and your feedback. It's personalised to you, not a generic template."),
     ("Which female-specific training plans does Horsepower offer?",
      "Four Female-First plans are live now: 70.3, Olympic-distance triathlon, marathon and "
      "century. Each is built for a female athlete targeting that specific event."),
     ("Is female-specific training only for elite athletes?",
-     "No. The same approach that supports our racing athletes supports a first-timer. It is "
-     "about training the athlete in front of us properly, at every level and life stage."),
+     "No. The same approach that supports my racing athletes supports a first-timer. It's "
+     "about training the athlete in front of me properly, at every level and life stage."),
 ]
 
 
@@ -1444,10 +1488,7 @@ def render_female(cat) -> str:
   <div class="wrap">
     <p class="eyebrow" style="color:var(--teal-soft)">Female performance</p>
     <h1>{esc(FEMALE_LEAD)}</h1>
-    <p class="lede">Endurance training was written for men and handed to women with the
-    numbers turned down. We do it the other way round. From the first session, the training
-    is built for a female athlete, and when we coach you it adapts around your physiology,
-    not an average.</p>
+    <p class="lede">{esc(FEMALE_FIRST_BODY)}</p>
     <div class="cta-row">
       <a class="btn" href="{BASE_PATH}/coached/">Get coached</a>
       <a class="btn on-dark ghost" href="#female-plans">See the plans</a>
@@ -1459,16 +1500,15 @@ def render_female(cat) -> str:
   <div class="wrap prose">
     <h2>Why "female adapted" fails</h2>
     <p>Most training plans, most research and most coaching were built around the male
-    athlete, then shrunk to fit everyone else. Women were trained as small men. That
-    ignores the things that actually shape how a female athlete responds to training:
-    how you recover, how you fuel, the strength work that protects your bones and tendons,
-    and how load is best distributed across your week. Turning a men's plan down is not
-    the same as building the right one.</p>
+    athlete, then shrunk to fit everyone else. Women got trained as small men. That ignores
+    what actually shapes how a female athlete responds to training: how you recover, how you
+    fuel, the strength work that protects your bones and tendons, and how load is best spread
+    across your week. Turning a men's plan down isn't the same as building the right one.</p>
     <h2>What female first actually means</h2>
-    <p>It means the plan starts from the female athlete, not from a template. It means
-    recovery-respecting structure so the work lands instead of grinding you down. It means
-    strength work built in for long-term bone and tendon health, not bolted on as an
-    afterthought. And it means being honest about what each level of support can and cannot do.</p>
+    <p>Female first means the plan starts from the female athlete rather than a template. It
+    means recovery-respecting structure so the work lands instead of grinding you down, and
+    strength work built in for long-term bone and tendon health rather than bolted on as an
+    afterthought. And it means I'm honest about what each level of support can and can't do.</p>
   </div>
 </section>
 
@@ -1479,15 +1519,15 @@ def render_female(cat) -> str:
       <p class="eyebrow">Coached and Coached by Tom</p>
       <h2>Genuinely cycle-aware coaching</h2>
       <p class="section-intro">This is where female-specific training stops being a label and
-      gets personal. When we coach you, three things happen that a downloadable plan cannot do.</p>
+      gets personal. When I coach you, three things happen that a downloadable plan can't.</p>
       <ul class="about-list">
         <li><strong>The plan adapts around your physiology.</strong> Load, recovery and intensity are shaped to how you respond, not to an average athlete.</li>
         <li><strong>Feedback reads your sessions in context.</strong> What your body actually did, alongside your reported symptoms, recovery and where you are in your cycle.</li>
         <li><strong>Strength for bone and tendon is built in.</strong> Not bolted on, because long-term durability is part of performance, not separate from it.</li>
       </ul>
-      <p style="margin-top:16px">We are honest about the limits: coaching is personalised week to
-      week, and we will never overclaim what it does. Tom coaches with a particular emphasis on
-      female-specific performance development, drawn from years of working with female athletes
+      <p style="margin-top:16px">I'm honest about the limits: coaching is personalised week to
+      week, and I'll never overclaim what it does. I coach with a particular emphasis on
+      female-specific performance development, built from years of working with female athletes
       from first finish lines to the front of the race.</p>
       <p style="margin-top:20px">
         <a class="btn" href="{BASE_PATH}/coached/">How coaching works</a>
@@ -1502,9 +1542,9 @@ def render_female(cat) -> str:
     <p class="eyebrow">The women who prove it</p>
     <h2>Real names, real results</h2>
     <p style="color:var(--teal-soft);font-family:'Oswald',sans-serif;font-size:1.15rem;letter-spacing:0.04em;margin:6px 0 14px">Female results, not female participation.</p>
-    <p class="section-intro" style="color:#CFCFCF">Not stock-photo athletes. These are Horsepower-coached
-    women. Two of them, Hannah S and Madison S, have won Ironman Wales outright, and every
-    line below comes straight from their race results, not invented.</p>
+    <p class="section-intro" style="color:#CFCFCF">These are women I coach, not stock-photo athletes.
+    Two of them, Hannah S and Madison S, have won Ironman Wales outright, and every line below comes
+    straight from their race results.</p>
     <div class="honours-grid">{"".join(
       f'<div class="honour">'
       f'<div class="honour-media">{img(h["img"])}</div>'
@@ -1528,7 +1568,7 @@ def render_female(cat) -> str:
     <p class="section-intro">Start here. Four plans, each built for a female athlete targeting its
     event, with recovery-respecting structure and dedicated strength work for bone and tendon
     health. What they do not do is claim to sync to your menstrual cycle: an off-the-shelf plan
-    cannot know where you are in yours, so we will not pretend it does. That is what coaching
+    cannot know where you are in yours, so I won't pretend it does. That's what coaching
     is for. One-off, delivered through TrainingPeaks.</p>
     <div class="card-grid" style="margin-top:26px">{plan_cards}</div>
     <div class="callout callout--wide" style="margin-top:34px">
@@ -1601,7 +1641,7 @@ BANNER_SLOTS = [
                     ("plans-pyrenees-switchback", "Alternate: lone rider on a Pyrenean switchback"),
                     ("hero-alps", "Alternate: cyclist climbing high above an alpine valley"),
                     "plans-pyrenees-dawn", "hero-welsh-climb", "alpine-ridge", "coached-band"]},
-    {"id": "coached-top", "kind": "band", "name": "Coached (£85), top banner",
+    {"id": "coached-top", "kind": "band", "name": "Coached (£120), top banner",
      "where": "The full-width band under the hero on the Coached page. Ships live as "
               "hero-torridon-ridge; the alternates below are here for you to override.",
      "candidates": ["hero-torridon-ridge", "alpine-ridge", "plans-pyrenees-switchback",
@@ -1767,14 +1807,14 @@ def run_gates(cat, written):
         if EM_DASH in content:
             errors.append(f"em-dash (U+2014) found in {path}")
 
-    # Gate 2: verbatim approved copy present (on the home page at least).
-    home = written["index.html"]
+    # Gate 2: every approved (verbatim-locked) copy string appears byte-exact
+    # somewhere in the built HTML. Tom's voice is locked here (WS-SITE12 de-AI
+    # rewrite): the gate tracks the constants, so a copy edit updates the gate in
+    # the same file. Copy A/E live on home; B on home + /plans/; C on home +
+    # /coached/; D on home + /coaching/. All are validated across the whole site.
+    all_html = "".join(v for k, v in written.items() if k.endswith(".html"))
     for s in VERBATIM_REQUIRED:
-        target = home if s in (HERO_HEADLINE, HERO_BODY, TIER_PLANS_BODY, TIER_COACHED_BODY,
-                               TIER_TOM_BODY, RESULTS_LINE, WHICH_PLANS, WHICH_COACHED, WHICH_TOM) else None
-        # PLANS_INTRO lives on home + plans; the rest on home.
-        pool = home + written["plans/index.html"]
-        if esc(s) not in pool and s not in pool:
+        if esc(s) not in all_html and s not in all_html:
             errors.append(f"verbatim copy missing: {s[:48]}...")
 
     # Gate 3: viewport + unique title + meta description on every page.
