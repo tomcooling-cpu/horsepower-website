@@ -31,6 +31,29 @@ BASE_URL = "https://tomcooling-cpu.github.io/horsepower-website"
 EXISTING = "https://www.horsepowercoaching.co.uk"   # current live site (phase 2 links)
 CONTACT_URL = EXISTING + "/contact"
 
+# ── Production canonical host (WS-SITE10) ────────────────────────────────────
+# The site is *served* from the github.io preview (BASE_PATH / BASE_URL, above,
+# which drive every internal href, asset src and BASE_PATH-prefixed link, and
+# must NOT change). But canonical / Open Graph / sitemap / JSON-LD absolute URLs
+# point at the DNS-cutover target so the tags are already correct at go-live,
+# when the custom domain serves this content at its root (no BASE_PATH prefix).
+PROD_ORIGIN = "https://horsepowercoaching.co.uk"
+SITE_NAME = "Horsepower Coaching"
+OG_LOGO = PROD_ORIGIN + "/assets/logo-white.png"
+
+
+def prod_url(path: str = "") -> str:
+    """Absolute production URL for a root-relative logical path (no BASE_PATH)."""
+    return PROD_ORIGIN + path
+
+
+def og_image_url(name: str) -> str:
+    """Absolute production URL for an image derivative used as an OG/Twitter card."""
+    return f"{PROD_ORIGIN}/assets/img/{name}.webp"
+
+
+DEFAULT_OG_IMAGE = "ironman-wales-finish"   # landscape fallback social image
+
 # ── Approved copy (VERBATIM) ─────────────────────────────────────────────────
 HERO_HEADLINE = "Big goals are built from ordinary weeks done properly."
 HERO_BODY = ("Your first 70.3. Ironman Wales. Kona. A 100 mile TT. Whatever the dream "
@@ -100,7 +123,11 @@ def esc(s) -> str:
     return html.escape(str(s), quote=True)
 
 
-def head(title, description, canonical, extra="") -> str:
+def head(title, description, canonical, og_image_name=None, og_type="website", extra="") -> str:
+    name = og_image_name or DEFAULT_OG_IMAGE
+    og_img = og_image_url(name)
+    og_alt = IMG_ALT.get(name, SITE_NAME)
+    w, h = IMG_DIMS.get(name, (1200, 800))
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -108,10 +135,23 @@ def head(title, description, canonical, extra="") -> str:
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{esc(title)}</title>
 <meta name="description" content="{esc(description)}">
+<meta name="author" content="Tom Cooling">
 <link rel="canonical" href="{esc(canonical)}">
+<meta property="og:site_name" content="{esc(SITE_NAME)}">
+<meta property="og:locale" content="en_GB">
+<meta property="og:type" content="{esc(og_type)}">
 <meta property="og:title" content="{esc(title)}">
 <meta property="og:description" content="{esc(description)}">
-<meta property="og:type" content="website">
+<meta property="og:url" content="{esc(canonical)}">
+<meta property="og:image" content="{esc(og_img)}">
+<meta property="og:image:alt" content="{esc(og_alt)}">
+<meta property="og:image:width" content="{w}">
+<meta property="og:image:height" content="{h}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{esc(title)}">
+<meta name="twitter:description" content="{esc(description)}">
+<meta name="twitter:image" content="{esc(og_img)}">
+<meta name="twitter:image:alt" content="{esc(og_alt)}">
 <meta name="theme-color" content="#0F0F0F">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -207,8 +247,139 @@ def footer() -> str:
 </html>"""
 
 
-def page(active, title, description, canonical, body, extra="") -> str:
-    return head(title, description, canonical, extra) + header(active) + body + footer()
+def page(active, title, description, canonical, body,
+         og_image_name=None, og_type="website", extra="") -> str:
+    return (head(title, description, canonical, og_image_name, og_type, extra)
+            + header(active) + body + footer())
+
+
+# ── JSON-LD structured data (WS-SITE10) ──────────────────────────────────────
+# Every fact below already exists on the site or in config (no fabrication).
+# Blocks are emitted verbatim as application/ld+json; a build gate parses every
+# block and asserts zero "domestiq".
+def ld_script(objs) -> str:
+    if isinstance(objs, dict):
+        objs = [objs]
+    return "".join(
+        f'<script type="application/ld+json">{json.dumps(o)}</script>\n'
+        for o in objs)
+
+
+def _org_provider():
+    return {"@type": "Organization", "name": SITE_NAME, "url": prod_url("/")}
+
+
+def _area_served():
+    return [{"@type": "Country", "name": "United Kingdom"},
+            {"@type": "Place", "name": "Online and remote coaching worldwide"}]
+
+
+def org_node(with_rating=False):
+    """Organization / LocalBusiness (SportsActivityLocation) for Horsepower."""
+    node = {
+        "@context": "https://schema.org",
+        "@type": ["SportsActivityLocation", "LocalBusiness"],
+        "name": SITE_NAME,
+        "alternateName": "Horsepower Coaching | Triathlon, Cycling and Endurance Coaching",
+        "url": prod_url("/"),
+        "logo": OG_LOGO,
+        "image": og_image_url("ironman-wales-finish"),
+        "description": ("Triathlon, cycling and endurance coaching and training plans built "
+                        "for your target race, with a particular emphasis on female-specific "
+                        "performance. Based in Clevedon, UK; coaching athletes online worldwide."),
+        "founder": {"@type": "Person", "name": "Tom Cooling"},
+        "address": {"@type": "PostalAddress", "addressLocality": "Clevedon",
+                    "addressRegion": "Somerset", "addressCountry": "GB"},
+        "areaServed": [{"@type": "City", "name": "Clevedon"}] + _area_served(),
+        "knowsAbout": ["Triathlon coaching", "Ironman training", "Cycling coaching",
+                       "Time trial training", "Ultra-endurance racing", "Marathon training",
+                       "Female-specific endurance training", "Heat acclimation",
+                       "Race pacing and fuelling strategy"],
+        "sport": ["Triathlon", "Cycling", "Running", "Endurance"],
+        "sameAs": [INSTAGRAM_URL, FACEBOOK_URL, GOOGLE_REVIEW_URL],
+    }
+    if with_rating and REVIEW_RATING and REVIEW_COUNT:
+        node["aggregateRating"] = {
+            "@type": "AggregateRating",
+            "ratingValue": f"{REVIEW_RATING:g}", "reviewCount": str(REVIEW_COUNT),
+            "bestRating": "5", "worstRating": "1"}
+    return node
+
+
+def website_node():
+    return {"@context": "https://schema.org", "@type": "WebSite",
+            "name": SITE_NAME, "url": prod_url("/"),
+            "inLanguage": "en-GB", "publisher": _org_provider()}
+
+
+def person_node():
+    return {
+        "@context": "https://schema.org", "@type": "Person",
+        "name": "Tom Cooling",
+        "jobTitle": "Founder and Head Coach",
+        "worksFor": _org_provider(),
+        "url": prod_url("/about/"),
+        "image": og_image_url("tom-portrait"),
+        "description": ("Ex-elite triathlete, ultra-bike racer and FKT holder with over a "
+                        "decade coaching athletes from complete beginners to world-tour level "
+                        "professionals, with a particular emphasis on female-specific "
+                        "performance development."),
+        "knowsAbout": ["Triathlon coaching", "Ultra-endurance cycling", "Heat acclimation",
+                       "Breathwork", "Female-specific performance", "Race strategy"],
+        "sameAs": [INSTAGRAM_URL, FACEBOOK_URL],
+        "hasCredential": [
+            {"@type": "EducationalOccupationalCredential", "credentialCategory": "degree",
+             "name": "First Class BA and Master's Degree in Sport Science and Athlete Development"},
+            {"@type": "EducationalOccupationalCredential", "credentialCategory": "certification",
+             "name": "Oxygen Advantage Advanced Breathwork Instructor"},
+            {"@type": "EducationalOccupationalCredential", "credentialCategory": "certification",
+             "name": "AIDA L4 Freediver"},
+            {"@type": "EducationalOccupationalCredential", "credentialCategory": "certification",
+             "name": "Core Temp and XTRI Extreme Triathlon Accredited Coach"},
+            {"@type": "EducationalOccupationalCredential", "credentialCategory": "certification",
+             "name": "BMC (British Mountaineering Council) Trained and Assessed Mountain Leader"},
+        ],
+    }
+
+
+def service_node(name, description, path, monthly_price=None, low_price=None,
+                 high_price=None, offer_count=None):
+    """A coaching Service node. Prices are only ever stated where they are public
+    on the site (£39.99+ Plans, £85/mo Coached, £160/mo Coached by Tom)."""
+    node = {
+        "@context": "https://schema.org", "@type": "Service",
+        "serviceType": "Endurance coaching",
+        "name": name, "description": description,
+        "provider": _org_provider(),
+        "areaServed": _area_served(),
+        "url": prod_url(path),
+    }
+    if monthly_price is not None:
+        node["offers"] = {
+            "@type": "Offer", "priceCurrency": "GBP",
+            "availability": "https://schema.org/InStock", "url": prod_url(path),
+            "priceSpecification": {
+                "@type": "UnitPriceSpecification", "price": monthly_price,
+                "priceCurrency": "GBP", "unitText": "MONTH"}}
+    elif low_price is not None:
+        node["offers"] = {
+            "@type": "AggregateOffer", "priceCurrency": "GBP",
+            "lowPrice": low_price, "highPrice": high_price,
+            "offerCount": offer_count, "availability": "https://schema.org/InStock",
+            "url": prod_url(path)}
+    return node
+
+
+def breadcrumb_node(trail):
+    """trail: list of (name, path_or_None). Final crumb usually has no link."""
+    items = []
+    for i, (name, path) in enumerate(trail):
+        li = {"@type": "ListItem", "position": i + 1, "name": name}
+        if path:
+            li["item"] = prod_url(path)
+        items.append(li)
+    return {"@context": "https://schema.org", "@type": "BreadcrumbList",
+            "itemListElement": items}
 
 
 # ── Imagery ──────────────────────────────────────────────────────────────────
@@ -662,17 +833,9 @@ def render_home(cat) -> str:
 </main>"""
     desc = ("Training plans and coaching built for your target race, at the right "
             "dose, adjusted when life happens. Over 150 plans, plus coaching from £85 a month.")
-    org_ld = {
-        "@context": "https://schema.org", "@type": "Organization",
-        "name": "Horsepower Coaching", "url": BASE_URL + "/",
-        "aggregateRating": {
-            "@type": "AggregateRating",
-            "ratingValue": f"{REVIEW_RATING:g}", "reviewCount": str(REVIEW_COUNT),
-            "bestRating": "5", "worstRating": "1"},
-    }
-    extra = f'<script type="application/ld+json">{json.dumps(org_ld)}</script>\n'
+    extra = ld_script([org_node(with_rating=True), website_node()])
     return page("home", "Horsepower Coaching | Training plans and coaching for your race",
-                desc, BASE_URL + "/", body, extra)
+                desc, prod_url("/"), body, og_image_name="hero-alpine-mist", extra=extra)
 
 
 def _filter_options(plans, key):
@@ -712,7 +875,7 @@ def render_plans_index(cat) -> str:
 </article>""")
 
     body = f"""<main id="main">
-<div class="page-banner">{img("hero-alps", cls="banner-bg", lazy=False)}</div>
+<div class="page-banner">{img("plans-pyrenees-switchback", cls="banner-bg", lazy=False)}</div>
 <section class="alt" style="padding-bottom:24px">
   <div class="wrap">
     <p class="eyebrow">The plan library</p>
@@ -741,12 +904,36 @@ def render_plans_index(cat) -> str:
 <script src="{BASE_PATH}/assets/catalogue.js" defer></script>"""
     desc = (f"Browse {total} Horsepower training plans, each built for a target race. "
             "Filter by sport, event, level, length and weekly hours. From £39.99.")
+    prices = [p["price"] for p in plans]
+    collection = {
+        "@context": "https://schema.org", "@type": "CollectionPage",
+        "name": f"Horsepower Coaching Training Plan Library ({total} plans)",
+        "url": prod_url("/plans/"),
+        "description": ("Structured triathlon, cycling and running training plans, each built "
+                        "for a specific target race and delivered through TrainingPeaks."),
+        "mainEntity": {
+            "@type": "ItemList", "numberOfItems": total,
+            "itemListElement": [
+                {"@type": "ListItem", "position": i + 1,
+                 "url": prod_url(f"/plans/{p['slug']}/"), "name": p["title"]}
+                for i, p in enumerate(plans)]},
+    }
+    service = service_node(
+        "Horsepower training plans",
+        ("Over 150 race-specific triathlon, cycling and running training plans, each built for "
+         "a target event and delivered through TrainingPeaks. From £39.99, one-off."),
+        "/plans/", low_price=f"{min(prices):.2f}", high_price=f"{max(prices):.2f}",
+        offer_count=total)
+    extra = ld_script([
+        breadcrumb_node([("Home", "/"), ("Training Plans", None)]),
+        collection, service])
     return page("plans", f"Training Plan Library | {total} plans built for your race | Horsepower Coaching",
-                desc, BASE_URL + "/plans/", body)
+                desc, prod_url("/plans/"), body,
+                og_image_name="plans-pyrenees-switchback", extra=extra)
 
 
 def render_plan_detail(cat, p) -> str:
-    canonical = f"{BASE_URL}/plans/{p['slug']}/"
+    canonical = prod_url(f"/plans/{p['slug']}/")
     tier_line = "" if p["tier"] == "Standard" else f'<div class="spec-box"><div class="k">Level</div><div class="v">{esc(p["tier"])}</div></div>'
     paras = "".join(f"<p>{esc(x)}</p>" for x in re.split(r"(?<=[.])\s{2,}", p["description"]) if x.strip()) or f"<p>{esc(p['description'])}</p>"
     ld = {
@@ -754,10 +941,13 @@ def render_plan_detail(cat, p) -> str:
         "name": p["title"], "description": p["description"],
         "brand": {"@type": "Brand", "name": "Horsepower Coaching"},
         "category": f'{p["sport"]} training plan',
+        "url": canonical,
         "offers": {"@type": "Offer", "price": f'{p["price"]:.2f}', "priceCurrency": "GBP",
                    "availability": "https://schema.org/InStock", "url": p["buy_url"]},
     }
-    extra = f'<script type="application/ld+json">{json.dumps(ld)}</script>\n'
+    crumbs_ld = breadcrumb_node([("Home", "/"), ("Training Plans", "/plans/"),
+                                 (p["title"], None)])
+    extra = ld_script([ld, crumbs_ld])
     female_note = ""
     if p["slug"] in FEMALE_FIRST_SLUGS:
         female_note = f"""
@@ -804,10 +994,31 @@ def render_plan_detail(cat, p) -> str:
 </section>
 </main>"""
     desc = (p["blurb"][:150]).rsplit(" ", 1)[0]
-    return page("plans", f"{p['title']} | Horsepower Coaching", desc, canonical, body, extra)
+    return page("plans", f"{p['title']} | Horsepower Coaching", desc, canonical, body,
+                og_image_name="plans-pyrenees-switchback", og_type="product", extra=extra)
+
+
+COACHED_FAQ = [
+    ("Is there a call every week?",
+     "No. Coached is built around the work and the why, delivered in writing so you can go "
+     "back to it. If you want calls, WhatsApp and race-day strategy built together, that is "
+     "Coached by Tom."),
+    ("What if my numbers change or life gets in the way?",
+     "The plan moves. When your data shifts or a week falls apart, the next block reflects it. "
+     "That is the point of building it block by block instead of all at once."),
+    ("Which sports do you coach?",
+     "Triathlon across every distance, road and ultra running, and cycling from sportives to "
+     "ultra-distance. If you have a target event, we can build for it."),
+    ("Can I upgrade later?",
+     "Yes. If you want Tom directly, you can move to Coached by Tom when a place is open."),
+]
 
 
 def render_coached(cat) -> str:
+    faq_html = "".join(
+        f'<details class="faq"{" open" if i == 0 else ""}><summary>{esc(q)}</summary>'
+        f'<p>{esc(a)}</p></details>'
+        for i, (q, a) in enumerate(COACHED_FAQ))
     body = f"""<main id="main">
 <section class="hero" style="padding:60px 0 64px">
   <div class="wrap">
@@ -841,10 +1052,7 @@ def render_coached(cat) -> str:
   <div class="wrap content-grid two">
     <div>
       <h2>Honest answers</h2>
-      <details class="faq" open><summary>Is there a call every week?</summary><p>No. Coached is built around the work and the why, delivered in writing so you can go back to it. If you want calls, WhatsApp and race-day strategy built together, that is Coached by Tom.</p></details>
-      <details class="faq"><summary>What if my numbers change or life gets in the way?</summary><p>The plan moves. When your data shifts or a week falls apart, the next block reflects it. That is the point of building it block by block instead of all at once.</p></details>
-      <details class="faq"><summary>Which sports do you coach?</summary><p>Triathlon across every distance, road and ultra running, and cycling from sportives to ultra-distance. If you have a target event, we can build for it.</p></details>
-      <details class="faq"><summary>Can I upgrade later?</summary><p>Yes. If you want Tom directly, you can move to Coached by Tom when a place is open.</p></details>
+      {faq_html}
     </div>
     <div>
       <div class="callout">
@@ -867,11 +1075,23 @@ def render_coached(cat) -> str:
 </section>
 {quote_block("coached")}
 </main>"""
-    desc = ("Coached by Horsepower, £85 a month. Your race, your hours, your plan, "
-            "built block by block with real feedback on every session and a race "
-            "plan before every start line.")
+    desc = ("Coached by Horsepower, £85 a month. Your race, your hours, your plan, built "
+            "block by block with real feedback on every session and a race plan for race day.")
+    faq_ld = {
+        "@context": "https://schema.org", "@type": "FAQPage",
+        "mainEntity": [
+            {"@type": "Question", "name": q,
+             "acceptedAnswer": {"@type": "Answer", "text": a}}
+            for q, a in COACHED_FAQ]}
+    svc = service_node(
+        f"{TIER2_NAME} coaching",
+        (f"{COACHED_INTRO} Built block by block around your life and target event, with real "
+         "feedback on every completed session and a race plan before every start line."),
+        "/coached/", monthly_price="85.00")
+    extra = ld_script([
+        breadcrumb_node([("Home", "/"), (TIER2_NAME, None)]), svc, faq_ld])
     return page("coached", f"{TIER2_NAME} | £85 a month | Horsepower Coaching", desc,
-                BASE_URL + "/coached/", body)
+                prod_url("/coached/"), body, og_image_name="hero-torridon-ridge", extra=extra)
 
 
 COACHED_BY_TOM_GET = [
@@ -999,10 +1219,18 @@ def render_coaching(cat) -> str:
 </section>
 </main>"""
     desc = ("Coached by Tom, £160 a month, limited places. A bespoke TrainingPeaks programme, "
-            "in-depth WKO5 analysis, unlimited contact and amendments, weekly feedback and a "
-            "race plan before every start line, built and read by Tom directly.")
+            "unlimited contact, weekly feedback and a race plan for race day.")
+    svc = service_node(
+        "Coached by Tom",
+        ("The highest level of Horsepower support: a fully bespoke TrainingPeaks programme with "
+         "in-depth WKO5 analysis, unlimited contact and amendments, weekly session feedback and "
+         "a race plan before every start line, built and read by Tom Cooling directly. Limited "
+         "places."),
+        "/coaching/", monthly_price="160.00")
+    extra = ld_script([
+        breadcrumb_node([("Home", "/"), ("Coached by Tom", None)]), svc])
     return page("coaching", "Coached by Tom | £160 a month | Horsepower Coaching", desc,
-                BASE_URL + "/coaching/", body)
+                prod_url("/coaching/"), body, og_image_name="tom-alps-finish", extra=extra)
 
 
 def render_about(cat) -> str:
@@ -1104,11 +1332,14 @@ def render_about(cat) -> str:
 </section>
 {quote_block("about")}
 </main>"""
-    desc = ("Tom Cooling is an ex-elite triathlete, ultra-bike racer and FKT holder "
-            "with over a decade coaching beginners to world-tour professionals across "
-            "triathlon, ultra-bike and Haute Route racing.")
-    return page("about", "About Us | Horsepower Coaching", desc,
-                BASE_URL + "/about/", body)
+    desc = ("Tom Cooling: ex-elite triathlete, ultra-bike racer and FKT holder coaching "
+            "triathlon, cycling and endurance athletes from first-timers to world-tour pros.")
+    extra = ld_script([
+        breadcrumb_node([("Home", "/"), ("About Us", None)]),
+        person_node(), org_node(with_rating=False)])
+    return page("about", "About Tom Cooling | Founder and Head Coach | Horsepower Coaching",
+                desc, prod_url("/about/"), body,
+                og_image_name="about-brecon-titan", extra=extra)
 
 
 FEMALE_LEAD = "Female first, not female adapted."
@@ -1201,7 +1432,8 @@ def render_female(cat) -> str:
              "acceptedAnswer": {"@type": "Answer", "text": a}}
             for q, a in FEMALE_FAQ],
     }
-    extra = f'<script type="application/ld+json">{json.dumps(faq_ld)}</script>\n'
+    extra = ld_script([
+        breadcrumb_node([("Home", "/"), ("Female Performance", None)]), faq_ld])
 
     body = f"""<main id="main">
 <section class="hero hero--image">
@@ -1308,12 +1540,12 @@ def render_female(cat) -> str:
   </div>
 </section>
 </main>"""
-    desc = ("Female-first endurance coaching and training plans: female-specific triathlon, "
-            "cycling and marathon training built for female athletes, with cycle-aware coaching. "
-            "Female first, not female adapted.")
+    desc = ("Female-first triathlon, cycling and running coaching and training plans, built "
+            "for female athletes with cycle-aware coaching. Female first, not female adapted.")
     return page("female",
                 "Female Performance Coaching | Female-Specific Triathlon, Cycling and Running Training | Horsepower Coaching",
-                desc, BASE_URL + "/female-performance/", body, extra)
+                desc, prod_url("/female-performance/"), body,
+                og_image_name="female-hero", extra=extra)
 
 
 # ── Banner option previews (hidden /options/ page) ───────────────────────────
@@ -1360,8 +1592,8 @@ BANNER_SLOTS = [
                     "female-welsh-tt"]},
     {"id": "plans-banner", "kind": "pagebanner", "name": "Plans banner",
      "where": "The full-width banner at the top of the plan library. Ships live as "
-              "hero-alps; the alternates below are here for you to override.",
-     "candidates": ["hero-alps", "plans-pyrenees-switchback", "plans-pyrenees-dawn",
+              "plans-pyrenees-switchback; the alternates below are here for you to override.",
+     "candidates": ["plans-pyrenees-switchback", "hero-alps", "plans-pyrenees-dawn",
                     "plans-izoard-trio", "hero-welsh-climb", "alpine-ridge", "coached-band"]},
     {"id": "coached-top", "kind": "band", "name": "Coached (£85), top banner",
      "where": "The full-width band under the hero on the Coached page. Ships live as "
@@ -1435,10 +1667,12 @@ def render_options() -> str:
 </section>
 {''.join(blocks)}
 </main>"""
-    extra = '<meta name="robots" content="noindex, nofollow">\n'
+    webpage_ld = {"@context": "https://schema.org", "@type": "WebPage",
+                  "name": "Banner options (private preview)", "url": prod_url("/options/")}
+    extra = '<meta name="robots" content="noindex, nofollow">\n' + ld_script(webpage_ld)
     return page("", "Banner options (private preview) | Horsepower Coaching",
                 "Private banner preview page. Not indexed.",
-                BASE_URL + "/options/", body, extra)
+                prod_url("/options/"), body, og_image_name="hero-alpine-mist", extra=extra)
 
 
 # ── Write + gates ────────────────────────────────────────────────────────────
@@ -1474,18 +1708,44 @@ def build():
     for p in plans:
         write(f"plans/{p['slug']}/index.html", render_plan_detail(cat, p), written)
 
-    # sitemap + robots
-    urls = [BASE_URL + "/", BASE_URL + "/plans/", BASE_URL + "/female-performance/",
-            BASE_URL + "/coached/", BASE_URL + "/coaching/", BASE_URL + "/about/"]
-    urls += [f"{BASE_URL}/plans/{p['slug']}/" for p in plans]
+    # sitemap (absolute prod URLs; /options/ deliberately excluded)
     today = date.today().isoformat()
+
+    def sm_entry(loc, changefreq, priority):
+        return (f"  <url><loc>{loc}</loc><lastmod>{today}</lastmod>"
+                f"<changefreq>{changefreq}</changefreq><priority>{priority}</priority></url>")
+
+    main_pages = [("/", "weekly", "1.0"), ("/plans/", "weekly", "0.9"),
+                  ("/female-performance/", "weekly", "0.9"), ("/coached/", "monthly", "0.8"),
+                  ("/coaching/", "monthly", "0.8"), ("/about/", "monthly", "0.6")]
     sm = ['<?xml version="1.0" encoding="UTF-8"?>',
           '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
-    for u in urls:
-        sm.append(f"  <url><loc>{u}</loc><lastmod>{today}</lastmod></url>")
+    for path, cf, pr in main_pages:
+        sm.append(sm_entry(prod_url(path), cf, pr))
+    for p in plans:
+        sm.append(sm_entry(prod_url(f"/plans/{p['slug']}/"), "monthly", "0.7"))
     sm.append("</urlset>")
     write("sitemap.xml", "\n".join(sm), written)
-    write("robots.txt", f"User-agent: *\nAllow: /\nSitemap: {BASE_URL}/sitemap.xml\n", written)
+
+    # robots.txt: allow all standard crawlers AND the major AI crawlers explicitly
+    # (Tom wants AI training + answer-engine citation for reach). /options/ stays
+    # disallowed. Robots is honoured at the host root, so paths are root-relative
+    # and the sitemap points at the production host.
+    ai_bots = ["GPTBot", "OAI-SearchBot", "ChatGPT-User", "ClaudeBot", "anthropic-ai",
+               "Claude-Web", "PerplexityBot", "Perplexity-User", "Google-Extended",
+               "CCBot", "Applebot-Extended", "Bytespider", "Amazonbot",
+               "meta-externalagent", "cohere-ai", "Diffbot", "Timpibot", "YouBot"]
+    rb = ["# Horsepower Coaching",
+          "# Triathlon, cycling and endurance coaching | Clevedon, UK + online worldwide",
+          "",
+          "User-agent: *",
+          "Allow: /",
+          "Disallow: /options/",
+          ""]
+    for bot in ai_bots:
+        rb += [f"User-agent: {bot}", "Allow: /", "Disallow: /options/", ""]
+    rb += [f"Sitemap: {prod_url('/sitemap.xml')}", ""]
+    write("robots.txt", "\n".join(rb), written)
 
     run_gates(cat, written)
     print("Built %d pages into %s" % (len(written), SITE))
@@ -1643,6 +1903,82 @@ def run_gates(cat, written):
         if "domestiq" in content.lower():
             errors.append(f'"domestiq" found in {path} (must be zero site-wide)')
 
+    # ── WS-SITE10 SEO / AEO gates ────────────────────────────────────────────
+    # options/ is a private, noindex preview harness that intentionally renders
+    # many hero slots (many <h1>s), so it is exempt from the single-h1 rule but
+    # still validated for canonical + parsing JSON-LD.
+    OPTIONS = "options/index.html"
+    indexable = {k: v for k, v in html_pages.items() if k != OPTIONS}
+
+    # Gate 10a: exactly one <h1> per indexable page.
+    for path, content in indexable.items():
+        n_h1 = len(re.findall(r"<h1[\s>]", content))
+        if n_h1 != 1:
+            errors.append(f"{path} has {n_h1} <h1> (must be exactly 1)")
+
+    # Gate 10b: self-referencing canonical on the production host, unique per page.
+    canon = {}
+    for path, content in html_pages.items():
+        m = re.search(r'<link rel="canonical" href="([^"]+)"', content)
+        if not m:
+            errors.append(f"missing canonical: {path}")
+            continue
+        if not m.group(1).startswith(PROD_ORIGIN):
+            errors.append(f"canonical not on prod host in {path}: {m.group(1)}")
+        canon.setdefault(m.group(1), []).append(path)
+    for c, paths in canon.items():
+        if len(paths) > 1:
+            errors.append(f"duplicate canonical {c!r}: {paths}")
+
+    # Gate 10c: Open Graph + Twitter card present on every page.
+    for path, content in html_pages.items():
+        for tag in ('property="og:title"', 'property="og:description"', 'property="og:url"',
+                    'property="og:image"', 'name="twitter:card"', 'name="twitter:image"'):
+            if tag not in content:
+                errors.append(f"missing social tag {tag} in {path}")
+
+    # Gate 10d: every page carries >=1 JSON-LD block; every block parses as valid
+    # JSON and contains zero "domestiq".
+    for path, content in html_pages.items():
+        blocks = re.findall(r'<script type="application/ld\+json">(.*?)</script>',
+                            content, re.S)
+        if not blocks:
+            errors.append(f"no JSON-LD block on {path}")
+        for b in blocks:
+            try:
+                obj = json.loads(b)
+            except Exception as exc:
+                errors.append(f"invalid JSON-LD in {path}: {exc}")
+                continue
+            if "domestiq" in json.dumps(obj).lower():
+                errors.append(f"'domestiq' in JSON-LD of {path}")
+
+    # Gate 11: robots.txt allows the major AI crawlers, disallows /options/,
+    # and references the sitemap.
+    robots = written.get("robots.txt", "")
+    for bot in ("GPTBot", "OAI-SearchBot", "ClaudeBot", "anthropic-ai", "PerplexityBot",
+                "Google-Extended", "CCBot", "Applebot-Extended", "Bytespider"):
+        if bot not in robots:
+            errors.append(f"robots.txt missing required AI crawler allow: {bot}")
+    if "Disallow: /options/" not in robots:
+        errors.append("robots.txt missing 'Disallow: /options/'")
+    if "Sitemap:" not in robots:
+        errors.append("robots.txt missing Sitemap reference")
+
+    # Gate 12: sitemap uses the prod host and never lists /options/.
+    smx = written.get("sitemap.xml", "")
+    if PROD_ORIGIN not in smx:
+        errors.append("sitemap.xml not using production host")
+    if BASE_URL in smx:
+        errors.append("sitemap.xml still references the github.io preview host")
+    if "/options/" in smx:
+        errors.append("sitemap.xml must not list /options/")
+
+    # Gate 13: the live Plans page banner serves the Tom-approved switchback image.
+    plans_idx = written.get("plans/index.html", "")
+    if 'class="page-banner"' in plans_idx and "plans-pyrenees-switchback.webp" not in plans_idx:
+        errors.append("plans page banner is not plans-pyrenees-switchback.webp")
+
     # Gate 9: total shipped image weight under budget.
     img_dir = os.path.join(SITE, "assets", "img")
     img_bytes = 0
@@ -1656,7 +1992,7 @@ def run_gates(cat, written):
         errors.append("full-res img/src originals leaked into shipped site/assets/img")
     img_budget = 3.5 * 1024 * 1024
     if img_bytes > img_budget:
-        errors.append(f"image weight {img_bytes/1024:.0f}KB exceeds 2.5MB budget")
+        errors.append(f"image weight {img_bytes/1024:.0f}KB exceeds 3.5MB budget")
 
     if errors:
         print("BUILD GATES FAILED:")
@@ -1672,6 +2008,12 @@ def run_gates(cat, written):
     print(f"  - {img_count} images shipped, {img_bytes/1024:.0f}KB total (budget 3584KB); no fabricated ratings")
     print(f"  - zero 'domestiq' occurrences across all generated output")
     print(f"  - zero client surnames across all generated output (first name + initial policy)")
+    ld_total = sum(len(re.findall(r'application/ld\+json', v)) for v in html_pages.values())
+    print(f"  - SEO/AEO: 1 h1 + canonical(prod host) + OG/Twitter + parsing JSON-LD per page "
+          f"({ld_total} JSON-LD blocks total)")
+    print(f"  - robots.txt: {len([l for l in written['robots.txt'].splitlines() if l.startswith('User-agent:')])} "
+          f"user-agent groups incl. AI crawlers; /options/ disallowed; sitemap referenced")
+    print(f"  - sitemap.xml: {written['sitemap.xml'].count('<url>')} URLs on prod host, /options/ excluded")
 
 
 if __name__ == "__main__":

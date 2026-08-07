@@ -1,3 +1,80 @@
+# Horsepower Coaching
+# Triathlon, cycling and endurance coaching | Clevedon, UK + online worldwide
+
 User-agent: *
 Allow: /
-Sitemap: https://tomcooling-cpu.github.io/horsepower-website/sitemap.xml
+Disallow: /options/
+
+User-agent: GPTBot
+Allow: /
+Disallow: /options/
+
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /options/
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /options/
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /options/
+
+User-agent: anthropic-ai
+Allow: /
+Disallow: /options/
+
+User-agent: Claude-Web
+Allow: /
+Disallow: /options/
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /options/
+
+User-agent: Perplexity-User
+Allow: /
+Disallow: /options/
+
+User-agent: Google-Extended
+Allow: /
+Disallow: /options/
+
+User-agent: CCBot
+Allow: /
+Disallow: /options/
+
+User-agent: Applebot-Extended
+Allow: /
+Disallow: /options/
+
+User-agent: Bytespider
+Allow: /
+Disallow: /options/
+
+User-agent: Amazonbot
+Allow: /
+Disallow: /options/
+
+User-agent: meta-externalagent
+Allow: /
+Disallow: /options/
+
+User-agent: cohere-ai
+Allow: /
+Disallow: /options/
+
+User-agent: Diffbot
+Allow: /
+Disallow: /options/
+
+User-agent: Timpibot
+Allow: /
+Disallow: /options/
+
+User-agent: YouBot
+Allow: /
+Disallow: /options/
+
+Sitemap: https://horsepowercoaching.co.uk/sitemap.xml
