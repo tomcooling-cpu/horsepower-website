@@ -69,12 +69,12 @@ CTA_FIND = "Find your plan"
 CTA_GET = "Get coached"
 
 # Anti-AI band on the home page (copy A). Answers Jo's "reads very AI" note head on.
-HUMAN_HEADING = "Written by me. Not by a machine."
-HUMAN_BODY = ("Every plan on this site is built by me, Tom Cooling, using the same "
-              "approach I use with the athletes I coach one to one. When you get "
-              "feedback, it is me reading your session and telling you what I see, not "
-              "an algorithm writing a paragraph. This is proper coaching, from a proper "
-              "coach, honed over a decade of taking real athletes to real results.")
+HUMAN_HEADING = "Written by a professional coach."
+HUMAN_BODY = ("Every plan and every piece of feedback comes from me, Tom Cooling, a "
+              "professional coach with over a decade of experience and a proven record "
+              "of taking athletes to podiums and to the dream they set out to chase. "
+              "Nothing here is off the shelf. Everything is built bespoke to you and the "
+              "race you are driving towards.")
 
 # Female-first block (copy E). Home female feature + /female-performance/ intro.
 # The locked headline stays FEMALE_LEAD; this is the body that sits beneath it.
