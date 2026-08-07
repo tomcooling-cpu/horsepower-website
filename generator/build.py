@@ -430,7 +430,7 @@ IMG_ALT = {
     "coached-band": "A time triallist riding hard past a stone wall on a wet mountain road",
     "tom-gravel": "A cyclist riding a white gravel road towards the camera under a big blue sky",
     "tom-portrait": "Tom Cooling, founder and head coach of Horsepower Coaching",
-    "female-tt": "A cyclist racing a time trial in an aero tuck on a country road",
+    "female-tt-v2": "A cyclist racing a time trial in an aero tuck on a country road",
     "female-podium": "Three athletes celebrating on a race podium",
     "female-trail": "A trail runner on a mountain path with an alpine range behind",
     "camp-group": "A group of coached cyclists riding together through an alpine village",
@@ -448,7 +448,7 @@ IMG_POS = {
     "coached-band": "50% 52%",           # TT rider mid-frame against the mountain
     "tom-gravel": "64% 46%",             # Tom riding toward camera, right of text
     "camp-group": "50% 58%",             # the bunch of riders low-centre
-    "female-tt": "50% 45%",              # centred crop of Madison S (WS-SITE9 1b)
+    "female-tt-v2": "50% 50%",           # WS-SITE11a re-crop, Madison S centred in frame
     "female-podium": "50% 30%",          # the three athletes' faces
     "female-trail": "50% 54%",           # runner on the trail, centre
     "tom-portrait": "50% 30%",           # Tom's face
@@ -510,7 +510,7 @@ IMG_DIMS = {
     "alpine-ridge": (1500, 1001),
     "female-hero": (1500, 1001), "ironman-wales-finish": (1500, 1000),
     "coached-band": (1500, 999), "tom-gravel": (1400, 1050),
-    "camp-group": (1400, 1050), "female-tt": (880, 1100),
+    "camp-group": (1400, 1050), "female-tt-v2": (606, 758),
     "female-podium": (825, 1100), "female-trail": (675, 900),
     "tom-portrait": (825, 1100),
     # drop-2026-08-05
@@ -790,7 +790,7 @@ def render_home(cat) -> str:
 
 <section class="alt feature-female">
   <div class="wrap feature-grid feature-grid--portrait">
-    <div class="feature-media feature-media--portrait">{img("female-tt")}</div>
+    <div class="feature-media feature-media--portrait">{img("female-tt-v2")}</div>
     <div class="feature-copy">
       <p class="eyebrow">Female performance</p>
       <h2>Female first, not female adapted.</h2>

@@ -34,11 +34,16 @@ JOBS = {
     # ("disorganised group"), female-podium (results band removed) and
     # coached-tenby-swim (swimmers not visible; replaced by hero-tenby-swim).
     # Their old .webp files are deleted from assets/img so they stop shipping.
-    # female-tt (home "Female first" feature): the source frames Madison S in the
-    # right ~40% with empty road left, so she reads off-centre in the portrait
-    # tile. WS-SITE9: a centred crop of the SAME photo (Tom's ask, 1b). Optional
-    # 4th tuple element is a pixel crop box (left, top, right, bottom).
-    "female-tt":            ("female-tt.jpeg",           FEAT, 80, (466, 461, 1366, 1586)),
+    # female-tt-v2 (home "Female first" feature): the source frames Madison S
+    # against the right edge with empty blurred greenery left, so she reads
+    # off-centre in the portrait tile. WS-SITE9's crop (left=466) still left ~40%
+    # dead green on the left. WS-SITE11a re-crops tighter from the right edge so
+    # her helmet/face/hands cluster sits ~59% (visually centred, balanced by the
+    # forward aero-bar arms filling the lower-left) with the pink base bar, BRAV
+    # jersey and orange bear logo all in frame. Renamed to -v2 to cache-bust the
+    # CDN/browser (old female-tt.webp bytes were being served stale). Optional 4th
+    # tuple element is a pixel crop box (left, top, right, bottom).
+    "female-tt-v2":         ("female-tt.jpeg",           FEAT, 80, (760, 480, 1366, 1238)),
     "female-trail":         ("female-trail.jpeg",        900, 58),
     "tom-portrait":         ("tom-portrait.jpeg",        FEAT, 80),
     # drop-2026-08-05: honours band (athlete identity verified per file)
