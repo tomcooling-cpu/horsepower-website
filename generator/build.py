@@ -380,7 +380,7 @@ def person_node():
 def service_node(name, description, path, monthly_price=None, low_price=None,
                  high_price=None, offer_count=None):
     """A coaching Service node. Prices are only ever stated where they are public
-    on the site (£39.99+ Plans, £120/mo Coached, £160/mo Coached by Tom)."""
+    on the site (£39.99+ Plans, £120/mo Coached, £185/mo Coached by Tom)."""
     node = {
         "@context": "https://schema.org", "@type": "Service",
         "serviceType": "Endurance coaching",
@@ -829,7 +829,7 @@ def render_home(cat) -> str:
       </div>
       <div class="tier-card">
         <h3>Coached by Tom</h3>
-        <div class="price">&pound;160 a month</div>
+        <div class="price">&pound;185 a month</div>
         <p>{esc(TIER_TOM_BODY)}</p>
         <p>{esc(TIER_TOM_BODY_2)}</p>
         <a class="btn" href="{BASE_PATH}/coaching/">See if there is a place</a>
@@ -1171,7 +1171,7 @@ def render_coaching(cat) -> str:
 <section class="hero hero--image">
   {img("coached-tom-dolomites-arch", cls="hero-bg", lazy=False)}
   <div class="wrap">
-    <p class="eyebrow" style="color:var(--teal-soft)">Coached by Tom &middot; &pound;160 a month &middot; Limited places</p>
+    <p class="eyebrow" style="color:var(--teal-soft)">Coached by Tom &middot; &pound;185 a month &middot; Limited places</p>
     <h1>A coach in your corner for all&nbsp;of&nbsp;it</h1>
     <p class="lede">{esc(TIER_TOM_BODY)}</p>
     <p class="lede">{esc(TIER_TOM_BODY_2)}</p>
@@ -1244,7 +1244,7 @@ def render_coaching(cat) -> str:
   <div class="wrap">
     <div class="pricing-card">
       <p class="eyebrow">Coached by Tom</p>
-      <div class="pricing-figure"><span class="amount">&pound;160</span><span class="per">a month</span></div>
+      <div class="pricing-figure"><span class="amount">&pound;185</span><span class="per">a month</span></div>
       <ul class="pricing-points">
         <li>No setup fee</li>
         <li>Three-month minimum</li>
@@ -1267,7 +1267,7 @@ def render_coaching(cat) -> str:
   </div>
 </section>
 </main>"""
-    desc = ("Coached by Tom, £160 a month, limited places. A bespoke TrainingPeaks programme, "
+    desc = ("Coached by Tom, £185 a month, limited places. A bespoke TrainingPeaks programme, "
             "unlimited contact, weekly feedback and a race plan for race day.")
     svc = service_node(
         "Coached by Tom",
@@ -1275,10 +1275,10 @@ def render_coaching(cat) -> str:
          "in-depth WKO5 analysis, unlimited contact and amendments, weekly session feedback and "
          "a race plan before every start line, built and read by Tom Cooling directly. Limited "
          "places."),
-        "/coaching/", monthly_price="160.00")
+        "/coaching/", monthly_price="185.00")
     extra = ld_script([
         breadcrumb_node([("Home", "/"), ("Coached by Tom", None)]), svc])
-    return page("coaching", "Coached by Tom | £160 a month | Horsepower Coaching", desc,
+    return page("coaching", "Coached by Tom | £185 a month | Horsepower Coaching", desc,
                 prod_url("/coaching/"), body, og_image_name="coached-tom-dolomites-arch", extra=extra)
 
 
@@ -1613,7 +1613,7 @@ BANNER_SLOTS = [
     {"id": "coaching-top", "kind": "hero", "name": "Coached by Tom, top banner",
      "where": "The hero at the top of the Coached by Tom page. Ships live as "
               "coached-tom-dolomites-arch; the alternates below are here for you to override.",
-     "eyebrow": "Coached by Tom · £160 a month · Limited places",
+     "eyebrow": "Coached by Tom · £185 a month · Limited places",
      "headline": "A coach in your corner for all of it",
      "lede": ("Everything in Coached, plus me. Calls when you need them, WhatsApp when it is "
               "urgent, and a coach who knows your story, not just your data."),
