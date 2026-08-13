@@ -2,10 +2,16 @@
 Read-only against automated-horsepower course loader + wind model logic.
 
 Panel A: elevation profile (real smoothed GPX), climbs shaded = where power matters.
-Panel B: wind head/tail/cross along the route for a sample fresh WSW wind (from 247.5).
+Panel B: the real IMWA bike route drawn as a MAP in its true geographic shape,
+         each segment coloured by head/tail/crosswind for a sample fresh WSW wind
+         (from 247.5), with a compass rose showing the wind direction.
 
 Wind model: headwind fraction = cos(travel_bearing - wind_from_bearing), the same
 cos(course_bearing - wind_direction) component used in src/race_planner.py.
+
+Map projection: equirectangular, aspect-correct (longitude scaled by cos(mean
+latitude)) so the route keeps its true shape; fit into the panel preserving
+aspect ratio (uniform scale, never stretched), north up.
 """
 import math
 import os
@@ -62,7 +68,7 @@ while target <= total_m and i < len(pts) - 1:
     samples.append((target, lat, lon))
     target += STEP
 
-wind_seg = []  # (dist_m, headwind_fraction)
+wind_seg = []  # (dist_m, headwind_fraction) — one per segment between samples
 for j in range(len(samples) - 1):
     b = bearing((samples[j][1], samples[j][2]), (samples[j + 1][1], samples[j + 1][2]))
     frac = math.cos(math.radians(b - WIND_FROM_DEG))  # + head, - tail, ~0 cross
@@ -83,10 +89,9 @@ n = len(wind_seg)
 share = {k: round(100.0 * v / n) for k, v in counts.items()}
 
 # ── SVG geometry ──────────────────────────────────────────────────────────────
-W, H = 1000, 560
+W, H = 1000, 660
 PADL, PADR = 64, 26
-AX_TOP_A, AX_H_A = 92, 210          # elevation panel
-AX_TOP_B, AX_H_B = 386, 66          # wind strip panel
+AX_TOP_A, AX_H_A = 92, 210          # elevation panel (unchanged)
 plot_w = W - PADL - PADR
 emin, emax = min(selev), max(selev)
 espan = max(1.0, emax - emin)
@@ -163,51 +168,106 @@ for e in (round(emin), round((emin + emax) / 2), round(emax)):
     ylabs += (f'<text x="{PADL - 10:.1f}" y="{yy + 4:.1f}" text-anchor="end" '
               f'font-family="JetBrains Mono,monospace" font-size="11" fill="#6B6B6B">{e}</text>')
 
-# Wind strip: bin the fine samples into ~1km bins (average fraction) so the
-# inline SVG stays light, while the head/tail/cross shares above use fine data.
+# ── Panel B: WIND MAP ─────────────────────────────────────────────────────────
+# The route in its true geographic shape, equirectangular + aspect-correct
+# (longitude scaled by cos(mean latitude)), fit into the map box preserving
+# aspect (uniform scale), north up.
+MAP_TITLE_Y = 372
+MBX, MBY, MBW, MBH = PADL, 384, 452, 240    # map bounding box
+MPAD = 14                                    # inner padding inside the box
+
+# bounds from the resampled route (the same points we draw + colour)
+route_lats = [s[1] for s in samples]
+route_lons = [s[2] for s in samples]
+lat_min, lat_max = min(route_lats), max(route_lats)
+lon_min, lon_max = min(route_lons), max(route_lons)
+mean_lat = sum(route_lats) / len(route_lats)
+coslat = math.cos(math.radians(mean_lat))
+
+pw = (lon_max - lon_min) * coslat            # projected width  (deg * cos lat)
+ph = (lat_max - lat_min)                     # projected height (deg)
+iw = MBW - 2 * MPAD
+ih = MBH - 2 * MPAD
+scale = min(iw / pw, ih / ph)                # uniform => true shape, no stretch
+xoff = (iw - pw * scale) / 2.0               # centre the route in the box
+yoff = (ih - ph * scale) / 2.0
+
+def project(lat, lon):
+    px = (lon - lon_min) * coslat
+    py = (lat_max - lat)                      # flip: higher latitude -> higher up
+    return (MBX + MPAD + xoff + px * scale,
+            MBY + MPAD + yoff + py * scale)
+
+# Colour the route per segment; merge consecutive same-class segments into one
+# polyline so the inline SVG stays light.
 colour = {"head": CORAL, "tail": TEAL, "cross": STONE}
-BIN_M = 1000.0
-bins = []  # (start_m, end_m, avg_frac)
-cur_start = 0.0
-acc, cnt = 0.0, 0
-for m, f in wind_seg:
-    acc += f
-    cnt += 1
-    if m - cur_start >= BIN_M:
-        bins.append((cur_start, m, acc / cnt))
-        cur_start, acc, cnt = m, 0.0, 0
-if cnt:
-    bins.append((cur_start, total_m, acc / cnt))
-wind_rects = ""
-for (s, e, f) in bins:
-    x0 = PADL + plot_w * (s / total_m)
-    x1 = PADL + plot_w * (e / total_m)
-    cls = wind_class(f)
-    wind_rects += (f'<rect x="{x0:.2f}" y="{AX_TOP_B:.0f}" width="{x1 - x0 + 0.6:.2f}" '
-                   f'height="{AX_H_B:.0f}" fill="{colour[cls]}"/>')
+runs = []              # (class, [(X,Y), ...])
+prev_cls = None
+cur = []
+for j in range(len(samples) - 1):
+    cls = wind_class(wind_seg[j][1])
+    p0 = project(samples[j][1], samples[j][2])
+    p1 = project(samples[j + 1][1], samples[j + 1][2])
+    if cls != prev_cls:
+        if cur:
+            runs.append((prev_cls, cur))
+        cur = [p0]
+        prev_cls = cls
+    cur.append(p1)
+if cur:
+    runs.append((prev_cls, cur))
 
-# x-axis for wind strip (same scale)
-wxticks = ""
-km = 0
-while km <= total_km:
-    xx = x_of(km * 1000.0)
-    wxticks += (f'<line x1="{xx:.1f}" y1="{AX_TOP_B + AX_H_B:.1f}" x2="{xx:.1f}" '
-                f'y2="{AX_TOP_B + AX_H_B + 5:.1f}" stroke="{GRID}" stroke-width="1"/>'
-                f'<text x="{xx:.1f}" y="{AX_TOP_B + AX_H_B + 19:.1f}" text-anchor="middle" '
-                f'font-family="JetBrains Mono,monospace" font-size="11" fill="#6B6B6B">{km}</text>')
-    km += 20
+route_paths = ""
+for cls, ptsr in runs:
+    pstr = " ".join(f"{x:.1f},{y:.1f}" for x, y in ptsr)
+    route_paths += (f'<polyline points="{pstr}" fill="none" stroke="{colour[cls]}" '
+                    f'stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>')
 
-# Compass rose showing the wind FROM direction
-cx, cy, cr = W - 78, AX_TOP_B + AX_H_B / 2, 26
-ang = math.radians(WIND_FROM_DEG - 90)  # 0deg=N at top; screen x=cos(a-90)
-# arrow points in the direction the wind blows TO (from-dir + 180)
-tox = math.cos(math.radians(WIND_FROM_DEG + 90))
-toy = math.sin(math.radians(WIND_FROM_DEG + 90))
-# convert compass bearing to screen vector: N=up. bearing b -> (sin b, -cos b)
+# Faint wind-direction streaks across the map (blowing FROM WSW toward ENE).
 def screen_vec(b):
     return math.sin(math.radians(b)), -math.cos(math.radians(b))
-fx, fy = screen_vec(WIND_FROM_DEG)          # from-point on rim
-ax_, ay_ = screen_vec(WIND_FROM_DEG + 180)  # arrow head (blows to)
+tox, toy = screen_vec(WIND_FROM_DEG + 180)   # unit vector the wind blows toward
+streaks = ""
+STREAK_LEN = 74
+for k in range(3):
+    # tails spread along the lower-left edge, heads point up-right
+    sx = MBX + 40 + k * 96
+    sy = MBY + MBH - 40 - k * 14
+    ex = sx + tox * STREAK_LEN
+    ey = sy + toy * STREAK_LEN
+    # small arrow head
+    perpx, perpy = -toy, tox
+    h1x, h1y = ex - 9 * tox + 4 * perpx, ey - 9 * toy + 4 * perpy
+    h2x, h2y = ex - 9 * tox - 4 * perpx, ey - 9 * toy - 4 * perpy
+    streaks += (f'<line x1="{sx:.1f}" y1="{sy:.1f}" x2="{ex:.1f}" y2="{ey:.1f}" '
+                f'stroke="{STONE}" stroke-width="1.5" stroke-opacity="0.45"/>'
+                f'<polyline points="{h1x:.1f},{h1y:.1f} {ex:.1f},{ey:.1f} {h2x:.1f},{h2y:.1f}" '
+                f'fill="none" stroke="{STONE}" stroke-width="1.5" stroke-opacity="0.45"/>')
+
+# Start / finish marker (Tenby — the route starts and finishes at the same point).
+sfx, sfy = project(samples[0][1], samples[0][2])
+start_marker = (f'<circle cx="{sfx:.1f}" cy="{sfy:.1f}" r="4.6" fill="{CREAM}" '
+                f'stroke="{INK}" stroke-width="2"/>'
+                f'<text x="{sfx + 9:.1f}" y="{sfy + 4:.1f}" font-family="Oswald,sans-serif" '
+                f'font-size="12" font-weight="600" fill="{INK}">Start / finish</text>')
+
+# ── Compass rose (right of the map): wind FROM the WSW, blowing toward ENE ─────
+cx, cy, cr = 862, 486, 52
+fx, fy = screen_vec(WIND_FROM_DEG)          # from-point on rim (WSW, lower-left)
+ax_, ay_ = screen_vec(WIND_FROM_DEG + 180)  # arrow head on rim (ENE, upper-right)
+# cardinal ticks
+cardinals = ""
+for lab, bdeg in (("N", 0), ("E", 90), ("S", 180), ("W", 270)):
+    vx, vy = screen_vec(bdeg)
+    cardinals += (f'<line x1="{vx*(cr-6):.1f}" y1="{vy*(cr-6):.1f}" '
+                  f'x2="{vx*cr:.1f}" y2="{vy*cr:.1f}" stroke="{INK}" stroke-width="1"/>'
+                  f'<text x="{vx*(cr+11):.1f}" y="{vy*(cr+11)+4:.1f}" text-anchor="middle" '
+                  f'font-family="JetBrains Mono,monospace" font-size="10" fill="#6B6B6B">{lab}</text>')
+# arrow head geometry (points to ENE rim)
+perpx, perpy = -ay_, ax_
+hx, hy = ax_ * cr, ay_ * cr
+ha1x, ha1y = hx - 12 * ax_ + 6 * perpx, hy - 12 * ay_ + 6 * perpy
+ha2x, ha2y = hx - 12 * ax_ - 6 * perpx, hy - 12 * ay_ - 6 * perpy
 
 def stat(x, y, big, small, col):
     return (f'<text x="{x}" y="{y}" font-family="Oswald,sans-serif" font-size="26" '
@@ -217,7 +277,7 @@ def stat(x, y, big, small, col):
 
 svg = f'''<svg class="raceplan-svg" viewBox="0 0 {W} {H}" role="img" width="100%"
   xmlns="http://www.w3.org/2000/svg"
-  aria-label="Ironman Wales bike course race plan snapshot. An elevation profile of the {total_km:.0f} kilometre bike leg with {len(POWER_CLIMBS)} climbs shaded where power matters most, and a wind analysis for a sample fresh {WIND_LABEL} wind showing headwind, tailwind and crosswind sections along the route.">
+  aria-label="Ironman Wales bike course race plan snapshot. An elevation profile of the {total_km:.0f} kilometre bike leg with {len(POWER_CLIMBS)} climbs shaded where power matters most, and a map of the real bike route drawn in its true geographic shape, each section coloured for a sample fresh {WIND_LABEL} wind to show the headwind, tailwind and crosswind portions of the course, with a compass showing the wind blowing from the {WIND_LABEL}.">
 <title>Ironman Wales bike course: elevation and wind race-plan snapshot</title>
 <rect x="0" y="0" width="{W}" height="{H}" fill="{CREAM}"/>
 <rect x="0" y="0" width="{W}" height="6" fill="{TEAL}"/>
@@ -240,29 +300,43 @@ svg = f'''<svg class="raceplan-svg" viewBox="0 0 {W} {H}" role="img" width="100%
 <path d="{line}" fill="none" stroke="{INK}" stroke-width="1.6" stroke-linejoin="round"/>
 {xticks}{ylabs}{ann}
 <text x="{PADL - 10}" y="{AX_TOP_A - 4}" text-anchor="end" font-family="Source Sans 3,sans-serif" font-size="10" fill="#6B6B6B">m</text>
+<text x="{W/2:.0f}" y="{AX_TOP_A + AX_H_A + 40}" text-anchor="middle" font-family="Source Sans 3,sans-serif" font-size="12" fill="#3A3A3A">Distance along the bike course (km)</text>
 
-<!-- Panel B: wind -->
-<text x="{PADL}" y="{AX_TOP_B - 12}" font-family="Oswald,sans-serif" font-size="13" font-weight="600"
-  fill="{INK}" letter-spacing="0.5">WIND &#183; A SAMPLE FRESH {WIND_LABEL} DAY</text>
-{wind_rects}
-<rect x="{PADL}" y="{AX_TOP_B}" width="{plot_w:.1f}" height="{AX_H_B}" fill="none" stroke="{INK}" stroke-width="1"/>
-{wxticks}
-<text x="{W/2:.0f}" y="{AX_TOP_B + AX_H_B + 42}" text-anchor="middle" font-family="Source Sans 3,sans-serif" font-size="12" fill="#3A3A3A">Distance along the bike course (km)</text>
+<!-- Panel B: wind MAP -->
+<text x="{PADL}" y="{MAP_TITLE_Y}" font-family="Oswald,sans-serif" font-size="13" font-weight="600"
+  fill="{INK}" letter-spacing="0.5">WIND ON THE COURSE &#183; A SAMPLE FRESH {WIND_LABEL} DAY</text>
+<rect x="{MBX}" y="{MBY}" width="{MBW}" height="{MBH}" fill="#FBFAF6" stroke="{GRID}" stroke-width="1"/>
+{streaks}
+{route_paths}
+{start_marker}
+
+<!-- Wind direction: compass rose -->
+<g transform="translate({cx},{cy})">
+<circle r="{cr}" fill="#FBFAF6" stroke="{INK}" stroke-width="1"/>
+{cardinals}
+<line x1="{fx*cr:.1f}" y1="{fy*cr:.1f}" x2="{ax_*cr:.1f}" y2="{ay_*cr:.1f}" stroke="{CORAL}" stroke-width="3"/>
+<polygon points="{hx:.1f},{hy:.1f} {ha1x:.1f},{ha1y:.1f} {ha2x:.1f},{ha2y:.1f}" fill="{CORAL}"/>
+<circle r="3" fill="{INK}"/>
+</g>
+<text x="{cx}" y="{cy + cr + 24}" text-anchor="middle" font-family="Oswald,sans-serif" font-size="14" font-weight="700" fill="{INK}">WIND FROM THE {WIND_LABEL}</text>
+<text x="{cx}" y="{cy + cr + 42}" text-anchor="middle" font-family="Source Sans 3,sans-serif" font-size="12" fill="#3A3A3A">blowing toward the ENE</text>
+
+<!-- Framing note (left of the compass, clear of it) -->
+<g font-family="Source Sans 3,sans-serif" font-size="12.5" fill="#3A3A3A">
+<text x="{MBX + MBW + 38}" y="{MBY + 20}">A sample fresh {WIND_LABEL} wind</text>
+<text x="{MBX + MBW + 38}" y="{MBY + 38}">(from 247.5&#176;), typical of a</text>
+<text x="{MBX + MBW + 38}" y="{MBY + 56}">Pembrokeshire race day.</text>
+<text x="{MBX + MBW + 38}" y="{MBY + 74}">Every metre of the route is</text>
+<text x="{MBX + MBW + 38}" y="{MBY + 92}">coloured by whether you</text>
+<text x="{MBX + MBW + 38}" y="{MBY + 110}">push into it, ride with it,</text>
+<text x="{MBX + MBW + 38}" y="{MBY + 128}">or handle it side-on.</text>
+</g>
 
 <!-- Wind legend -->
 <g font-family="Source Sans 3,sans-serif" font-size="12" fill="{INK}">
 <rect x="{PADL}" y="{H - 26}" width="13" height="13" fill="{CORAL}"/><text x="{PADL + 19}" y="{H - 15}">Headwind {share['head']}%</text>
 <rect x="{PADL + 150}" y="{H - 26}" width="13" height="13" fill="{TEAL}"/><text x="{PADL + 169}" y="{H - 15}">Tailwind {share['tail']}%</text>
 <rect x="{PADL + 300}" y="{H - 26}" width="13" height="13" fill="{STONE}"/><text x="{PADL + 319}" y="{H - 15}">Crosswind {share['cross']}%</text>
-</g>
-
-<!-- Compass -->
-<g transform="translate({cx},{cy})">
-<circle r="{cr}" fill="none" stroke="{INK}" stroke-width="1"/>
-<text x="0" y="{-cr - 4}" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#6B6B6B">N</text>
-<line x1="{fx*cr:.1f}" y1="{fy*cr:.1f}" x2="{ax_*cr:.1f}" y2="{ay_*cr:.1f}" stroke="{CORAL}" stroke-width="2.4"/>
-<polygon points="{ax_*cr:.1f},{ay_*cr:.1f} {ax_*cr - 7*(ax_+0.5*fy):.1f},{ay_*cr - 7*(ay_-0.5*fx):.1f} {ax_*cr - 7*(ax_-0.5*fy):.1f},{ay_*cr - 7*(ay_+0.5*fx):.1f}" fill="{CORAL}"/>
-<text x="0" y="{cr + 14}" text-anchor="middle" font-family="Oswald,sans-serif" font-size="11" font-weight="600" fill="{INK}">{WIND_LABEL} wind</text>
 </g>
 </svg>'''
 
@@ -272,6 +346,8 @@ with open(out, "w") as f:
 print("wrote", out, len(svg), "bytes")
 print("power climbs shaded:", len(POWER_CLIMBS))
 print("wind shares:", share)
+print("route runs (map polylines):", len(runs))
+print("map box", (MBX, MBY, MBW, MBH), "scale px/deg", round(scale, 1))
 print("steepest max grade:", steep["max_gradient_pct"], "at km", round(steep["start_dist_m"]/1000,1))
 print("biggest net gain:", round(biggest["net_gain_m"]), "at km", round(biggest["start_dist_m"]/1000,1))
 print("total_km", round(total_km,1), "gain", bike.elevation_gain_m)
