@@ -26,6 +26,21 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 SITE = os.path.normpath(os.path.join(HERE, "..", "site"))
 CATALOGUE = os.path.join(HERE, "catalogue.json")
 CONTENT_BLOG = os.path.join(HERE, "content", "blog")   # WS-SITE14 blog posts (front matter + markdown)
+# WS-SITE16 race-plan snapshot: one self-contained inline SVG of the IRONMAN Wales
+# bike course (real IMWA GPX via the automated-horsepower course loader + wind
+# model). Committed as source; inlined into /coaching/ so it inherits the page's
+# Oswald / JetBrains Mono webfonts and costs no extra request or image weight.
+# Regenerate with scripts under automated-horsepower (read-only), never at build time.
+RACEPLAN_SVG_PATH = os.path.join(HERE, "content", "imwales-raceplan.svg")
+# Real figures baked into the committed SVG (from the IMWA bike.gpx course loader).
+RACEPLAN_KM = 178
+RACEPLAN_ASCENT = "2,421 m"
+
+
+def raceplan_svg() -> str:
+    """The committed IRONMAN Wales race-plan snapshot SVG, inlined verbatim."""
+    with open(RACEPLAN_SVG_PATH, encoding="utf-8") as fh:
+        return fh.read().strip()
 
 # Base path for every internal href/src. Two deploy targets, one generator:
 #   - GitHub Pages preview (the committed site/, served at a project subpath):
@@ -124,16 +139,17 @@ TIER_COACHED_BODY_2 = ("The only thing you don't get compared to full coaching i
                        "just without the premium of unlimited access.")
 
 # Coached by Tom tier (copy D), two paragraphs. Home tier card + the /coaching/ hero.
-TIER_TOM_BODY = ("The full thing. One to one, completely bespoke, and about as close as it "
-                 "gets to having a professional coach in your corner. I build your "
-                 "programme around your race, your life and your body, then I'm with you "
-                 "the whole way: feedback every week, proper analysis of the sessions that "
-                 "matter, and a hand with everything that decides the day, from pacing and "
-                 "fuelling to race craft, bike fit and the mental side.")
+TIER_TOM_BODY = ("The full thing. One to one, completely bespoke, and a professional coach "
+                 "in your corner the whole way. I build your programme around your race, "
+                 "your life and your body, then I'm with you every step: feedback every "
+                 "week, proper analysis of the sessions that matter, and a hand with "
+                 "everything that decides the day, from pacing and fuelling to race craft, "
+                 "bike fit and the mental side.")
 TIER_TOM_BODY_2 = ("This is the coaching that's taken Horsepower athletes to Ironman "
-                   "titles, course records and finish lines they'd been told were beyond "
-                   "them. Places are limited, simply because there are only so many "
-                   "athletes I can coach this closely at once.")
+                   "titles, course records and finish lines and achievements they didn't "
+                   "think were possible. Places are limited simply because I can only give "
+                   "this level of support to a small cohort, so I only ever open 15 Coached "
+                   "by Tom spots.")
 
 RESULTS_LINE = ("Ironman wins, 70.3 and XTRI podiums, Haute Route podiums and ultra race "
                 "wins, and a whole lot of first finish lines that I'm every bit as proud "
@@ -657,21 +673,21 @@ CLIENT_RESULT_LINE = ("Coached athlete Madison S won Ironman Wales 2025, "
 # earlier point and never invented past it. Every string here must appear in
 # VERIFIED_QUOTES byte-exact (carousel-data gate).
 CLIENT_QUOTES = [
-    {"name": "Ian C", "context": "Cycling athlete", "pages": ["coached"],
+    {"name": "Ian C", "context": "Cycling athlete", "pages": ["coached", "coaching"],
      "quote": ("Tom is a great coach and has helped massively with my cycling, helping me "
                "achieve results I wouldn't have thought possible previously.")},
     {"name": "jc b", "context": "Ironman finisher, 11h13", "pages": ["coached", "coaching"],
      "quote": ("I can't recommend Tom enough. Over the past year, the support, structure, "
                "and guidance I received helped me progress massively and achieve my "
                "Ironman goal, finishing in 11h13.")},
-    {"name": "Emma N", "context": "Multi-event athlete", "pages": ["female"],
+    {"name": "Emma N", "context": "Multi-event athlete", "pages": ["female", "coaching"],
      "quote": ("Really enjoyed being coached by Horsepower Coaching. Tom really knows his "
                "stuff and is easy to talk to. If ever I had any questions, Tom was always "
                "quick to answer & provided detailed race plans for my various events. "
                "Would highly recommend.")},
     {"name": "Google review", "context": "70.3 athlete", "pages": ["coaching"],
      "quote": "The dream was to finish a 70.3 before turning 50 with a personal best."},
-    {"name": "Google review", "context": "", "pages": [],
+    {"name": "Google review", "context": "", "pages": ["coaching"],
      "quote": "The sessions are tough but always enjoyable I would highly recommend him"},
 ]
 
@@ -861,7 +877,7 @@ def render_home(cat) -> str:
         <p class="support-line"><span class="support-tag support-tag--mid">Support: {esc(SUPPORT_LEVELS[1][1])}</span>{esc(SUPPORT_LEVELS[1][2])}</p>
         <p>{esc(TIER_COACHED_BODY)}</p>
         <p>{esc(TIER_COACHED_BODY_2)}</p>
-        <a class="btn" href="{BASE_PATH}/coached/">How coaching works</a>
+        <a class="btn" href="{BASE_PATH}/coached/">How Plan Only works</a>
       </div>
       <div class="tier-card">
         <h3>Coached by Tom</h3>
@@ -1240,7 +1256,7 @@ def render_coaching(cat) -> str:
     <div class="side-fig-grid">
       <ol class="step-list">
         <li><strong>Your block lands</strong>Three weeks of training built around your life, calibrated to where your form is right now and where it needs to be to reach your dream goal, delivered to your TrainingPeaks account.</li>
-        <li><strong>You train, I stay close</strong>Every session tells you what to do and why. Message me any time you need to move something or talk it through. Contact is unlimited, so you are never left guessing between sessions.</li>
+        <li><strong>Every session earns its place</strong>Every session in your plan has a purpose. If I can't justify why it's there, it doesn't go in. Message me any time to move something or talk it through, and contact is unlimited, so you are never left guessing between sessions.</li>
         <li><strong>Read, analysed, fed back on</strong>I read the sessions you complete, analyse them against what was set using your actual data in TrainingPeaks and WKO5, and feed back on them. Feedback is a key part of the coaching journey, so each week you get a full round of feedback on everything you have completed.</li>
         <li><strong>We talk, the plan moves</strong>Block by block video catch-ups, WhatsApp for general chat, and the next block reflects real life and your numbers as they move.</li>
       </ol>
@@ -1266,17 +1282,36 @@ def render_coaching(cat) -> str:
     <div>
       <div class="callout">
         <h2>Why places are limited</h2>
-        <p>I keep this group small on purpose. If we are going to do it, we do it properly, and
-        that means I can only take on so many athletes at this level at once. When it is full,
-        it is full.</p>
+        <p>I keep this group small on purpose. I only ever open 15 Coached by Tom spots, because
+        this level of support, weekly feedback, unlimited contact and a coach reading every
+        session, is not something I can give properly to more than a small cohort. When those 15
+        are taken, it is full.</p>
         <p style="margin-top:18px"><a class="btn on-dark ghost" href="{esc(CONTACT_URL)}">Ask about a place</a></p>
       </div>
     </div>
   </div>
 </section>
 
+<section class="alt">
+  <div class="wrap">
+    <p class="eyebrow">A look at the kind of race plan you get</p>
+    <h2>Your race, mapped out before you get there</h2>
+    <p class="section-intro">Here is the bike leg of IRONMAN Wales, one of the toughest courses my
+    athletes race, straight from the real course data. The profile shows where the power actually
+    goes, on the climbs and the sustained drags, and the wind panel shows how a fresh westerly
+    turns the same road into a headwind one way and a tailwind the other. Your plan gets the same
+    treatment for your event: where to spend, where to save, and what the day is really asking of you.</p>
+    <figure class="raceplan">
+      {raceplan_svg()}
+      <figcaption>IRONMAN Wales bike course, roughly {RACEPLAN_KM} km and {RACEPLAN_ASCENT} of climbing,
+      from the official course file. Wind shown for a sample fresh WSW day, the direction that decides
+      most days in Pembrokeshire.</figcaption>
+    </figure>
+  </div>
+</section>
+
 <div class="media-band">{img("coaching-alpine-hairpin", cls="media-bg")}</div>
-{carousel("coaching", subhead="What athletes say about being coached by Tom")}
+{carousel("coaching", subhead="What athletes say about being coached by Tom", include_result=False)}
 <section class="alt">
   <div class="wrap">
     <div class="pricing-card">
