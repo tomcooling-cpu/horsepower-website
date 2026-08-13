@@ -1,4 +1,4 @@
-# WS-SITE13 GoDaddy -> Netlify 301 map. Blog URLs intentionally omitted.
+# WS-SITE13 GoDaddy -> Netlify 301 map. Blog URLs added in WS-SITE14.
 /triathlon-coaching       /triathlon-coaching/     301
 /cycling-coaching         /cycling-coaching/       301
 /training-plans           /plans/                  301
@@ -10,3 +10,24 @@
 /the-foundry              /                        301
 /bespoke-wheelbuilding    /                        301
 /equality-development-1   /female-performance/     301
+
+# Blog: the old GoDaddy URLs were /blog and /blog/f/<slug> (no trailing
+# slash). Send them to the new trailing-slash pages so ranking is kept.
+/blog                      /blog/                   301
+/blog/f/female-first-not-female-adapted    /blog/f/female-first-not-female-adapted/    301
+/blog/f/make-the-plan-then-hold-it    /blog/f/make-the-plan-then-hold-it/    301
+/blog/f/dont-get-fancy-before-youre-fancy    /blog/f/dont-get-fancy-before-youre-fancy/    301
+/blog/f/train-easier-than-you-think    /blog/f/train-easier-than-you-think/    301
+/blog/f/into-the-unknown    /blog/f/into-the-unknown/    301
+/blog/f/how-to-improve-your-triathlon-swim    /blog/f/how-to-improve-your-triathlon-swim/    301
+/blog/f/my-triathlon-top-tips    /blog/f/my-triathlon-top-tips/    301
+/blog/f/the-lightest-disc-brake-bike    /blog/f/the-lightest-disc-brake-bike/    301
+/blog/f/how-not-to-coach---the-art-of-listening    /blog/f/how-not-to-coach---the-art-of-listening/    301
+/blog/f/plastic-pollution-triathlon    /blog/f/plastic-pollution-triathlon/    301
+/blog/f/once-twice-three-times-an-ironman    /blog/f/once-twice-three-times-an-ironman/    301
+/blog/f/tits-up---how-to-deal-with-failure    /blog/f/tits-up---how-to-deal-with-failure/    301
+/blog/f/everesting---climbing-the-mountain    /blog/f/everesting---climbing-the-mountain/    301
+/blog/f/our-origins---a-little-bit-of-history    /blog/f/our-origins---a-little-bit-of-history/    301
+/blog/f/ironman-wales---enter-the-dragon    /blog/f/ironman-wales---enter-the-dragon/    301
+/blog/f/2017-season-wrapup---calm-after-the-storm    /blog/f/2017-season-wrapup---calm-after-the-storm/    301
+/blog/f/psychology---use-your-head    /blog/f/psychology---use-your-head/    301
