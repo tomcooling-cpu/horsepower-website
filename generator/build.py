@@ -79,13 +79,9 @@ HERO_BODY = ("Your first 70.3. Ironman Wales. Kona. A 100 mile TT. Whatever your
 CTA_FIND = "Find your plan"
 CTA_GET = "Get coached"
 
-# Anti-AI band on the home page (copy A). Answers Jo's "reads very AI" note head on.
-HUMAN_HEADING = "Written by a professional coach."
-HUMAN_BODY = ("Every plan and every piece of feedback comes from me, Tom Cooling, a "
-              "professional coach with over a decade of experience and a proven record "
-              "of taking athletes to podiums and to the dream they set out to chase. "
-              "Nothing here is off the shelf. Everything is built bespoke to you and the "
-              "race you are driving towards.")
+# (Removed 2026-08-13: the "written by a professional coach / not a machine" home band was
+# dropped. Protesting that the coaching is not AI is itself an AI tell; the site sells the
+# coaching on its own terms in Tom's voice, never by arguing it is human.)
 
 # Female-first block (copy E). Home female feature + /female-performance/ intro.
 # The locked headline stays FEMALE_LEAD; this is the body that sits beneath it.
@@ -178,7 +174,7 @@ SUPPORT_LEVELS = [
 
 # Strings that must appear byte-exact in the built output (copy-verbatim gate).
 VERBATIM_REQUIRED = [
-    HERO_HEADLINE, HERO_BODY, HUMAN_HEADING, HUMAN_BODY, FEMALE_FIRST_BODY,
+    HERO_HEADLINE, HERO_BODY, FEMALE_FIRST_BODY,
     TIER_PLANS_BODY, TIER_COACHED_BODY, TIER_COACHED_BODY_2,
     TIER_TOM_BODY, TIER_TOM_BODY_2, RESULTS_LINE,
     WHICH_PLANS, WHICH_COACHED, WHICH_TOM, PLANS_INTRO,
@@ -837,16 +833,6 @@ def render_home(cat) -> str:
     <div class="cta-row">
       <a class="btn" href="{BASE_PATH}/plans/">{esc(CTA_FIND)}</a>
       <a class="btn on-dark ghost" href="{BASE_PATH}/coached/">{esc(CTA_GET)}</a>
-    </div>
-  </div>
-</section>
-
-<section class="alt">
-  <div class="wrap">
-    <div class="callout callout--wide">
-      <p class="eyebrow" style="color:var(--teal-soft)">The Horsepower difference</p>
-      <h2>{esc(HUMAN_HEADING)}</h2>
-      <p>{esc(HUMAN_BODY)}</p>
     </div>
   </div>
 </section>
