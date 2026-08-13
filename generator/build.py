@@ -162,9 +162,11 @@ WHICH_TOM = "Chasing something big and want a coach in your corner for all of it
 # The /plans/ intro is copy B, reused verbatim from the home tier card.
 PLANS_INTRO = TIER_PLANS_BODY
 
-COACHED_INTRO = ("The same coaching that goes into my fully coached athletes' plans, "
-                 "written for you, for £120 a month. I build your programme block by block "
-                 "and give you honest feedback on the sessions you actually do.")
+COACHED_INTRO = ("The same coaching my fully coached athletes get, written for you, block by "
+                 "block, for £120 a month. I build your programme myself and give you honest "
+                 "feedback on every session you complete. The only difference is the contact: "
+                 "no calls, and I am not on call day to day. The coaching in the plan is exactly "
+                 "the same.")
 
 # ── Tier 1 display name (the £39.99 off-the-shelf plan library) ───────────────
 # Renamed "Plans" -> "Plan Store" (WS-SITE13, Tom's ask). The route stays /plans/;
@@ -248,8 +250,9 @@ NAV = [
     ("Home", BASE_PATH + "/", "home"),
     ("Coached by Tom", BASE_PATH + "/coaching/", "coaching"),
     ("Female Performance", BASE_PATH + "/female-performance/", "female"),
-    (TIER1_NAME, BASE_PATH + "/plans/", "plans"),
+    # WS-SITE18: Plan Only before Plan Store in the nav.
     (TIER2_NAME, BASE_PATH + "/coached/", "coached"),
+    (TIER1_NAME, BASE_PATH + "/plans/", "plans"),
     ("About Us", BASE_PATH + "/about/", "about"),
     ("Blog", BASE_PATH + "/blog/", "blog"),
 ]
@@ -369,11 +372,17 @@ def org_node(with_rating=False):
         "image": og_image_url("ironman-wales-finish"),
         "description": ("Triathlon, cycling and endurance coaching and training plans built "
                         "for your target race, with a particular emphasis on female-specific "
-                        "performance. Based in Clevedon, UK; coaching athletes online worldwide."),
+                        "performance. Based in Truro, Cornwall, UK; coaching athletes online worldwide."),
         "founder": {"@type": "Person", "name": "Tom Cooling"},
-        "address": {"@type": "PostalAddress", "addressLocality": "Clevedon",
-                    "addressRegion": "Somerset", "addressCountry": "GB"},
-        "areaServed": [{"@type": "City", "name": "Clevedon"}] + _area_served(),
+        # WS-SITE18: business now based in Truro, Cornwall. Clevedon (plus Cornwall and
+        # the wider South West) is deliberately kept in areaServed so the long-standing
+        # Clevedon search signal / Google listing is not lost.
+        "address": {"@type": "PostalAddress", "addressLocality": "Truro",
+                    "addressRegion": "Cornwall", "addressCountry": "GB"},
+        "areaServed": [{"@type": "City", "name": "Truro"},
+                       {"@type": "City", "name": "Clevedon"},
+                       {"@type": "AdministrativeArea", "name": "Cornwall"},
+                       {"@type": "AdministrativeArea", "name": "South West England"}] + _area_served(),
         "knowsAbout": ["Triathlon coaching", "Ironman training", "Cycling coaching",
                        "Time trial training", "Ultra-endurance racing", "Marathon training",
                        "Female-specific endurance training", "Heat acclimation",
@@ -550,7 +559,7 @@ IMG_POS = {
     "tom-alps-lead": "50% 45%",          # Tom on the front of the bunch
     "tom-alps-finish": "42% 52%",        # Tom left of centre, TAG Heuer arch behind
     "coached-tom-dolomites-arch": "50% 46%",  # Tom + the timing arch held in the wide banner crop
-    "coaching-alpine-hairpin": "50% 58%",     # riders + road low-centre in the band
+    "coaching-alpine-hairpin": "50% 74%",     # WS-SITE18: pan down so Ian (2nd rider, HP kit) + bike are fully in view
     "tom-bottle-refill": "50% 30%",      # Tom's face + bottle
     "about-brecon-titan": "50% 40%",     # Tom central under the FINISH arch
     "about-dolomites-descender": "50% 55%",  # descending rider low, peaks above
@@ -818,8 +827,10 @@ def quote_block(page):
 
 
 def reviews_band():
-    """Homepage client-voices carousel: every quote plus the Madison result."""
-    return carousel("home")
+    """Homepage client-voices carousel: reviews only (WS-SITE18, Tom's ruling).
+    The Madison result/stats slide is deliberately excluded so the home carousel
+    reads as genuine Google reviews, nothing fabricated."""
+    return carousel("home", include_result=False)
 
 
 # The four live Female-First plan SKUs, cross-linked to the female performance page.
@@ -849,8 +860,8 @@ def render_home(cat) -> str:
     <h1>{esc(HERO_HEADLINE)}</h1>
     <p class="lede">{esc(HERO_BODY)}</p>
     <div class="cta-row">
-      <a class="btn" href="{BASE_PATH}/plans/">{esc(CTA_FIND)}</a>
-      <a class="btn on-dark ghost" href="{BASE_PATH}/coached/">{esc(CTA_GET)}</a>
+      <a class="btn" href="{BASE_PATH}/coaching/">{esc(CTA_GET)}</a>
+      <a class="btn on-dark ghost" href="{BASE_PATH}/plans/">{esc(CTA_FIND)}</a>
     </div>
   </div>
 </section>
@@ -864,28 +875,28 @@ def render_home(cat) -> str:
     coaching relationship. No nonsense, no upselling, just the right level of support for where you are.</p>
     <div class="support-ladder" role="list" aria-label="Support increases across the three tiers">{ladder}</div>
     <div class="tier-grid">
-      <div class="tier-card">
+      <div class="tier-card tier-card--store">
         <h3>{esc(TIER1_NAME)}</h3>
         <div class="price">From &pound;39.99, one-off</div>
         <p class="support-line"><span class="support-tag support-tag--none">Support: {esc(SUPPORT_LEVELS[0][1])}</span>{esc(SUPPORT_LEVELS[0][2])}</p>
         <p>{esc(TIER_PLANS_BODY)}</p>
-        <a class="btn" href="{BASE_PATH}/plans/">Browse the library</a>
+        <a class="btn btn--store" href="{BASE_PATH}/plans/">Browse the library</a>
       </div>
-      <div class="tier-card feature">
+      <div class="tier-card feature tier-card--plan">
         <h3>{esc(TIER2_NAME)}</h3>
         <div class="price">&pound;120 a month</div>
         <p class="support-line"><span class="support-tag support-tag--mid">Support: {esc(SUPPORT_LEVELS[1][1])}</span>{esc(SUPPORT_LEVELS[1][2])}</p>
         <p>{esc(TIER_COACHED_BODY)}</p>
         <p>{esc(TIER_COACHED_BODY_2)}</p>
-        <a class="btn" href="{BASE_PATH}/coached/">How Plan Only works</a>
+        <a class="btn btn--plan" href="{BASE_PATH}/coached/">How Plan Only works</a>
       </div>
-      <div class="tier-card">
+      <div class="tier-card tier-card--tom">
         <h3>Coached by Tom</h3>
         <div class="price">&pound;185 a month</div>
         <p class="support-line"><span class="support-tag support-tag--full">Support: {esc(SUPPORT_LEVELS[2][1])}</span>{esc(SUPPORT_LEVELS[2][2])}</p>
         <p>{esc(TIER_TOM_BODY)}</p>
         <p>{esc(TIER_TOM_BODY_2)}</p>
-        <a class="btn" href="{BASE_PATH}/coaching/">See if there is a place</a>
+        <a class="btn btn--tom" href="{BASE_PATH}/coaching/">See if there is a place</a>
       </div>
     </div>
   </div>
@@ -916,9 +927,9 @@ def render_home(cat) -> str:
   <div class="wrap">
     <p class="eyebrow">Which one am I?</p>
     <div class="which-grid">
-      <div class="which-item"><strong>{esc(TIER1_NAME)}</strong>{esc(WHICH_PLANS)}</div>
-      <div class="which-item"><strong>{esc(TIER2_NAME)}</strong>{esc(WHICH_COACHED)}</div>
-      <div class="which-item"><strong>Coached by Tom</strong>{esc(WHICH_TOM)}</div>
+      <div class="which-item which-item--store"><strong>{esc(TIER1_NAME)}</strong>{esc(WHICH_PLANS)}</div>
+      <div class="which-item which-item--plan"><strong>{esc(TIER2_NAME)}</strong>{esc(WHICH_COACHED)}</div>
+      <div class="which-item which-item--tom"><strong>Coached by Tom</strong>{esc(WHICH_TOM)}</div>
     </div>
   </div>
 </section>
@@ -1126,7 +1137,7 @@ def render_coached(cat) -> str:
     <p class="eyebrow" style="color:var(--teal-soft)">{esc(TIER2_NAME)} &middot; &pound;120 a month</p>
     <h1>A plan I build for you, block by block</h1>
     <p class="lede">{esc(COACHED_INTRO)}</p>
-    <div class="cta-row"><a class="btn" href="{esc(CONTACT_URL)}">Apply for coaching</a></div>
+    <div class="cta-row"><a class="btn" href="{esc(CONTACT_URL)}">Apply for Plan Only</a></div>
   </div>
 </section>
 
@@ -1137,7 +1148,7 @@ def render_coached(cat) -> str:
     <h2>What you get for &pound;120 a month</h2>
     <p class="section-intro">{esc(TIER_COACHED_BODY)}</p>
     <p class="section-intro">{esc(TIER_COACHED_BODY_2)}</p>
-    <div class="side-fig-grid">
+    <div class="side-fig-grid side-fig-grid--balanced">
       <ol class="step-list">
         <li><strong>It starts with you</strong>A proper intake: your target event, your history, your week, your numbers and the hours you actually have.</li>
         <li><strong>Your plan arrives block by block</strong>Built around your life and your event, three weeks at a time, so it stays current with how your training is actually going rather than a whole year written on day one.</li>
@@ -1172,7 +1183,7 @@ def render_coached(cat) -> str:
   <div class="wrap">
     <h2>Ready to start?</h2>
     <p class="section-intro">Tell me about your event and your season and I'll take it from there.</p>
-    <p style="margin-top:18px"><a class="btn" href="{esc(CONTACT_URL)}">Apply for coaching</a></p>
+    <p style="margin-top:18px"><a class="btn" href="{esc(CONTACT_URL)}">Apply for Plan Only</a></p>
   </div>
 </section>
 {quote_block("coached")}
@@ -1211,7 +1222,7 @@ COACHED_BY_TOM_GET = [
      "Instant messaging day to day and regular video catch-ups. You are never left guessing between sessions."),
     ("Science-backed methodology",
      "Evidence-led training including dedicated heat-preparation sessions when your race demands them."),
-    ("Advice on the whole race",
+    ("All the things that count on race day",
      "Race craft, race prep, kit and equipment, nutrition and psychology. The parts of performance a training file alone cannot cover."),
 ]
 
@@ -1227,7 +1238,6 @@ def render_coaching(cat) -> str:
     <p class="eyebrow" style="color:var(--teal-soft)">Coached by Tom &middot; &pound;185 a month &middot; Limited places</p>
     <h1>A coach in your corner for all&nbsp;of&nbsp;it</h1>
     <p class="lede">{esc(TIER_TOM_BODY)}</p>
-    <p class="lede">{esc(TIER_TOM_BODY_2)}</p>
     <div class="cta-row">
       <a class="btn" href="{esc(CONTACT_URL)}">Ask about a place</a>
       <a class="btn on-dark ghost" href="#what-you-get">See what you get</a>
@@ -1267,46 +1277,45 @@ def render_coaching(cat) -> str:
 </section>
 
 <section>
-  <div class="wrap content-grid two">
-    <div class="prose">
-      <p class="eyebrow">Race support</p>
-      <h2>A proper race plan, before every start line</h2>
-      <p>Before every event you get a race plan built for that day: pacing for the climbs and
-      the flats, a fuelling strategy you have rehearsed, heat and weather contingencies, and
-      the race craft that decides close finishes. These are the same detailed race-plan
-      documents our athletes have taken to Ironman Wales, long-course triathlon and the Haute
-      Route, not a paragraph of generic advice.</p>
-      <p>We build the strategy together, so on the day you are not hoping it goes well. You know
-      the plan, because it is yours.</p>
-    </div>
-    <div>
-      <div class="callout">
-        <h2>Why places are limited</h2>
-        <p>I keep this group small on purpose. I only ever open 15 Coached by Tom spots, because
-        this level of support, weekly feedback, unlimited contact and a coach reading every
-        session, is not something I can give properly to more than a small cohort. When those 15
-        are taken, it is full.</p>
-        <p style="margin-top:18px"><a class="btn on-dark ghost" href="{esc(CONTACT_URL)}">Ask about a place</a></p>
+  <div class="wrap">
+    <p class="eyebrow">Race support</p>
+    <h2>A proper race plan, before every start line</h2>
+    <div class="raceplan-grid">
+      <div class="prose">
+        <p>Before every event you get a race plan built for that day: pacing for the climbs and
+        the flats, a fuelling strategy you have rehearsed, heat and weather contingencies, and
+        the race craft that decides close finishes. These are the same detailed race-plan
+        documents our athletes have taken to Ironman Wales, long-course triathlon and the Haute
+        Route, not a paragraph of generic advice.</p>
+        <p>I do not like surprises, other than birthdays and Christmas. A race should be the
+        controlled execution of the training you have rehearsed, so you start the day knowing
+        every element of it: your kit and equipment, your pacing strategy and your fuelling
+        strategy, all practised and proven. That is what lets you actually enjoy the big day.</p>
+        <p>We build the strategy together, so on the day you are not hoping it goes well. You know
+        the plan, because it is yours.</p>
       </div>
+      <figure class="raceplan">
+        {raceplan_svg()}
+        <figcaption>The bike leg of IRONMAN Wales, one of the toughest courses my athletes race,
+        straight from the real course file: roughly {RACEPLAN_KM} km and {RACEPLAN_ASCENT} of
+        climbing. The profile shows where the power goes on the climbs and the sustained drags,
+        and the wind panel shows how a fresh westerly turns the same road into a headwind one way
+        and a tailwind the other. Your plan gets the same treatment for your event.</figcaption>
+      </figure>
     </div>
   </div>
 </section>
 
 <section class="alt">
   <div class="wrap">
-    <p class="eyebrow">A look at the kind of race plan you get</p>
-    <h2>Your race, mapped out before you get there</h2>
-    <p class="section-intro">Here is the bike leg of IRONMAN Wales, one of the toughest courses my
-    athletes race, straight from the real course data. The profile shows where the power actually
-    goes, on the climbs and the sustained drags, and the wind panel shows how a fresh westerly
-    turns the same road into a headwind one way and a tailwind the other. Your plan gets the same
-    treatment for your event: where to spend, where to save, and what the day is really asking of you.</p>
-    <figure class="raceplan">
-      {raceplan_svg()}
-      <figcaption>IRONMAN Wales bike course, roughly {RACEPLAN_KM} km and {RACEPLAN_ASCENT} of climbing,
-      from the official course file. Wind shown for a sample fresh WSW day, the direction that decides
-      most days in Pembrokeshire.</figcaption>
-    </figure>
+    <div class="callout callout--wide">
+      <h2>Why places are limited</h2>
+      <p>I keep this group small on purpose. I only ever open 15 Coached by Tom spots, because
+      this level of support, weekly feedback, unlimited contact and a coach reading every
+      session, is not something I can give properly to more than a small cohort. When those 15
+      are taken, it is full.</p>
+      <p style="margin-top:18px"><a class="btn btn--tom" href="{esc(CONTACT_URL)}">Ask about a place</a></p>
+    </div>
   </div>
 </section>
 
@@ -1332,9 +1341,9 @@ def render_coaching(cat) -> str:
   <div class="wrap">
     <h2>Not sure which tier?</h2>
     <div class="which-grid">
-      <div class="which-item"><strong>{esc(TIER1_NAME)}</strong>{esc(WHICH_PLANS)}</div>
-      <div class="which-item"><strong>{esc(TIER2_NAME)}</strong>{esc(WHICH_COACHED)}</div>
-      <div class="which-item"><strong>Coached by Tom</strong>{esc(WHICH_TOM)}</div>
+      <div class="which-item which-item--store"><strong>{esc(TIER1_NAME)}</strong>{esc(WHICH_PLANS)}</div>
+      <div class="which-item which-item--plan"><strong>{esc(TIER2_NAME)}</strong>{esc(WHICH_COACHED)}</div>
+      <div class="which-item which-item--tom"><strong>Coached by Tom</strong>{esc(WHICH_TOM)}</div>
     </div>
   </div>
 </section>
@@ -1362,9 +1371,10 @@ def render_about(cat) -> str:
     <div class="about-hero-copy">
       <p class="eyebrow" style="color:var(--teal-soft)">About Us</p>
       <h1>The coach behind Horsepower</h1>
-      <p class="lede">I'm Tom Cooling: an ex-elite triathlete, seasoned ultra-bike racer
-      and FKT holder, and I've spent over a decade coaching athletes from complete beginners
-      to world-tour level professionals.</p>
+      <p class="lede">I'm Tom Cooling, Founder and Head Coach at Horsepower Coaching, and I
+      bring a rare blend of lived experience and academic expertise. An ex-elite triathlete,
+      seasoned ultra-bike racer and FKT holder, with a first-class degree and a master's in
+      sport science behind everything I coach.</p>
     </div>
     <figure class="about-hero-portrait">{img("tom-portrait")}
       <figcaption>Tom Cooling, founder and head coach of Horsepower Coaching</figcaption></figure>
@@ -1375,8 +1385,8 @@ def render_about(cat) -> str:
   <div class="wrap content-grid two about-grid">
     <div class="prose">
       <h2>Coaching experience</h2>
-      <p>I've spent over a decade coaching athletes from complete beginners to
-      world-tour level professionals, and taken them to wins and podiums across Ironman,
+      <p>I've spent over a decade coaching athletes from complete beginners to world-tour
+      level professionals, guiding competitors to wins and podiums across Ironman,
       middle-distance triathlon, ultra-bike events and Haute Route-style races.</p>
 
       <h2>Where it comes from</h2>
@@ -1406,8 +1416,8 @@ def render_about(cat) -> str:
     <div class="cred-band cred-band--five">
       <div class="cred"><h3>Sport science</h3><p>First Class BA and Master's Degree in Sport Science and Athlete Development.</p></div>
       <div class="cred"><h3>Breathwork and freediving</h3><p>Oxygen Advantage Advanced Breathwork Instructor, and AIDA L4 Freediver.</p></div>
-      <div class="cred"><h3>Heat adaptation</h3><p>Accredited heat-training coach with applied experience in climate adaptation protocols.</p></div>
-      <div class="cred"><h3>Extreme triathlon</h3><p>Core Temp and XTRI Extreme Triathlon Accredited Coach.</p></div>
+      <div class="cred"><h3>Core Temp Accredited Coach</h3><p>Heat and climate adaptation, from designing the protocol to executing it on race day.</p></div>
+      <div class="cred"><h3>XTRI Extreme Triathlon Accredited Coach</h3><p>Accredited for the extreme end of the sport, the XTRI races like Norseman and Celtman.</p></div>
       <div class="cred"><h3>Mountain leadership</h3><p>BMC (British Mountaineering Council) Trained and Assessed Mountain Leader.</p></div>
     </div>
   </div>
@@ -1570,18 +1580,24 @@ def render_female(cat) -> str:
 </section>
 
 <section>
-  <div class="wrap prose">
-    <h2>Why "female adapted" fails</h2>
-    <p>Most training plans, most research and most coaching were built around the male
-    athlete, then shrunk to fit everyone else. Women got trained as small men. That ignores
-    what actually shapes how a female athlete responds to training: how you recover, how you
-    fuel, the strength work that protects your bones and tendons, and how load is best spread
-    across your week. Turning a men's plan down isn't the same as building the right one.</p>
-    <h2>What female first actually means</h2>
-    <p>Female first means the plan starts from the female athlete rather than a template. It
-    means recovery-respecting structure so the work lands instead of grinding you down, and
-    strength work built in for long-term bone and tendon health rather than bolted on as an
-    afterthought. And it means I'm honest about what each level of support can and can't do.</p>
+  <div class="wrap">
+    <div class="two-col-prose">
+      <div class="prose">
+        <h2>Why "female adapted" fails</h2>
+        <p>Most training plans, most research and most coaching were built around the male
+        athlete, then shrunk to fit everyone else. Women got trained as small men. That ignores
+        what actually shapes how a female athlete responds to training: how you recover, how you
+        fuel, the strength work that protects your bones and tendons, and how load is best spread
+        across your week. Turning a men's plan down isn't the same as building the right one.</p>
+      </div>
+      <div class="prose">
+        <h2>What female first actually means</h2>
+        <p>Female first means the plan starts from the female athlete rather than a template. It
+        means recovery-respecting structure so the work lands instead of grinding you down, and
+        strength work built in for long-term bone and tendon health rather than bolted on as an
+        afterthought. And it means I'm honest about what each level of support can and can't do.</p>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -1646,12 +1662,14 @@ def render_female(cat) -> str:
     <div class="card-grid" style="margin-top:26px">{plan_cards}</div>
     <div class="callout callout--wide" style="margin-top:34px">
       <h2>Want it built around your body?</h2>
-      <p>Get coached and have the training adapt around your physiology, your event and your life,
-      with genuinely cycle-aware feedback on every session.</p>
-      <p style="margin-top:18px">
-        <a class="btn on-dark ghost" href="{BASE_PATH}/coaching/">Coached by Tom</a>
-        <a class="btn" href="{BASE_PATH}/coached/" style="margin-left:10px">Get coached</a>
-      </p>
+      <p>Pick your way in. Start with a proven plan off the shelf, have me write and read your
+      training block by block, or go all in with a coach in your corner for all of it. Whichever
+      path you choose, the training bends around your physiology, your event and your life.</p>
+      <div class="tier-cta-row">
+        <a class="btn btn--store" href="{BASE_PATH}/plans/">Plan Store</a>
+        <a class="btn btn--plan" href="{BASE_PATH}/coached/">Plan Only</a>
+        <a class="btn btn--tom" href="{BASE_PATH}/coaching/">Coached by Tom</a>
+      </div>
     </div>
   </div>
 </section>
@@ -1826,7 +1844,7 @@ def render_contact(cat) -> str:
           <span class="ch-icon">{SVG_FB}</span>
           <span class="ch-body"><strong>Reviews</strong><span>Read {REVIEW_COUNT} reviews on Google</span></span></a></li>
       </ul>
-      <p style="color:var(--grey-mid);margin-top:22px">Based in Clevedon, coaching athletes
+      <p style="color:var(--grey-mid);margin-top:22px">Based in Truro, Cornwall, coaching athletes
       across the UK and online worldwide.</p>
     </div>
     <div>
@@ -1871,14 +1889,16 @@ def _funnel_cards():
         (TIER2_NAME, "&pound;120 a month", SUPPORT_LEVELS[1][1], "/coached/", "How it works"),
         ("Coached by Tom", "&pound;185 a month", SUPPORT_LEVELS[2][1], "/coaching/", "See if there's a place"),
     ]
+    # WS-SITE18 tier colour theme: store (white/bordered), plan (teal), tom (gold).
+    tier_cls = ["tier-card--store", "feature tier-card--plan", "tier-card--tom"]
+    btn_cls = ["btn--store", "btn--plan", "btn--tom"]
     cards = []
     for i, (name, price, support, path, cta) in enumerate(tiers):
-        feat = " feature" if i == 1 else ""
         cards.append(
-            f'<div class="tier-card{feat}"><h3>{esc(name)}</h3>'
+            f'<div class="tier-card {tier_cls[i]}"><h3>{esc(name)}</h3>'
             f'<div class="price">{price}</div>'
             f'<p class="support-line"><span class="support-tag">Support: {esc(support)}</span></p>'
-            f'<a class="btn" href="{BASE_PATH}{path}">{esc(cta)}</a></div>')
+            f'<a class="btn {btn_cls[i]}" href="{BASE_PATH}{path}">{esc(cta)}</a></div>')
     return "".join(cards)
 
 
@@ -2096,16 +2116,52 @@ def human_date(iso):
     return f"{d.day} {d.strftime('%B %Y')}"
 
 
+# WS-SITE18: a topically-appropriate hero image per post, drawn only from the
+# existing shipped derivatives (so no new image weight is added and the budget
+# stays green). Keyed by slug; any unmapped post falls back to a clean branded
+# image. The four recent posts use Tom's briefed picks.
+BLOG_HERO = {
+    # Recent posts (Tom's brief)
+    "female-first-not-female-adapted": "female-welsh-tt",     # a female athlete racing (Welsh 100 TT)
+    "make-the-plan-then-hold-it": "coached-band",             # a hard TT / pacing effort
+    "train-easier-than-you-think": "plans-pyrenees-switchback",  # steady endurance on an alpine road
+    "dont-get-fancy-before-youre-fancy": "hero-welsh-climb",  # honest fundamentals, climbing
+    # Migrated posts
+    "2017-season-wrapup---calm-after-the-storm": "plans-pyrenees-dawn",
+    "everesting---climbing-the-mountain": "hero-alps",
+    "how-not-to-coach---the-art-of-listening": "tom-alps-lead",
+    "how-to-improve-your-triathlon-swim": "hero-tenby-swim",
+    "into-the-unknown": "hero-torridon-ridge",
+    "ironman-wales---enter-the-dragon": "ironman-wales-finish",
+    "my-triathlon-top-tips": "female-naomi-tt",
+    "once-twice-three-times-an-ironman": "female-wales-podium",
+    "our-origins---a-little-bit-of-history": "about-brecon-titan",
+    "plastic-pollution-triathlon": "hero-tenby-swim",
+    "psychology---use-your-head": "about-dolomites-descender",
+    "the-lightest-disc-brake-bike": "plans-izoard-trio",
+    "tits-up---how-to-deal-with-failure": "about-dolomites-cobbles",
+}
+BLOG_HERO_FALLBACK = "hero-alpine-mist"   # clean branded fallback
+
+
+def blog_hero(slug):
+    return BLOG_HERO.get(slug, BLOG_HERO_FALLBACK)
+
+
 def render_blog_index(posts):
     cards = []
     for p in posts:
         url = f'{BASE_PATH}/blog/f/{p["slug"]}/'
+        media = img(blog_hero(p["slug"]), extra=f' fetchpriority="low"')
         cards.append(
             f'<article class="blog-card">'
+            f'<a class="blog-card-media" href="{url}" aria-hidden="true" tabindex="-1">{media}</a>'
+            f'<div class="blog-card-body">'
             f'<p class="blog-date"><time datetime="{esc(p["date"])}">{esc(human_date(p["date"]))}</time></p>'
             f'<h2 class="blog-card-title"><a href="{url}">{esc(p["title"])}</a></h2>'
             f'<p class="blog-excerpt">{esc(p.get("description", ""))}</p>'
             f'<p><a class="link-plain" href="{url}">Read the post &rarr;</a></p>'
+            f'</div>'
             f'</article>')
     body = f"""<main id="main">
 <section class="hero" style="padding:60px 0 40px">
@@ -2153,6 +2209,7 @@ def render_blog_post(p):
     <p class="blog-meta">By Tom Cooling &middot; <time datetime="{esc(p["date"])}">{esc(human_date(p["date"]))}</time></p>
   </div>
 </section>
+<div class="media-band blog-hero-media">{img(blog_hero(slug), cls="media-bg", lazy=False)}</div>
 <section>
   <article class="wrap prose blog-prose">
     {p["body_html"]}

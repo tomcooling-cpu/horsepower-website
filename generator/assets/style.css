@@ -14,6 +14,13 @@
   --teal-dark: #0B7A70;
   --teal-soft: #CCFBF1;
   --maxw: 1120px;
+  /* WS-SITE18 tier colour theme: Plan Store = white/cream + ink + subtle border,
+     Plan Only = teal, Coached by Tom = gold. Applied site-wide to every tier
+     card, ladder rung and tier CTA/button set. */
+  --gold: #B8841A;
+  --gold-dark: #9C6F15;
+  --gold-soft: #F7EAD0;
+  --tier-store-bg: #FFFDF8;
 }
 
 * { box-sizing: border-box; }
@@ -111,6 +118,16 @@ a { color: var(--teal-dark); }
 .btn.on-dark.ghost { color: var(--white); border-color: var(--white); }
 .btn.on-dark.ghost:hover { background: var(--white); color: var(--black); }
 
+/* WS-SITE18 tier-themed buttons (Plan Store white/bordered, Plan Only teal, Coached by Tom gold) */
+.btn--plan { background: var(--teal); color: var(--white); }
+.btn--plan:hover { background: var(--teal-dark); color: var(--white); }
+.btn--tom { background: var(--gold); color: var(--white); }
+.btn--tom:hover { background: var(--gold-dark); color: var(--white); }
+.btn--store { background: var(--white); color: var(--black); border: 2px solid var(--black); }
+.btn--store:hover { background: var(--black); color: var(--white); }
+/* A row of the three tier paths, Coached by Tom (gold) sitting on the right */
+.tier-cta-row { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 22px; }
+
 /* ---- Hero ---- */
 .hero {
   background: var(--black); color: var(--white);
@@ -142,6 +159,14 @@ section.alt { background: var(--grey-bg); }
 .tier-card p { color: var(--grey-dark); font-size: 1rem; }
 .tier-card .btn { margin-top: auto; align-self: flex-start; }
 
+/* WS-SITE18 per-tier card theming (site-wide) */
+.tier-card--store { background: var(--tier-store-bg); border-color: var(--rule); }
+.tier-card--plan.feature { border-color: var(--teal); box-shadow: 0 0 0 1px var(--teal); }
+.tier-card--plan .price { color: var(--teal-dark); }
+.tier-card--tom { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold); }
+.tier-card--tom .price { color: var(--gold-dark); }
+.tier-card--tom .support-tag { background: var(--gold-soft); border-color: var(--gold-soft); color: var(--gold-dark); }
+
 /* ---- Results line ---- */
 .results { background: var(--teal); color: var(--white); }
 .results p { font-size: clamp(1.2rem, 3vw, 1.8rem); font-family: 'Oswald', sans-serif; max-width: 26ch; margin: 0 auto; text-align: center; line-height: 1.25; }
@@ -152,6 +177,10 @@ section.alt { background: var(--grey-bg); }
 @media (min-width: 780px) { .which-grid { grid-template-columns: repeat(3, 1fr); } }
 .which-item { border-left: 3px solid var(--teal); padding: 6px 0 6px 18px; }
 .which-item strong { display: block; font-family: 'Oswald', sans-serif; text-transform: uppercase; font-size: 1.05rem; margin-bottom: 4px; }
+/* WS-SITE18 tier-coloured left borders on the "which one am I" strip */
+.which-item--store { border-left-color: var(--grey-light); }
+.which-item--plan { border-left-color: var(--teal); }
+.which-item--tom { border-left-color: var(--gold); }
 
 /* ---- Catalogue ---- */
 .filters {
@@ -310,6 +339,18 @@ details.faq p { margin: 10px 0 0; color: var(--grey-dark); }
 .raceplan { margin: 28px auto 0; max-width: 960px; }
 .raceplan .raceplan-svg { display: block; width: 100%; height: auto; border: 1px solid var(--rule); border-radius: 12px; box-shadow: 0 12px 32px rgba(15,15,15,0.08); }
 .raceplan figcaption { margin-top: 14px; font-size: 0.9rem; color: var(--grey-mid); line-height: 1.5; text-align: center; }
+
+/* WS-SITE18: race-plan copy beside the IM Wales snapshot (side by side, stacks on mobile) */
+.raceplan-grid { display: grid; gap: 40px; grid-template-columns: 1fr; align-items: center; margin-top: 8px; }
+@media (min-width: 900px) { .raceplan-grid { grid-template-columns: 1fr 1.05fr; } }
+.raceplan-grid .raceplan { margin-top: 0; max-width: 100%; }
+.raceplan-grid .raceplan figcaption { text-align: left; }
+
+/* WS-SITE18: two prose columns side by side (female "adapted fails" / "female first means") */
+.two-col-prose { display: grid; gap: 40px; grid-template-columns: 1fr; }
+@media (min-width: 820px) { .two-col-prose { grid-template-columns: 1fr 1fr; } }
+.two-col-prose .prose { max-width: none; }
+.two-col-prose h2 { font-size: 1.5rem; }
 
 /* Female-first cross-link on plan cards */
 .female-crosslink { margin: 4px 0 0; font-size: 0.82rem; }
@@ -575,6 +616,12 @@ section { padding: 64px 0; }
 @media (min-width: 900px) { .side-fig-grid { grid-template-columns: 1.35fr 0.85fr; } }
 .side-fig-grid .photo-fig--port { max-width: 420px; }
 @media (max-width: 899px) { .side-fig-grid .photo-fig--port { margin: 0 auto; } }
+/* WS-SITE18: balanced two-column feel so the support photo fills the right side
+   instead of looking like it has fallen off the edge (Plan Only "what you get"). */
+@media (min-width: 900px) {
+  .side-fig-grid--balanced { grid-template-columns: 1.1fr 0.9fr; }
+  .side-fig-grid--balanced .photo-fig--port { max-width: 100%; margin-left: auto; }
+}
 
 /* Options: note tag (flags a recommended pick) */
 .opt-tag--note { background: var(--teal-soft); color: var(--teal-dark);
@@ -596,8 +643,10 @@ section { padding: 64px 0; }
 .about-hero-portrait figcaption { padding: 10px 14px; font-size: 0.85rem; color: #B9B9B9; }
 @media (max-width: 819px) { .about-hero-portrait { margin: 0 auto; justify-self: center; } }
 
-/* Qualifications: five credential cards flow cleanly (3 up, then 2). */
-.cred-band--five { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+/* Qualifications: five credential cards, balanced. Flex-wrap with centred rows so
+   the layout reads even (3 then 2 centred) rather than a lopsided 3+2 (WS-SITE18). */
+.cred-band--five { display: flex; flex-wrap: wrap; justify-content: center; gap: 18px; }
+.cred-band--five .cred { flex: 1 1 300px; max-width: 340px; }
 
 /* About: photo-free branded CTA band (the china-clay quarry banner is retired). */
 .about-cta { border-top: 4px solid var(--teal); }
@@ -617,10 +666,11 @@ section { padding: 64px 0; }
   background: var(--white); padding: 14px 16px; display: flex; flex-direction: column; gap: 3px;
   border-left: 4px solid var(--grey-light); }
 .support-ladder .rung:nth-child(3) { border-left-color: var(--teal); }   /* Plan Only */
-.support-ladder .rung--full { border-left-color: var(--teal-dark);
-  background: var(--black); }
-.support-ladder .rung--full .rung-tier { color: var(--white); }
-.support-ladder .rung--full .rung-level { color: var(--teal-soft); }
+/* WS-SITE18: Coached by Tom rung is gold (replacing the old black fill) */
+.support-ladder .rung--full { border-left-color: var(--gold-dark);
+  background: var(--gold); }
+.support-ladder .rung--full .rung-tier { color: #171717; }
+.support-ladder .rung--full .rung-level { color: #4a3810; }
 .support-ladder .rung-tier { font-family: 'Oswald', sans-serif; text-transform: uppercase;
   letter-spacing: 0.03em; font-size: 1rem; color: var(--black); }
 .support-ladder .rung-level { font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;
@@ -665,13 +715,23 @@ section { padding: 64px 0; }
 .contact-form .btn { justify-self: start; }
 .hp-field { position: absolute; left: -9999px; }
 
-/* ---- Blog (WS-SITE14) ---- */
-.blog-list { display: grid; gap: 30px; grid-template-columns: 1fr; max-width: 760px; }
-.blog-card { border-bottom: 1px solid var(--rule); padding-bottom: 26px; }
-.blog-card:last-child { border-bottom: none; }
+/* ---- Blog (WS-SITE14; magazine cards + hero images WS-SITE18) ---- */
+.blog-list { display: grid; gap: 28px; grid-template-columns: 1fr; }
+@media (min-width: 700px) { .blog-list { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1000px) { .blog-list { grid-template-columns: repeat(3, 1fr); } }
+.blog-card { border: 1px solid var(--rule); border-radius: 14px; overflow: hidden;
+  background: var(--white); display: flex; flex-direction: column;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease; }
+.blog-card:hover { transform: translateY(-3px); box-shadow: 0 14px 30px rgba(0,0,0,0.10); border-color: var(--teal); }
+.blog-card-media { display: block; aspect-ratio: 16 / 9; overflow: hidden; }
+.blog-card-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.blog-card-body { padding: 20px 22px 24px; display: flex; flex-direction: column; flex: 1; }
+.blog-card .blog-excerpt { flex: 1; }
+/* Blog post lead image band (magazine feel) */
+.blog-hero-media { height: clamp(200px, 34vw, 380px); }
 .blog-date { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;
   text-transform: uppercase; letter-spacing: 0.06em; color: var(--grey-mid); margin-bottom: 6px; }
-.blog-card-title { font-size: 1.5rem; text-transform: none; line-height: 1.2; margin-bottom: 8px; }
+.blog-card-title { font-size: 1.35rem; text-transform: none; line-height: 1.2; margin-bottom: 8px; }
 .blog-card-title a { color: var(--black); text-decoration: none; }
 .blog-card-title a:hover { color: var(--teal-dark); }
 .blog-excerpt { color: var(--grey-dark); font-size: 1.02rem; margin-bottom: 12px; max-width: 62ch; }
