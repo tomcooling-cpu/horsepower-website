@@ -25,6 +25,7 @@ from datetime import date
 HERE = os.path.dirname(os.path.abspath(__file__))
 SITE = os.path.normpath(os.path.join(HERE, "..", "site"))
 CATALOGUE = os.path.join(HERE, "catalogue.json")
+CONTENT_BLOG = os.path.join(HERE, "content", "blog")   # WS-SITE14 blog posts (front matter + markdown)
 
 # Base path for every internal href/src. Two deploy targets, one generator:
 #   - GitHub Pages preview (the committed site/, served at a project subpath):
@@ -238,6 +239,7 @@ NAV = [
     (TIER1_NAME, BASE_PATH + "/plans/", "plans"),
     (TIER2_NAME, BASE_PATH + "/coached/", "coached"),
     ("About Us", BASE_PATH + "/about/", "about"),
+    ("Blog", BASE_PATH + "/blog/", "blog"),
 ]
 
 
@@ -302,7 +304,7 @@ def footer() -> str:
           <li><a href="{EXISTING}/breathwork">Breathwork</a></li>
           <li><a href="{EXISTING}/wheelbuilding">Wheelbuilding</a></li>
           <li><a href="{EXISTING}/alps-camp">Alps Camp</a></li>
-          <li><a href="{EXISTING}/blog">Blog</a></li>
+          <li><a href="{BASE_PATH}/blog/">Blog</a></li>
         </ul>
       </div>
     </div>
@@ -1954,6 +1956,214 @@ def render_cycling_coaching(cat) -> str:
                       "Tom Cooling. Based in Clevedon, UK; coaching online worldwide."))
 
 
+# ── Blog (WS-SITE14) ─────────────────────────────────────────────────────────
+# Posts live as generator/content/blog/<slug>.md: a small YAML-ish front matter
+# block (title, slug, date, datetime, description) followed by a light Markdown
+# body. The 13 migrated posts keep their exact GoDaddy slugs so the live URLs
+# (/blog/f/<slug>) are preserved; the old no-slash paths 301 to the new
+# trailing-slash pages via _redirects. Canonicals use the trailing-slash clean
+# URL, consistent with every other page on the site.
+import datetime as _dt
+
+_MD_SPECIAL = "\\`*_[]"
+_SENT = "\x00"
+
+
+def _md_inline(text):
+    """Inline Markdown -> HTML for a single logical line. Handles backslash
+    escapes, [label](url) links (root-relative links are BASE_PATH-prefixed),
+    **bold** and *italic*. Everything else is HTML-escaped."""
+    protected = []
+
+    def _protect(m):
+        protected.append(m.group(1))
+        return f"{_SENT}{len(protected) - 1}{_SENT}"
+
+    text = re.sub(r"\\([\\`*_\[\]])", _protect, text)
+    text = esc(text)   # escape &, <, >, quotes before we inject our own tags
+
+    def _link(m):
+        label, url = m.group(1), m.group(2)
+        if url.startswith("/"):
+            url = BASE_PATH + url
+        return f'<a href="{url}">{label}</a>'
+
+    text = re.sub(r"\[([^\]]+)\]\(([^)\s]+)\)", _link, text)
+    text = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", text)
+    text = re.sub(r"\*(.+?)\*", r"<em>\1</em>", text)
+    text = re.sub(_SENT + r"(\d+)" + _SENT, lambda m: esc(protected[int(m.group(1))]), text)
+    return text
+
+
+def _md_to_html(body):
+    """Minimal, dependency-free Markdown block renderer (h2/h3, ul, ol,
+    blockquote, paragraphs). A leading '#' h1 is demoted to h2 so each page
+    keeps exactly one <h1> (the post title in the hero)."""
+    lines = body.split("\n")
+    out, para, i, n = [], [], 0, len(lines)
+
+    def flush():
+        if para:
+            out.append("<p>" + _md_inline(" ".join(para)) + "</p>")
+            para.clear()
+
+    while i < n:
+        s = lines[i].strip()
+        if not s:
+            flush(); i += 1; continue
+        if s.startswith("### "):
+            flush(); out.append("<h3>" + _md_inline(s[4:].strip()) + "</h3>"); i += 1; continue
+        if s.startswith("## "):
+            flush(); out.append("<h2>" + _md_inline(s[3:].strip()) + "</h2>"); i += 1; continue
+        if s.startswith("# "):
+            flush(); out.append("<h2>" + _md_inline(s[2:].strip()) + "</h2>"); i += 1; continue
+        if s.startswith(">"):
+            flush(); quote = []
+            while i < n and lines[i].strip().startswith(">"):
+                quote.append(lines[i].strip().lstrip(">").strip()); i += 1
+            out.append("<blockquote><p>" + _md_inline(" ".join(quote)) + "</p></blockquote>"); continue
+        if re.match(r"[-*]\s+", s):
+            flush(); items = []
+            while i < n and re.match(r"[-*]\s+", lines[i].strip()):
+                items.append("<li>" + _md_inline(re.sub(r"^[-*]\s+", "", lines[i].strip())) + "</li>"); i += 1
+            out.append("<ul>" + "".join(items) + "</ul>"); continue
+        if re.match(r"\d+\.\s+", s):
+            flush(); items = []
+            while i < n and re.match(r"\d+\.\s+", lines[i].strip()):
+                items.append("<li>" + _md_inline(re.sub(r"^\d+\.\s+", "", lines[i].strip())) + "</li>"); i += 1
+            out.append("<ol>" + "".join(items) + "</ol>"); continue
+        para.append(s); i += 1
+    flush()
+    return "\n".join(out)
+
+
+def _parse_post(path):
+    raw = open(path, encoding="utf-8").read()
+    m = re.match(r"^---\s*\n(.*?)\n---\s*\n?(.*)$", raw, re.S)
+    if not m:
+        raise ValueError(f"post missing front matter: {path}")
+    fm_text, body = m.group(1), m.group(2)
+    meta = {}
+    for line in fm_text.split("\n"):
+        if ":" not in line:
+            continue
+        k, v = line.split(":", 1)
+        v = v.strip()
+        if len(v) >= 2 and v[0] == '"' and v[-1] == '"':
+            v = v[1:-1].replace('\\"', '"')
+        meta[k.strip()] = v
+    meta["body_html"] = _md_to_html(body.strip())
+    return meta
+
+
+def load_posts():
+    posts = []
+    if os.path.isdir(CONTENT_BLOG):
+        for fn in sorted(os.listdir(CONTENT_BLOG)):
+            if fn.endswith(".md"):
+                posts.append(_parse_post(os.path.join(CONTENT_BLOG, fn)))
+    # newest first, by the full timestamp when present, else the date
+    posts.sort(key=lambda p: p.get("datetime") or p.get("date", ""), reverse=True)
+    return posts
+
+
+def human_date(iso):
+    d = _dt.datetime.strptime(iso[:10], "%Y-%m-%d")
+    return f"{d.day} {d.strftime('%B %Y')}"
+
+
+def render_blog_index(posts):
+    cards = []
+    for p in posts:
+        url = f'{BASE_PATH}/blog/f/{p["slug"]}/'
+        cards.append(
+            f'<article class="blog-card">'
+            f'<p class="blog-date"><time datetime="{esc(p["date"])}">{esc(human_date(p["date"]))}</time></p>'
+            f'<h2 class="blog-card-title"><a href="{url}">{esc(p["title"])}</a></h2>'
+            f'<p class="blog-excerpt">{esc(p.get("description", ""))}</p>'
+            f'<p><a class="link-plain" href="{url}">Read the post &rarr;</a></p>'
+            f'</article>')
+    body = f"""<main id="main">
+<section class="hero" style="padding:60px 0 40px">
+  <div class="wrap">
+    <p class="eyebrow" style="color:var(--teal-soft)">The Horsepower blog</p>
+    <h1>Thoughts from the road, the pool and the coaching desk</h1>
+    <p class="lede">Race reports, training philosophy and the odd rant, written by me over the years.
+    The same voice you get when I coach you.</p>
+  </div>
+</section>
+<section>
+  <div class="wrap">
+    <div class="blog-list">
+      {''.join(cards)}
+    </div>
+  </div>
+</section>
+</main>"""
+    desc = ("The Horsepower Coaching blog: triathlon and cycling training philosophy, race reports "
+            "and honest coaching thinking, written by Tom Cooling.")
+    blog_ld = {
+        "@context": "https://schema.org", "@type": "Blog",
+        "name": "Horsepower Coaching Blog", "url": prod_url("/blog/"),
+        "description": desc, "publisher": _org_provider(),
+        "blogPost": [
+            {"@type": "BlogPosting", "headline": p["title"],
+             "url": prod_url(f'/blog/f/{p["slug"]}/'),
+             "datePublished": p.get("datetime") or p["date"],
+             "author": {"@type": "Person", "name": "Tom Cooling"}}
+            for p in posts],
+    }
+    extra = ld_script([breadcrumb_node([("Home", "/"), ("Blog", None)]), blog_ld])
+    return page("blog", "Blog | Horsepower Coaching", desc, prod_url("/blog/"), body,
+                og_image_name="hero-welsh-climb", extra=extra)
+
+
+def render_blog_post(p):
+    slug = p["slug"]
+    canonical = prod_url(f"/blog/f/{slug}/")
+    body = f"""<main id="main">
+<section class="plan-hero blog-post-hero">
+  <div class="wrap">
+    <p class="crumbs"><a href="{BASE_PATH}/blog/">Blog</a> / {esc(human_date(p["date"]))}</p>
+    <h1>{esc(p["title"])}</h1>
+    <p class="blog-meta">By Tom Cooling &middot; <time datetime="{esc(p["date"])}">{esc(human_date(p["date"]))}</time></p>
+  </div>
+</section>
+<section>
+  <article class="wrap prose blog-prose">
+    {p["body_html"]}
+    <hr class="blog-rule">
+    <p><a class="link-plain" href="{BASE_PATH}/blog/">&larr; Back to the blog</a></p>
+    <div class="callout" style="margin-top:30px">
+      <p class="eyebrow" style="color:var(--teal-soft)">Train with Horsepower</p>
+      <p>If that is how you like your coaching, straight and built for your race, take a look at the
+      <a class="link-plain on-dark" href="{BASE_PATH}/plans/">training plans</a> or see
+      <a class="link-plain on-dark" href="{BASE_PATH}/coached/">how coaching works</a>.</p>
+    </div>
+  </article>
+</section>
+</main>"""
+    desc = (p.get("description", "") or p["title"]).strip()
+    if len(desc) > 300:
+        desc = desc[:297].rsplit(" ", 1)[0] + "..."
+    ld = {
+        "@context": "https://schema.org", "@type": "BlogPosting",
+        "headline": p["title"], "description": desc,
+        "url": canonical, "mainEntityOfPage": canonical,
+        "datePublished": p.get("datetime") or p["date"],
+        "dateModified": p.get("datetime") or p["date"],
+        "author": {"@type": "Person", "name": "Tom Cooling", "url": prod_url("/about/")},
+        "publisher": {"@type": "Organization", "name": SITE_NAME,
+                      "logo": {"@type": "ImageObject", "url": OG_LOGO}},
+        "image": og_image_url(DEFAULT_OG_IMAGE),
+        "inLanguage": "en-GB",
+    }
+    crumbs = breadcrumb_node([("Home", "/"), ("Blog", "/blog/"), (p["title"], None)])
+    extra = ld_script([ld, crumbs])
+    return page("blog", f'{p["title"]} | Horsepower Coaching', desc, canonical, body,
+                og_image_name=DEFAULT_OG_IMAGE, og_type="article", extra=extra)
+
+
 # ── Write + gates ────────────────────────────────────────────────────────────
 def write(rel_path, content, written):
     path = os.path.join(SITE, rel_path)
@@ -1990,6 +2200,12 @@ def build():
     for p in plans:
         write(f"plans/{p['slug']}/index.html", render_plan_detail(cat, p), written)
 
+    # blog (WS-SITE14): /blog/ index + one page per post at /blog/f/<slug>/
+    posts = load_posts()
+    write("blog/index.html", render_blog_index(posts), written)
+    for post in posts:
+        write(f"blog/f/{post['slug']}/index.html", render_blog_post(post), written)
+
     # sitemap (absolute prod URLs; /options/ deliberately excluded)
     today = date.today().isoformat()
 
@@ -2003,6 +2219,7 @@ def build():
                   ("/cycling-coaching/", "monthly", "0.8"),
                   ("/coached/", "monthly", "0.8"),
                   ("/coaching/", "monthly", "0.8"), ("/about/", "monthly", "0.6"),
+                  ("/blog/", "weekly", "0.7"),
                   ("/contact/", "monthly", "0.5")]
     sm = ['<?xml version="1.0" encoding="UTF-8"?>',
           '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
@@ -2010,6 +2227,8 @@ def build():
         sm.append(sm_entry(prod_url(path), cf, pr))
     for p in plans:
         sm.append(sm_entry(prod_url(f"/plans/{p['slug']}/"), "monthly", "0.7"))
+    for post in posts:
+        sm.append(sm_entry(prod_url(f"/blog/f/{post['slug']}/"), "monthly", "0.6"))
     sm.append("</urlset>")
     write("sitemap.xml", "\n".join(sm), written)
 
@@ -2039,7 +2258,7 @@ def build():
     # /blog/f/<slug> paths, handled in a later build). Root-relative, so this is
     # correct whichever base path the HTML is built at.
     redirects = [
-        "# WS-SITE13 GoDaddy -> Netlify 301 map. Blog URLs intentionally omitted.",
+        "# WS-SITE13 GoDaddy -> Netlify 301 map. Blog URLs added in WS-SITE14.",
         "/triathlon-coaching       /triathlon-coaching/     301",
         "/cycling-coaching         /cycling-coaching/       301",
         "/training-plans           /plans/                  301",
@@ -2052,7 +2271,13 @@ def build():
         "/bespoke-wheelbuilding    /                        301",
         "/equality-development-1   /female-performance/     301",
         "",
+        "# Blog: the old GoDaddy URLs were /blog and /blog/f/<slug> (no trailing",
+        "# slash). Send them to the new trailing-slash pages so ranking is kept.",
+        "/blog                      /blog/                   301",
     ]
+    for post in posts:
+        redirects.append(f"/blog/f/{post['slug']}    /blog/f/{post['slug']}/    301")
+    redirects.append("")
     write("_redirects", "\n".join(redirects), written)
 
     run_gates(cat, written)
