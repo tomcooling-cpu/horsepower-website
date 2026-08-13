@@ -1,0 +1,22 @@
+# Horsepower Coaching, Netlify configuration (WS-SITE13).
+#
+# The site is a no-JS static build produced by generator/build.py into site/.
+# Two deploy targets share one generator:
+#   - GitHub Pages preview serves the committed site/ at a project subpath, built
+#     with the default BASE_PATH="/horsepower-website" (see generator/build.py).
+#   - Netlify serves at the domain root, so here we rebuild the site with
+#     HP_BASE_PATH="" to make every internal link root-relative (/plans/ not
+#     /horsepower-website/plans/). The committed site/ is untouched by this.
+#
+# Canonical / Open Graph / sitemap / JSON-LD URLs use the production origin in
+# both builds, so the SEO tags are identical regardless of base path.
+#
+# The 301 redirect map (old GoDaddy URLs -> new equivalents) is generated into
+# site/_redirects by build.py and shipped from the publish directory.
+
+[build]
+  publish = "site"
+  command = "HP_BASE_PATH='' python3 generator/build.py"
+
+[build.environment]
+  PYTHON_VERSION = "3.11"

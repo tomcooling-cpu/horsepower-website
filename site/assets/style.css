@@ -600,3 +600,62 @@ section { padding: 64px 0; }
 /* Female reviews: the honest "more reviews on the way" placeholder slide. */
 .review-slide--more { border-style: dashed; border-color: var(--teal); background: var(--grey-bg); }
 .review-slide--more blockquote { color: var(--grey-dark); }
+
+/* ============================================================================
+   WS-SITE13: support ladder, per-tier support line, contact page + landing pages
+   ========================================================================== */
+
+/* Support ladder: none -> feedback -> full, read left to right at a glance. */
+.support-ladder { display: flex; flex-wrap: wrap; align-items: stretch; gap: 10px;
+  margin: 22px 0 4px; }
+.support-ladder .rung { flex: 1 1 200px; border: 1px solid var(--rule); border-radius: 10px;
+  background: var(--white); padding: 14px 16px; display: flex; flex-direction: column; gap: 3px;
+  border-left: 4px solid var(--grey-light); }
+.support-ladder .rung:nth-child(3) { border-left-color: var(--teal); }   /* Plan Only */
+.support-ladder .rung--full { border-left-color: var(--teal-dark);
+  background: var(--black); }
+.support-ladder .rung--full .rung-tier { color: var(--white); }
+.support-ladder .rung--full .rung-level { color: var(--teal-soft); }
+.support-ladder .rung-tier { font-family: 'Oswald', sans-serif; text-transform: uppercase;
+  letter-spacing: 0.03em; font-size: 1rem; color: var(--black); }
+.support-ladder .rung-level { font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;
+  color: var(--teal-dark); }
+.support-ladder .rung-arrow { align-self: center; color: var(--teal); font-size: 1.4rem;
+  font-weight: 700; line-height: 1; }
+@media (max-width: 640px) { .support-ladder { flex-direction: column; }
+  .support-ladder .rung-arrow { transform: rotate(90deg); } }
+
+/* Per-tier support descriptor inside a tier card. */
+.support-line { font-size: 0.95rem; color: var(--grey-dark) !important; margin-bottom: 14px;
+  padding-bottom: 14px; border-bottom: 1px solid var(--rule); }
+.support-tag { display: inline-block; font-family: 'Oswald', sans-serif; text-transform: uppercase;
+  letter-spacing: 0.05em; font-size: 0.72rem; background: var(--grey-bg); color: var(--teal-dark);
+  border: 1px solid var(--rule); border-radius: 20px; padding: 3px 11px; margin-right: 8px;
+  margin-bottom: 6px; }
+.support-tag--full { background: var(--teal-soft); border-color: var(--teal-soft); }
+
+/* Contact page: channels beside a Netlify form. */
+.contact-grid { display: grid; gap: 40px; grid-template-columns: 1fr; align-items: start; }
+@media (min-width: 820px) { .contact-grid { grid-template-columns: 0.9fr 1.1fr; } }
+.contact-channels { list-style: none; margin: 18px 0 0; padding: 0; display: grid; gap: 12px; }
+.contact-channels a { display: flex; align-items: center; gap: 14px; text-decoration: none;
+  border: 1px solid var(--rule); border-radius: 11px; padding: 14px 16px; color: var(--black);
+  transition: border-color 0.15s ease, transform 0.15s ease; }
+.contact-channels a:hover { border-color: var(--teal); transform: translateY(-1px); }
+.contact-channels .ch-icon { color: var(--teal-dark); display: flex; }
+.contact-channels .ch-body { display: flex; flex-direction: column; }
+.contact-channels .ch-body strong { font-family: 'Oswald', sans-serif; text-transform: uppercase;
+  letter-spacing: 0.03em; font-size: 0.95rem; }
+.contact-channels .ch-body span { color: var(--grey-mid); font-size: 0.9rem; }
+.contact-form { display: grid; gap: 16px; margin-top: 18px; }
+.contact-form .field { display: flex; flex-direction: column; gap: 6px; }
+.contact-form label { font-family: 'Oswald', sans-serif; text-transform: uppercase;
+  font-size: 0.8rem; letter-spacing: 0.06em; color: var(--grey-mid); }
+.contact-form input, .contact-form textarea { width: 100%; padding: 11px 13px;
+  border: 1px solid var(--grey-light); border-radius: 8px; font-size: 1rem; font-family: inherit;
+  background: var(--white); }
+.contact-form input:focus, .contact-form textarea:focus { outline: 2px solid var(--teal);
+  outline-offset: 1px; border-color: var(--teal); }
+.contact-form textarea { resize: vertical; }
+.contact-form .btn { justify-self: start; }
+.hp-field { position: absolute; left: -9999px; }

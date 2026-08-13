@@ -26,10 +26,21 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 SITE = os.path.normpath(os.path.join(HERE, "..", "site"))
 CATALOGUE = os.path.join(HERE, "catalogue.json")
 
-BASE_PATH = "/horsepower-website"          # GitHub Pages project-site subpath
+# Base path for every internal href/src. Two deploy targets, one generator:
+#   - GitHub Pages preview (the committed site/, served at a project subpath):
+#     BASE_PATH = "/horsepower-website" (the default, so the Pages build is
+#     unchanged and the committed site/ keeps working).
+#   - Netlify at the domain root (WS-SITE13): run the generator with
+#     HP_BASE_PATH="" so every link is root-relative (/plans/ not
+#     /horsepower-website/plans/). netlify.toml sets this env + build command.
+# Canonical / OG / sitemap / JSON-LD URLs use PROD_ORIGIN and are identical in
+# both builds, so switching BASE_PATH never changes the SEO tags.
+BASE_PATH = os.environ.get("HP_BASE_PATH", "/horsepower-website").rstrip("/")
 BASE_URL = "https://tomcooling-cpu.github.io/horsepower-website"
 EXISTING = "https://www.horsepowercoaching.co.uk"   # current live site (phase 2 links)
-CONTACT_URL = EXISTING + "/contact"
+# The Contact CTA now points at the real on-site /contact/ page (WS-SITE13),
+# not the old external contact-us. Root-relative so it resolves in both builds.
+CONTACT_URL = BASE_PATH + "/contact/"
 
 # ── Production canonical host (WS-SITE10) ────────────────────────────────────
 # The site is *served* from the github.io preview (BASE_PATH / BASE_URL, above,
@@ -93,7 +104,7 @@ FEMALE_FIRST_BODY = ("Most plans were built around male physiology and handed to
 # variable. A handful of Tom's byte-exact approved body-copy strings (the WHICH_*
 # lines and the TIER_* bodies, which are locked by the verbatim gate) still spell
 # the word literally; on rename those need Tom's re-approval, by design.
-TIER2_NAME = "Coached"
+TIER2_NAME = "Plan Only"
 
 # Plans tier (copy B). One block, reused on the home tier card and the /plans/ intro.
 TIER_PLANS_BODY = ("Built for your race, ready to start today. Pick from over 150 plans, "
@@ -131,8 +142,8 @@ RESULTS_LINE = ("Ironman wins. 70.3 podiums. XTRI podiums. Haute Route podiums. 
                 "race wins. And a lot of first finish lines, which I'm just as proud "
                 "of.")
 
-WHICH_PLANS = "Know what you're doing and want a proven route? Plans."
-WHICH_COACHED = "Want the plan built around your life, and someone reading your sessions? Coached."
+WHICH_PLANS = "Know what you're doing and want a proven route? Plan Store."
+WHICH_COACHED = "Want the plan built around your life, and someone reading your sessions? Plan Only."
 WHICH_TOM = "Chasing something big and want a coach in your corner for all of it? Coached by Tom."
 
 # The /plans/ intro is copy B, reused verbatim from the home tier card.
@@ -141,6 +152,29 @@ PLANS_INTRO = TIER_PLANS_BODY
 COACHED_INTRO = ("The coaching that goes into my fully coached athletes' plans, written "
                  "for you, for £120 a month. I build your programme block by block and "
                  "give you real feedback on the sessions you actually do.")
+
+# ── Tier 1 display name (the £39.99 off-the-shelf plan library) ───────────────
+# Renamed "Plans" -> "Plan Store" (WS-SITE13, Tom's ask). The route stays /plans/;
+# this is a display-name change only. Referenced in nav, footer, the home tier
+# card and "which one am I" strips.
+TIER1_NAME = "Plan Store"
+
+# ── Support ladder (WS-SITE13, Tom's explicit ask) ───────────────────────────
+# Make the level of support the clear differentiator, so the progression reads at
+# a glance as none -> feedback -> full. One support descriptor per tier card plus
+# a comparison strip on the home page. Tom's voice, no em-dashes.
+SUPPORT_LEVELS = [
+    ("Plan Store", "No support",
+     "Buy a proven plan off the shelf and follow it yourself. No feedback and no "
+     "check-ins, just a well-built plan ready to start today."),
+    ("Plan Only", "Feedback each block",
+     "Self-directed, but not on your own. I write your bespoke plan and give you a "
+     "full round of feedback each block. You drive the day to day, there are no calls "
+     "and I am not on call."),
+    ("Coached by Tom", "Fully supported",
+     "The complete relationship. One to one, weekly feedback, unlimited contact and a "
+     "coach in your corner the whole way."),
+]
 
 # Strings that must appear byte-exact in the built output (copy-verbatim gate).
 VERBATIM_REQUIRED = [
@@ -201,7 +235,7 @@ NAV = [
     ("Home", BASE_PATH + "/", "home"),
     ("Coached by Tom", BASE_PATH + "/coaching/", "coaching"),
     ("Female Performance", BASE_PATH + "/female-performance/", "female"),
-    ("Plans", BASE_PATH + "/plans/", "plans"),
+    (TIER1_NAME, BASE_PATH + "/plans/", "plans"),
     (TIER2_NAME, BASE_PATH + "/coached/", "coached"),
     ("About Us", BASE_PATH + "/about/", "about"),
 ]
@@ -250,7 +284,7 @@ def footer() -> str:
         <ul>
           <li><a href="{BASE_PATH}/coaching/">Coached by Tom</a></li>
           <li><a href="{BASE_PATH}/female-performance/">Female Performance</a></li>
-          <li><a href="{BASE_PATH}/plans/">Plans</a></li>
+          <li><a href="{BASE_PATH}/plans/">{esc(TIER1_NAME)}</a></li>
           <li><a href="{BASE_PATH}/coached/">{esc(TIER2_NAME)}</a></li>
           <li><a href="{BASE_PATH}/about/">About Tom</a></li>
           <li><a href="{esc(CONTACT_URL)}">Contact</a></li>
@@ -786,6 +820,14 @@ FEMALE_FIRST_SLUGS = {
 # ── Pages ────────────────────────────────────────────────────────────────────
 def render_home(cat) -> str:
     total = cat["stats"]["total"]
+    # Support ladder strip: none -> feedback -> full, read left to right.
+    ladder = ""
+    for i, (tname, tag, _line) in enumerate(SUPPORT_LEVELS):
+        if i:
+            ladder += '<span class="rung-arrow" aria-hidden="true">&rarr;</span>'
+        full = " rung--full" if i == len(SUPPORT_LEVELS) - 1 else ""
+        ladder += (f'<div class="rung{full}"><span class="rung-tier">{esc(tname)}</span>'
+                   f'<span class="rung-level">{esc(tag)}</span></div>')
     body = f"""<main id="main">
 <section class="hero hero--image">
   {img("hero-alpine-mist", cls="hero-bg", lazy=False)}
@@ -813,16 +855,22 @@ def render_home(cat) -> str:
   <div class="wrap">
     <p class="eyebrow">Three ways to train with Horsepower</p>
     <h2>Pick the level of support that fits</h2>
+    <p class="section-intro">The plan is only half of it. What changes across the three tiers is how
+    much of me you get: from a proven plan you run yourself, to feedback every block, to the full
+    coaching relationship.</p>
+    <div class="support-ladder" role="list" aria-label="Support increases across the three tiers">{ladder}</div>
     <div class="tier-grid">
       <div class="tier-card">
-        <h3>Plans</h3>
+        <h3>{esc(TIER1_NAME)}</h3>
         <div class="price">From &pound;39.99, one-off</div>
+        <p class="support-line"><span class="support-tag support-tag--none">Support: {esc(SUPPORT_LEVELS[0][1])}</span>{esc(SUPPORT_LEVELS[0][2])}</p>
         <p>{esc(TIER_PLANS_BODY)}</p>
         <a class="btn" href="{BASE_PATH}/plans/">Browse the library</a>
       </div>
       <div class="tier-card feature">
         <h3>{esc(TIER2_NAME)}</h3>
         <div class="price">&pound;120 a month</div>
+        <p class="support-line"><span class="support-tag support-tag--mid">Support: {esc(SUPPORT_LEVELS[1][1])}</span>{esc(SUPPORT_LEVELS[1][2])}</p>
         <p>{esc(TIER_COACHED_BODY)}</p>
         <p>{esc(TIER_COACHED_BODY_2)}</p>
         <a class="btn" href="{BASE_PATH}/coached/">How coaching works</a>
@@ -830,6 +878,7 @@ def render_home(cat) -> str:
       <div class="tier-card">
         <h3>Coached by Tom</h3>
         <div class="price">&pound;185 a month</div>
+        <p class="support-line"><span class="support-tag support-tag--full">Support: {esc(SUPPORT_LEVELS[2][1])}</span>{esc(SUPPORT_LEVELS[2][2])}</p>
         <p>{esc(TIER_TOM_BODY)}</p>
         <p>{esc(TIER_TOM_BODY_2)}</p>
         <a class="btn" href="{BASE_PATH}/coaching/">See if there is a place</a>
@@ -863,7 +912,7 @@ def render_home(cat) -> str:
   <div class="wrap">
     <p class="eyebrow">Which one am I?</p>
     <div class="which-grid">
-      <div class="which-item"><strong>Plans</strong>{esc(WHICH_PLANS)}</div>
+      <div class="which-item"><strong>{esc(TIER1_NAME)}</strong>{esc(WHICH_PLANS)}</div>
       <div class="which-item"><strong>{esc(TIER2_NAME)}</strong>{esc(WHICH_COACHED)}</div>
       <div class="which-item"><strong>Coached by Tom</strong>{esc(WHICH_TOM)}</div>
     </div>
@@ -926,7 +975,7 @@ def render_plans_index(cat) -> str:
 <div class="page-banner">{img("plans-izoard-trio", cls="banner-bg", lazy=False)}</div>
 <section class="alt" style="padding-bottom:24px">
   <div class="wrap">
-    <p class="eyebrow">The plan library</p>
+    <p class="eyebrow">The Plan Store</p>
     <h1>Find your plan</h1>
     <p class="section-intro">{esc(PLANS_INTRO)}</p>
     <div class="filters">
@@ -1048,7 +1097,7 @@ def render_plan_detail(cat, p) -> str:
 
 COACHED_FAQ = [
     ("Is there a call every week?",
-     "No. Coached is built around the work and the why, delivered in writing so you can go "
+     "No. Plan Only is built around the work and the why, delivered in writing so you can go "
      "back to it. If you want calls, WhatsApp and race-day strategy built together, that is "
      "Coached by Tom."),
     ("What if my numbers change or life gets in the way?",
@@ -1260,7 +1309,7 @@ def render_coaching(cat) -> str:
   <div class="wrap">
     <h2>Not sure which tier?</h2>
     <div class="which-grid">
-      <div class="which-item"><strong>Plans</strong>{esc(WHICH_PLANS)}</div>
+      <div class="which-item"><strong>{esc(TIER1_NAME)}</strong>{esc(WHICH_PLANS)}</div>
       <div class="which-item"><strong>{esc(TIER2_NAME)}</strong>{esc(WHICH_COACHED)}</div>
       <div class="which-item"><strong>Coached by Tom</strong>{esc(WHICH_TOM)}</div>
     </div>
@@ -1516,7 +1565,7 @@ def render_female(cat) -> str:
   <div class="wrap feature-grid">
     <div class="feature-media">{img("female-trail")}</div>
     <div class="feature-copy">
-      <p class="eyebrow">Coached and Coached by Tom</p>
+      <p class="eyebrow">Plan Only and Coached by Tom</p>
       <h2>Genuinely cycle-aware coaching</h2>
       <p class="section-intro">This is where female-specific training stops being a label and
       gets personal. When I coach you, three things happen that a downloadable plan can't.</p>
@@ -1615,7 +1664,7 @@ BANNER_SLOTS = [
               "coached-tom-dolomites-arch; the alternates below are here for you to override.",
      "eyebrow": "Coached by Tom · £185 a month · Limited places",
      "headline": "A coach in your corner for all of it",
-     "lede": ("Everything in Coached, plus me. Calls when you need them, WhatsApp when it is "
+     "lede": ("Everything in Plan Only, plus me. Calls when you need them, WhatsApp when it is "
               "urgent, and a coach who knows your story, not just your data."),
      "candidates": ["coached-tom-dolomites-arch",
                     ("tom-alps-finish", "Alternate: Tom riding into the Haute Route Alps stage finish"),
@@ -1634,15 +1683,15 @@ BANNER_SLOTS = [
                     ("female-naomi-tt", "Naomi S time trialling in Horsepower kit"),
                     ("honours-madison-tt", "Madison S on the TT bike"),
                     "female-welsh-tt"]},
-    {"id": "plans-banner", "kind": "pagebanner", "name": "Plans banner",
+    {"id": "plans-banner", "kind": "pagebanner", "name": "Plan Store banner",
      "where": "The full-width banner at the top of the plan library. Ships live as "
               "plans-izoard-trio; the alternates below are here for you to override.",
      "candidates": ["plans-izoard-trio",
                     ("plans-pyrenees-switchback", "Alternate: lone rider on a Pyrenean switchback"),
                     ("hero-alps", "Alternate: cyclist climbing high above an alpine valley"),
                     "plans-pyrenees-dawn", "hero-welsh-climb", "alpine-ridge", "coached-band"]},
-    {"id": "coached-top", "kind": "band", "name": "Coached (£120), top banner",
-     "where": "The full-width band under the hero on the Coached page. Ships live as "
+    {"id": "coached-top", "kind": "band", "name": "Plan Only (£120), top banner",
+     "where": "The full-width band under the hero on the Plan Only page. Ships live as "
               "hero-torridon-ridge; the alternates below are here for you to override.",
      "candidates": ["hero-torridon-ridge", "alpine-ridge", "plans-pyrenees-switchback",
                     "coached-band"]},
@@ -1721,6 +1770,190 @@ def render_options() -> str:
                 prod_url("/options/"), body, og_image_name="hero-alpine-mist", extra=extra)
 
 
+# ── Contact (WS-SITE13) ──────────────────────────────────────────────────────
+# A real on-site contact page. Channels are reused from the footer (WhatsApp,
+# Instagram, Google reviews); no email address is invented because the footer
+# does not carry one. The form is a plain Netlify Forms form: a static POST with
+# a hidden form-name field and a honeypot, so it works on Netlify with no backend.
+def render_contact(cat) -> str:
+    body = f"""<main id="main">
+<section class="hero" style="padding:60px 0 52px">
+  <div class="wrap">
+    <p class="eyebrow" style="color:var(--teal-soft)">Contact</p>
+    <h1>Get in touch</h1>
+    <p class="lede">Tell me about your event and your season and I'll come back to you. The
+    quickest way to reach me is WhatsApp or Instagram. If you'd rather write it all down,
+    use the form and I'll pick it up from there.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap contact-grid">
+    <div>
+      <h2>Talk to me directly</h2>
+      <ul class="contact-channels">
+        <li><a href="{WHATSAPP_URL}" rel="noopener" target="_blank">
+          <span class="ch-icon">{SVG_WA}</span>
+          <span class="ch-body"><strong>WhatsApp</strong><span>+44 7780 008724</span></span></a></li>
+        <li><a href="{INSTAGRAM_URL}" rel="noopener" target="_blank">
+          <span class="ch-icon">{SVG_IG}</span>
+          <span class="ch-body"><strong>Instagram</strong><span>@horsepower.coaching</span></span></a></li>
+        <li><a href="{esc(GOOGLE_REVIEW_URL)}" rel="noopener" target="_blank">
+          <span class="ch-icon">{SVG_FB}</span>
+          <span class="ch-body"><strong>Reviews</strong><span>Read {REVIEW_COUNT} reviews on Google</span></span></a></li>
+      </ul>
+      <p style="color:var(--grey-mid);margin-top:22px">Based in Clevedon, coaching athletes
+      across the UK and online worldwide.</p>
+    </div>
+    <div>
+      <h2>Send me a message</h2>
+      <form name="contact" method="POST" data-netlify="true" netlify-honeypot="bot-field" class="contact-form" action="{BASE_PATH}/contact/">
+        <input type="hidden" name="form-name" value="contact">
+        <p class="hp-field"><label>Leave this field empty if you're human <input name="bot-field"></label></p>
+        <div class="field"><label for="c-name">Your name</label>
+          <input id="c-name" name="name" type="text" autocomplete="name" required></div>
+        <div class="field"><label for="c-email">Your email</label>
+          <input id="c-email" name="email" type="email" autocomplete="email" required></div>
+        <div class="field"><label for="c-event">Your target event (optional)</label>
+          <input id="c-event" name="event" type="text"></div>
+        <div class="field"><label for="c-message">Your message</label>
+          <textarea id="c-message" name="message" rows="6" required></textarea></div>
+        <button class="btn" type="submit">Send message</button>
+      </form>
+    </div>
+  </div>
+</section>
+</main>"""
+    desc = ("Contact Tom Cooling at Horsepower Coaching. Message on WhatsApp +44 7780 008724 or "
+            "Instagram @horsepower.coaching, or send a message about your target event.")
+    contact_ld = {"@context": "https://schema.org", "@type": "ContactPage",
+                  "name": "Contact Horsepower Coaching", "url": prod_url("/contact/"),
+                  "about": _org_provider()}
+    extra = ld_script([breadcrumb_node([("Home", "/"), ("Contact", None)]),
+                       contact_ld, org_node(with_rating=False)])
+    return page("contact", "Contact | Horsepower Coaching", desc,
+                prod_url("/contact/"), body,
+                og_image_name="coached-tom-dolomites-arch", extra=extra)
+
+
+# ── Sport coaching landing pages (WS-SITE13, SEO retention) ──────────────────
+# Thin, keyword-strong entry points matching the old GoDaddy /triathlon-coaching
+# and /cycling-coaching URLs (the _redirects map sends the old no-slash URLs
+# here). Each targets its head term + Clevedon/UK, then funnels to the three
+# tiers. Not a duplicate of the tiers page; a focused door in.
+def _funnel_cards():
+    tiers = [
+        (TIER1_NAME, "From &pound;39.99, one-off", SUPPORT_LEVELS[0][1], "/plans/", "Browse the plans"),
+        (TIER2_NAME, "&pound;120 a month", SUPPORT_LEVELS[1][1], "/coached/", "How it works"),
+        ("Coached by Tom", "&pound;185 a month", SUPPORT_LEVELS[2][1], "/coaching/", "See if there's a place"),
+    ]
+    cards = []
+    for i, (name, price, support, path, cta) in enumerate(tiers):
+        feat = " feature" if i == 1 else ""
+        cards.append(
+            f'<div class="tier-card{feat}"><h3>{esc(name)}</h3>'
+            f'<div class="price">{price}</div>'
+            f'<p class="support-line"><span class="support-tag">Support: {esc(support)}</span></p>'
+            f'<a class="btn" href="{BASE_PATH}{path}">{esc(cta)}</a></div>')
+    return "".join(cards)
+
+
+def render_sport_landing(*, slug, h1, eyebrow, hero_img, og_name, title, desc,
+                         lede, intro_html, funnel_heading, service_name, service_desc) -> str:
+    body = f"""<main id="main">
+<section class="hero hero--image">
+  {img(hero_img, cls="hero-bg", lazy=False)}
+  <div class="wrap">
+    <p class="eyebrow" style="color:var(--teal-soft)">{esc(eyebrow)}</p>
+    <h1>{esc(h1)}</h1>
+    <p class="lede">{esc(lede)}</p>
+    <div class="cta-row">
+      <a class="btn" href="{BASE_PATH}/plans/">Find your plan</a>
+      <a class="btn on-dark ghost" href="{BASE_PATH}/coached/">Get coached</a>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap prose">
+    {intro_html}
+  </div>
+</section>
+
+<section class="alt">
+  <div class="wrap">
+    <p class="eyebrow">Three ways to train with Horsepower</p>
+    <h2>{esc(funnel_heading)}</h2>
+    <p class="section-intro">Pick the level of support that fits: a proven plan you run yourself,
+    a bespoke plan with feedback each block, or the full coaching relationship.</p>
+    <div class="tier-grid">{_funnel_cards()}</div>
+  </div>
+</section>
+</main>"""
+    svc = service_node(service_name, service_desc, f"/{slug}/")
+    extra = ld_script([
+        breadcrumb_node([("Home", "/"), (h1, None)]), svc, org_node(with_rating=False)])
+    return page("", title, desc, prod_url(f"/{slug}/"), body,
+                og_image_name=og_name, extra=extra)
+
+
+def render_triathlon_coaching(cat) -> str:
+    intro = (
+        "<h2>Triathlon coaching for every distance</h2>"
+        "<p>I'm Tom Cooling, and I coach triathletes from a first sprint or super-sprint all the "
+        "way to Ironman, long course and the extreme XTRI races. Whether you are chasing a first "
+        "70.3 finish or a podium at Ironman Wales, triathlon coaching with Horsepower is built "
+        "around your target race, your life and your numbers, from Clevedon and online worldwide.</p>"
+        "<p>Every plan is written by me, delivered through TrainingPeaks, and built in three-week "
+        "blocks so the load lands and the hard sessions are dosed the way the research says fitness "
+        "is actually built. Swim, bike, run and the transitions between them, prepared properly.</p>")
+    return render_sport_landing(
+        slug="triathlon-coaching",
+        h1="Triathlon Coaching",
+        eyebrow="Triathlon coaching, Clevedon and online",
+        hero_img="hero-tenby-swim", og_name="hero-tenby-swim",
+        title="Triathlon Coaching | Clevedon and Online, UK | Horsepower Coaching",
+        desc=("Triathlon coaching for every distance, from first sprint to Ironman, based in "
+              "Clevedon, UK and online worldwide. Bespoke plans and coaching by Tom Cooling."),
+        lede=("Triathlon coaching built for your race, from your first sprint to Ironman. Written "
+              "by me, delivered through TrainingPeaks, based in Clevedon and coaching worldwide."),
+        intro_html=intro,
+        funnel_heading="Your paths into triathlon coaching",
+        service_name="Triathlon coaching",
+        service_desc=("Triathlon coaching and training plans for every distance, from first sprint "
+                      "and 70.3 to Ironman and XTRI, built for your target race by Tom Cooling. "
+                      "Based in Clevedon, UK; coaching online worldwide."))
+
+
+def render_cycling_coaching(cat) -> str:
+    intro = (
+        "<h2>Cycling coaching from sportives to ultra-distance</h2>"
+        "<p>I coach cyclists from first sportives and hill climbs to 100 mile time trials, "
+        "gran fondos and ultra-distance racing. Cycling coaching with Horsepower is built around "
+        "the event you are targeting, your available hours and your own power numbers, from "
+        "Clevedon and online across the UK and worldwide.</p>"
+        "<p>Every plan is written by me and delivered through TrainingPeaks, with the load built "
+        "in three-week blocks and every target set as a percentage of your own numbers so it fits "
+        "you, not an average. Climbing, time trialling, endurance and the race craft that goes "
+        "with them.</p>")
+    return render_sport_landing(
+        slug="cycling-coaching",
+        h1="Cycling Coaching",
+        eyebrow="Cycling coaching, Clevedon and online",
+        hero_img="alpine-ridge", og_name="alpine-ridge",
+        title="Cycling Coaching | Clevedon and Online, UK | Horsepower Coaching",
+        desc=("Cycling coaching from sportives and hill climbs to 100 mile time trials and "
+              "ultra-distance racing, based in Clevedon, UK and online. Coaching by Tom Cooling."),
+        lede=("Cycling coaching built for your event, from sportives and hill climbs to 100 mile "
+              "TTs and ultra racing. Written by me and delivered through TrainingPeaks."),
+        intro_html=intro,
+        funnel_heading="Your paths into cycling coaching",
+        service_name="Cycling coaching",
+        service_desc=("Cycling coaching and training plans from sportives and hill climbs to 100 "
+                      "mile time trials and ultra-distance racing, built for your target event by "
+                      "Tom Cooling. Based in Clevedon, UK; coaching online worldwide."))
+
+
 # ── Write + gates ────────────────────────────────────────────────────────────
 def write(rel_path, content, written):
     path = os.path.join(SITE, rel_path)
@@ -1749,6 +1982,9 @@ def build():
     write("coached/index.html", render_coached(cat), written)
     write("coaching/index.html", render_coaching(cat), written)
     write("about/index.html", render_about(cat), written)
+    write("contact/index.html", render_contact(cat), written)
+    write("triathlon-coaching/index.html", render_triathlon_coaching(cat), written)
+    write("cycling-coaching/index.html", render_cycling_coaching(cat), written)
     # Hidden banner-preview page: noindex, deliberately absent from nav + sitemap.
     write("options/index.html", render_options(), written)
     for p in plans:
@@ -1762,8 +1998,12 @@ def build():
                 f"<changefreq>{changefreq}</changefreq><priority>{priority}</priority></url>")
 
     main_pages = [("/", "weekly", "1.0"), ("/plans/", "weekly", "0.9"),
-                  ("/female-performance/", "weekly", "0.9"), ("/coached/", "monthly", "0.8"),
-                  ("/coaching/", "monthly", "0.8"), ("/about/", "monthly", "0.6")]
+                  ("/female-performance/", "weekly", "0.9"),
+                  ("/triathlon-coaching/", "monthly", "0.8"),
+                  ("/cycling-coaching/", "monthly", "0.8"),
+                  ("/coached/", "monthly", "0.8"),
+                  ("/coaching/", "monthly", "0.8"), ("/about/", "monthly", "0.6"),
+                  ("/contact/", "monthly", "0.5")]
     sm = ['<?xml version="1.0" encoding="UTF-8"?>',
           '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
     for path, cf, pr in main_pages:
@@ -1792,6 +2032,28 @@ def build():
         rb += [f"User-agent: {bot}", "Allow: /", "Disallow: /options/", ""]
     rb += [f"Sitemap: {prod_url('/sitemap.xml')}", ""]
     write("robots.txt", "\n".join(rb), written)
+
+    # _redirects (Netlify, WS-SITE13): true 301s from the old GoDaddy URLs to
+    # their new equivalents. Ships inside the publish dir (site/). Destinations
+    # all exist in this build. Blog URLs are deliberately untouched (identical
+    # /blog/f/<slug> paths, handled in a later build). Root-relative, so this is
+    # correct whichever base path the HTML is built at.
+    redirects = [
+        "# WS-SITE13 GoDaddy -> Netlify 301 map. Blog URLs intentionally omitted.",
+        "/triathlon-coaching       /triathlon-coaching/     301",
+        "/cycling-coaching         /cycling-coaching/       301",
+        "/training-plans           /plans/                  301",
+        "/our-team                 /about/                  301",
+        "/achievements             /female-performance/     301",
+        "/performance-breathwork   /about/                  301",
+        "/contact-us               /contact/                301",
+        "/alps-training-camp       /coaching/               301",
+        "/the-foundry              /                        301",
+        "/bespoke-wheelbuilding    /                        301",
+        "/equality-development-1   /female-performance/     301",
+        "",
+    ]
+    write("_redirects", "\n".join(redirects), written)
 
     run_gates(cat, written)
     print("Built %d pages into %s" % (len(written), SITE))

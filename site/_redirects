@@ -1,0 +1,12 @@
+# WS-SITE13 GoDaddy -> Netlify 301 map. Blog URLs intentionally omitted.
+/triathlon-coaching       /triathlon-coaching/     301
+/cycling-coaching         /cycling-coaching/       301
+/training-plans           /plans/                  301
+/our-team                 /about/                  301
+/achievements             /female-performance/     301
+/performance-breathwork   /about/                  301
+/contact-us               /contact/                301
+/alps-training-camp       /coaching/               301
+/the-foundry              /                        301
+/bespoke-wheelbuilding    /                        301
+/equality-development-1   /female-performance/     301
