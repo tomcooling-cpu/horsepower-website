@@ -306,6 +306,11 @@ details.faq p { margin: 10px 0 0; color: var(--grey-dark); }
 .quote-card blockquote::before { content: "\201C"; color: var(--teal); font-weight: 700; }
 .quote-card figcaption { margin-top: 14px; font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.85rem; color: var(--teal-dark); }
 
+/* WS-SITE16 race-plan snapshot (inline SVG of the IMWA bike course) */
+.raceplan { margin: 28px auto 0; max-width: 960px; }
+.raceplan .raceplan-svg { display: block; width: 100%; height: auto; border: 1px solid var(--rule); border-radius: 12px; box-shadow: 0 12px 32px rgba(15,15,15,0.08); }
+.raceplan figcaption { margin-top: 14px; font-size: 0.9rem; color: var(--grey-mid); line-height: 1.5; text-align: center; }
+
 /* Female-first cross-link on plan cards */
 .female-crosslink { margin: 4px 0 0; font-size: 0.82rem; }
 .female-crosslink a { font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 0.04em; color: var(--teal-dark); text-decoration: none; }
