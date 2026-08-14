@@ -1208,15 +1208,17 @@ def render_coached(cat) -> str:
 <section>
   <div class="wrap">
     <h2>What you get for &pound;120 a month</h2>
-    <p class="section-intro">{esc(TIER_COACHED_BODY)}</p>
-    <p class="section-intro">{esc(TIER_COACHED_BODY_2)}</p>
     <div class="side-fig-grid side-fig-grid--balanced">
-      <ol class="step-list">
-        <li><strong>It starts with you</strong>A proper intake: your target event, your history, your week, your numbers and the hours you actually have.</li>
-        <li><strong>Your plan arrives block by block</strong>Built around your life and your event, three weeks at a time, so it stays current with how your training is actually going rather than a whole year written on day one.</li>
-        <li><strong>Feedback on every completed session</strong>I read the sessions you complete against what was asked, using your actual data, and tell you what it means and what happens next.</li>
-        <li><strong>A race plan before every start line</strong>Pacing, fuelling and strategy for your event, in your hands before you get there.</li>
-      </ol>
+      <div>
+        <p class="section-intro">{esc(TIER_COACHED_BODY)}</p>
+        <p class="section-intro">{esc(TIER_COACHED_BODY_2)}</p>
+        <ol class="step-list">
+          <li><strong>It starts with you</strong>A proper intake: your target event, your history, your week, your numbers and the hours you actually have.</li>
+          <li><strong>Your plan arrives block by block</strong>Built around your life and your event, three weeks at a time, so it stays current with how your training is actually going rather than a whole year written on day one.</li>
+          <li><strong>Feedback on every completed session</strong>I read the sessions you complete against what was asked, using your actual data, and tell you what it means and what happens next.</li>
+          <li><strong>A race plan before every start line</strong>Pacing, fuelling and strategy for your event, in your hands before you get there.</li>
+        </ol>
+      </div>
       <figure class="photo-fig photo-fig--port">{img("coached-almere-finish")}
         <figcaption>A Horsepower athlete finishing Challenge Almere-Amsterdam</figcaption></figure>
     </div>
@@ -1491,12 +1493,12 @@ def render_about(cat) -> str:
   <div class="wrap">
     <p class="eyebrow">Tom on the start line</p>
     <h2>Racing it, not just coaching it</h2>
-    <p class="section-intro">The coaching is grounded in racing. Haute Route weeks in the Alps
-    and the Dolomites, the Lost Dot TransPyrenees, the Brecon Titan: the same kind of
-    preparation Horsepower athletes get, tested first-hand.</p>
+    <p class="section-intro">The coaching is grounded in racing. Ironman and 70.3 podiums,
+    Haute Route weeks in the Alps and the Dolomites, the Lost Dot TransPyrenees: the same
+    kind of preparation Horsepower athletes get, tested first-hand.</p>
     <div class="about-gallery">
       <figure class="photo-fig photo-fig--land">{img("about-brecon-titan")}
-        <figcaption>Brecon Titan</figcaption></figure>
+        <figcaption>Multiple triathlon wins and podiums</figcaption></figure>
       <figure class="photo-fig photo-fig--land">{img("about-dolomites-descender")}
         <figcaption>Haute Route Dolomites</figcaption></figure>
       <figure class="photo-fig photo-fig--land">{img("about-dolomites-cobbles")}
