@@ -15,6 +15,7 @@ House rules enforced as build gates (build fails if any gate fails):
 """
 from __future__ import annotations
 
+import hashlib
 import html
 import json
 import os
@@ -279,6 +280,24 @@ def esc(s) -> str:
     return html.escape(str(s), quote=True)
 
 
+# WS-SITE23: SERP titles truncate near 60 characters, so assemble each page
+# <title> as `core` plus the LONGEST brand suffix that still fits within `cap`.
+# Where the full " | Horsepower Coaching" would push a long race name over, it
+# steps down to " | Horsepower", then drops the brand entirely, so a title is
+# never longer than it needs to be. A hard site-wide ceiling of 65 chars is
+# enforced separately by the title-length gate (one documented exception, the
+# keyword-rich female-performance page).
+TITLE_HARD_CAP = 65
+TITLE_CAP_EXEMPT = {"female-performance/index.html"}
+
+
+def fit_title(core, cap=60):
+    for suffix in (" | Horsepower Coaching", " | Horsepower", ""):
+        if len(core) + len(suffix) <= cap:
+            return core + suffix
+    return core
+
+
 def head(title, description, canonical, og_image_name=None, og_type="website", extra="",
          preload_img=None) -> str:
     name = og_image_name or DEFAULT_OG_IMAGE
@@ -479,6 +498,12 @@ def org_node(with_rating=False):
         # Clevedon search signal / Google listing is not lost.
         "address": {"@type": "PostalAddress", "addressLocality": "Truro",
                     "addressRegion": "Cornwall", "addressCountry": "GB"},
+        # WS-SITE23: LocalBusiness geo + telephone (SEO punch-list item d). The
+        # coordinates are Truro (city centre, 50.2632, -5.051), consistent with the
+        # Truro PostalAddress above; the phone is the number already public in the
+        # site footer and on the contact page (+44 7780 008724 / wa.me/447780008724).
+        "geo": {"@type": "GeoCoordinates", "latitude": 50.2632, "longitude": -5.051},
+        "telephone": "+44 7780 008724",
         "areaServed": [{"@type": "City", "name": "Truro"},
                        {"@type": "City", "name": "Clevedon"},
                        {"@type": "AdministrativeArea", "name": "Cornwall"},
@@ -1064,7 +1089,7 @@ def render_home(cat) -> str:
     desc = ("Training plans and coaching built for your race, written by Tom Cooling. "
             "Over 150 plans, plus coaching from £120 a month.")
     extra = ld_script([org_node(with_rating=True), website_node()])
-    return page("home", "Horsepower Coaching | Training plans and coaching for your race",
+    return page("home", "Horsepower Coaching | Training Plans for Your Race",
                 desc, prod_url("/"), body, og_image_name="hero-alpine-mist", extra=extra,
                 preload_img="hero-alpine-mist")
 
@@ -1158,16 +1183,192 @@ def render_plans_index(cat) -> str:
     extra = ld_script([
         breadcrumb_node([("Home", "/"), ("Training Plans", None)]),
         collection, service])
-    return page("plans", f"Training Plan Library | {total} plans built for your race | Horsepower Coaching",
+    return page("plans", f"Training Plan Library | {total} Plans | Horsepower Coaching",
                 desc, prod_url("/plans/"), body,
                 og_image_name="plans-izoard-trio", extra=extra,
                 preload_img="plans-izoard-trio")
 
 
+# ── Plan-page de-templating (WS-SITE23, punch-list b + 6) ────────────────────
+# The 153 plan detail pages used to share an identical ~90-word "How it is built"
+# block plus a heavily templated catalogue description, so same-sport pages read
+# near-identically (measured Jaccard word-overlap 69-74%, some pairs >95%). This
+# rebuilds each page's visible prose from ONLY the plan's own real attributes in
+# catalogue.json (event name, event type, weeks, weekly hours, level/tier, sport)
+# using rotating sentence patterns chosen independently per block, so both the
+# wording and the interpolated specifics differ page to page. Nothing here invents
+# a course fact: distances are the definitional distance of the event TYPE (a
+# marathon is 26.2 miles), or a generic descriptor where distance genuinely varies
+# (ultras, sportives). Each page also gets a 3-question FAQ (who it suits, hours
+# needed, how it is delivered) rendered visibly AND as FAQPage JSON-LD.
+_PLAN_DISTANCE = {
+    "ironman": "the full iron distance",
+    "70.3": "middle-distance triathlon",
+    "olympic": "Olympic-distance triathlon",
+    "duathlon": "a run, then a bike, then a run",
+    "marathon": "the full 26.2 mile marathon",
+    "half_marathon": "the 13.1 mile half marathon",
+    "ultra": "an ultra-distance race",
+    "sportive": "a long, hard day on the bike",
+    "mtb": "marathon mountain bike distance",
+    "hill_climb": "a short, all-out climb",
+    "hyrox": "the HYROX format of running and functional stations",
+    "base": "a block of base and strength work",
+}
+_SPORT_FOCUS = {
+    "Triathlon": "the swim, the bike, the run and the transitions that join them",
+    "Cycling": "your endurance, your climbing and the way you put the power down",
+    "Running": "your endurance, your pace and the durability to hold it late on",
+}
+# Event-type overrides where the plain sport focus would misstate the event
+# (a duathlon has no swim; HYROX pairs running with functional stations).
+_EVENT_FOCUS = {
+    "duathlon": "the run, the bike and the second run straight off it",
+    "hyrox": "your running, your engine and the strength for the stations",
+}
+_SPORT_METRICS = {
+    "Triathlon": "your own FTP and threshold pace",
+    "Cycling": "your own FTP and threshold power",
+    "Running": "your own threshold pace and heart rate",
+}
+_PLAN_GOAL = {
+    "Finish": "get you across the line in good shape",
+    "Finisher": "get you across the line in good shape",
+    "Improve": "take a real chunk out of your previous time",
+    "Performance": "take a real chunk out of your previous time",
+    "Compete": "have you racing at the sharp end",
+    "Competitive": "have you racing at the sharp end",
+}
+_LEVEL_AIM = {
+    "Finish": "aimed at getting you to a strong, controlled finish",
+    "Finisher": "aimed at getting you to a strong, controlled finish",
+    "Improve": "aimed at a genuinely faster time than last time out",
+    "Performance": "aimed at a genuinely faster time than last time out",
+    "Compete": "aimed at racing for a result, not just completing it",
+    "Competitive": "aimed at racing for a result, not just completing it",
+}
+
+
+def _plan_pick(slug, salt, n):
+    return int(hashlib.md5(f"{slug}|{salt}".encode()).hexdigest(), 16) % n
+
+
+def _plan_distance(p):
+    return _PLAN_DISTANCE.get(p["event_type"], f"{p['sport'].lower()} racing")
+
+
+def _hours_band(h):
+    return "lean" if h < 7 else ("solid" if h < 12 else "big")
+
+
+def _plan_focus(p):
+    return _EVENT_FOCUS.get(p["event_type"],
+                            _SPORT_FOCUS.get(p["sport"], "every discipline the event demands"))
+
+
+def plan_prose(p):
+    """Three attribute-driven paragraphs (intro, method, close), each chosen from
+    a rotating pool so same-sport pages diverge in both structure and specifics."""
+    ev = p["event_name"]
+    dist = _plan_distance(p)
+    wk = p["weeks"]
+    hph = f"{p['hours_per_week']:g}"
+    band = _hours_band(p["hours_per_week"])
+    focus = _plan_focus(p)
+    metrics = _SPORT_METRICS.get(p["sport"], "your own numbers")
+    goal = _PLAN_GOAL.get(p["tier"])
+
+    intro = [
+        (f"This plan is built for {ev}, start to finish. It is shaped around {dist}, running "
+         f"{wk} weeks at a {band} {hph} hours a week, so you know exactly what you are signing "
+         f"up for."),
+        (f"The whole plan points at one thing: {ev}. Across {wk} weeks and roughly {hph} hours "
+         f"a week, it builds you toward {dist} with nothing in there that does not earn its "
+         f"place."),
+        (f"Targeting {ev}? This is the plan for it. {wk} weeks, a {band} {hph} hours a week, "
+         f"every one of them built around {dist} rather than adapted from a template."),
+    ][_plan_pick(p["slug"], "intro", 3)]
+
+    method = [
+        (f"The load builds in three-week blocks and then backs off, so the work actually lands "
+         f"instead of burying you. The hard sessions are dosed the way the research says fitness "
+         f"is built, never piled on as junk volume, and {focus} all get their turn."),
+        (f"Every target is set as a percentage of {metrics}, so it fits you and not some average "
+         f"athlete. The weeks climb and then ease in three-week blocks, and across them {focus} "
+         f"are trained in balance."),
+        (f"Three weeks up, ease back, repeat: that rhythm is what makes the fitness stick. "
+         f"Intensity is rationed rather than sprayed around, every target reads off {metrics}, "
+         f"and the plan gives {focus} the attention each one needs."),
+    ][_plan_pick(p["slug"], "method", 3)]
+
+    if goal:
+        close = [
+            f"Follow it properly and the aim is clear: {goal} at {ev}.",
+            f"Do the work and this plan is built to {goal} when you line up for {ev}.",
+            f"Held to week after week, it is designed to {goal} on the day you race {ev}.",
+        ]
+    else:
+        close = [
+            f"Follow it as written and you will arrive at {ev} genuinely ready, not just hopeful.",
+            f"Do the work and you get to {ev} fit, confident and knowing your day is in hand.",
+            f"Held to from the first week, it will have you ready for {ev} on the day it counts.",
+        ]
+    close = close[_plan_pick(p["slug"], "close", 3)]
+    return [intro, method, close]
+
+
+def plan_faqs(p):
+    """Three real Q&As per plan, derived from its own attributes (who it suits,
+    hours needed, delivery). Returned as (question, answer) pairs for both the
+    visible FAQ and the FAQPage JSON-LD."""
+    ev = p["event_name"]
+    dist = _plan_distance(p)
+    wk = p["weeks"]
+    hph = f"{p['hours_per_week']:g}"
+    band = _hours_band(p["hours_per_week"])
+    aim = _LEVEL_AIM.get(p["tier"])
+    who = [
+        (f"Anyone with {ev} on the calendar. It is written for {dist}"
+         + (f", {aim}" if aim else "")
+         + f", and it assumes you can train consistently at around {hph} hours a week."),
+        (f"The rider or athlete targeting {ev}. It suits {dist}"
+         + (f" and is {aim}" if aim else "")
+         + f", for someone who can give it a fairly steady {hph} hours most weeks."),
+        (f"If {ev} is your goal, this is your plan. It is pitched at {dist}"
+         + (f", {aim}" if aim else "")
+         + f", and works best when you can hold roughly {hph} hours a week through the block."),
+    ][_plan_pick(p["slug"], "faq_who", 3)]
+    hours = [
+        (f"It runs {wk} weeks at a {band} {hph} hours a week. The load builds in three-week "
+         f"blocks and then eases back, so the volume is real but never random."),
+        (f"Plan on {wk} weeks and about {hph} hours a week. It rises for a couple of weeks, then "
+         f"drops to let the work settle, rather than climbing endlessly until you break."),
+        (f"You are looking at {wk} weeks and a {band} {hph} hours a week, arranged in three-week "
+         f"blocks that push and then recover so the fitness actually sticks."),
+    ][_plan_pick(p["slug"], "faq_hours", 3)]
+    delivery = [
+        ("It is a one-off purchase delivered straight into your TrainingPeaks account, written "
+         "out session by session in plain language so you always know what to do and why."),
+        ("You buy it once and it lands in your TrainingPeaks account, every session spelled out "
+         "in plain words with the reason it is there, ready to start straight away."),
+        ("A single payment drops the whole plan into TrainingPeaks for you, laid out session by "
+         "session in plain English so nothing is left to guesswork."),
+    ][_plan_pick(p["slug"], "faq_delivery", 3)]
+    return [("Who is this plan for?", who),
+            ("How much training does it involve?", hours),
+            ("How is the plan delivered?", delivery)]
+
+
 def render_plan_detail(cat, p) -> str:
     canonical = prod_url(f"/plans/{p['slug']}/")
     tier_line = "" if p["tier"] == "Standard" else f'<div class="spec-box"><div class="k">Level</div><div class="v">{esc(p["tier"])}</div></div>'
-    paras = "".join(f"<p>{esc(x)}</p>" for x in re.split(r"(?<=[.])\s{2,}", p["description"]) if x.strip()) or f"<p>{esc(p['description'])}</p>"
+    # WS-SITE23: visible prose rebuilt per-plan from real attributes (de-templating).
+    paras = "".join(f"<p>{esc(x)}</p>" for x in plan_prose(p))
+    faqs = plan_faqs(p)
+    faq_html = "".join(
+        f'<details class="faq"{" open" if i == 0 else ""}><summary>{esc(q)}</summary>'
+        f'<p>{esc(a)}</p></details>'
+        for i, (q, a) in enumerate(faqs))
     ld = {
         "@context": "https://schema.org", "@type": "Product",
         "name": p["title"], "description": p["description"],
@@ -1179,7 +1380,13 @@ def render_plan_detail(cat, p) -> str:
     }
     crumbs_ld = breadcrumb_node([("Home", "/"), ("Training Plans", "/plans/"),
                                  (p["title"], None)])
-    extra = ld_script([ld, crumbs_ld])
+    faq_ld = {
+        "@context": "https://schema.org", "@type": "FAQPage",
+        "mainEntity": [
+            {"@type": "Question", "name": q,
+             "acceptedAnswer": {"@type": "Answer", "text": a}}
+            for q, a in faqs]}
+    extra = ld_script([ld, crumbs_ld, faq_ld])
     female_note = ""
     if p["slug"] in FEMALE_FIRST_SLUGS:
         female_note = f"""
@@ -1211,14 +1418,10 @@ def render_plan_detail(cat, p) -> str:
   <div class="wrap prose">
     <h2>About this plan</h2>
     {paras}
-    <h2>How it is built</h2>
-    <p>Every Horsepower plan is generated by the same engine that builds our coached
-    athletes' programmes, then written out session by session in plain language. The
-    load builds in three-week blocks and eases back so the work lands, the hard
-    sessions are dosed the way the research says fitness is built, and every target is
-    set as a percentage of your own numbers so it fits you and not an average.</p>
     <p><a class="btn" href="{esc(p['buy_url'])}" rel="noopener" target="_blank">Get {esc(p['title'])}</a>
     &nbsp; <a class="link-plain" href="{BASE_PATH}/plans/">Back to the library</a></p>
+    <h2>Common questions</h2>
+    {faq_html}
     <p style="margin-top:26px;color:var(--grey-mid)">Want it built around your life instead of off the shelf?
     <a href="{BASE_PATH}/coached/">See {esc(TIER2_NAME)}</a>.</p>
     {female_note}
@@ -1226,7 +1429,7 @@ def render_plan_detail(cat, p) -> str:
 </section>
 </main>"""
     desc = (p["blurb"][:150]).rsplit(" ", 1)[0]
-    return page("plans", f"{p['title']} | Horsepower Coaching", desc, canonical, body,
+    return page("plans", fit_title(p['title']), desc, canonical, body,
                 og_image_name="plans-pyrenees-switchback", og_type="product", extra=extra)
 
 
@@ -1591,7 +1794,7 @@ def render_about(cat) -> str:
     extra = ld_script([
         breadcrumb_node([("Home", "/"), ("About Us", None)]),
         person_node(), org_node(with_rating=False)])
-    return page("about", "About Tom Cooling | Founder and Head Coach | Horsepower Coaching",
+    return page("about", fit_title("About Tom Cooling | Founder and Head Coach"),
                 desc, prod_url("/about/"), body,
                 og_image_name="about-brecon-titan", extra=extra)
 
@@ -2090,28 +2293,42 @@ def render_triathlon_coaching(cat) -> str:
         "<p>I'm Tom Cooling, and I coach triathletes from a first sprint all the way to Ironman, "
         "long course and the extreme XTRI races like Norseman. Whether you're chasing your first "
         "70.3 finish or a podium at Ironman Wales, coaching with Horsepower puts you and your dream "
-        "at the centre of it, built around your target race, your life and your numbers, from "
-        "Clevedon and online worldwide.</p>"
+        "at the centre of it, built around your target race, your life and your numbers, located "
+        "in the South West of the UK and coaching online worldwide.</p>"
         "<p>Every plan is written by me and delivered straight into TrainingPeaks, built in "
         "three-week blocks so the load lands and the hard sessions are dosed the way the research "
         "says fitness is actually built. Swim, bike, run and the transitions in between, all "
-        "prepared properly. Quality over quantity, every time.</p>")
+        "prepared properly. Quality over quantity, every time.</p>"
+        # WS-SITE23 punch-list c: ~150 words of unique head-term copy, Tom's voice.
+        "<h2>What triathlon coaching with me actually covers</h2>"
+        "<p>Triathlon is really four sports, not three, because the transitions and the way the "
+        "three disciplines feed into each other decide as much as any single one. So we work the "
+        "whole picture: a swim that leaves you fresh for the bike, bike pacing that protects your "
+        "run, and a run built on the durability to hold form when you are tired. Around that sits "
+        "the strength work, the fuelling you rehearse until it is boring, and the heat and "
+        "race-craft preparation the bigger days demand.</p>"
+        "<p>It suits the athlete who wants a coach reading their actual sessions, not a template "
+        "downloaded and forgotten. First-timers who want to reach the start line genuinely ready, "
+        "age-groupers chasing a championship slot, and plenty of people in between. Wherever you "
+        "are in the UK or further afield, the coaching is delivered online from the South West, so "
+        "the only thing that changes is your postcode, never the standard.</p>")
     return render_sport_landing(
         slug="triathlon-coaching",
         h1="Triathlon Coaching",
-        eyebrow="Triathlon coaching, Clevedon and online",
+        eyebrow="Triathlon coaching, South West UK and online",
         hero_img="hero-tenby-swim", og_name="hero-tenby-swim",
-        title="Triathlon Coaching | Clevedon and Online, UK | Horsepower Coaching",
-        desc=("Triathlon coaching for every distance, from first sprint to Ironman, based in "
-              "Clevedon, UK and online worldwide. Bespoke plans and coaching by Tom Cooling."),
+        title=fit_title("Triathlon Coaching | South West UK and Online"),
+        desc=("Triathlon coaching for every distance, first sprint to Ironman, located in the "
+              "South West of the UK and coaching online worldwide, by Tom Cooling."),
         lede=("Triathlon coaching built for your race, from your first sprint to Ironman. Written "
-              "by me, delivered through TrainingPeaks, based in Clevedon and coaching worldwide."),
+              "by me, delivered through TrainingPeaks, from the South West of the UK and coaching "
+              "worldwide."),
         intro_html=intro,
         funnel_heading="Your paths into triathlon coaching",
         service_name="Triathlon coaching",
         service_desc=("Triathlon coaching and training plans for every distance, from first sprint "
                       "and 70.3 to Ironman and XTRI, built for your target race by Tom Cooling. "
-                      "Based in Clevedon, UK; coaching online worldwide."))
+                      "Located in the South West of the UK; coaching online worldwide."))
 
 
 def render_cycling_coaching(cat) -> str:
@@ -2120,19 +2337,33 @@ def render_cycling_coaching(cat) -> str:
         "<p>I coach cyclists from their first sportive or hill climb to the perfect 25 mile time "
         "trial, gran fondos, Everestings and full-blown ultra-distance racing. Coaching with "
         "Horsepower is built around the event you're chasing, the hours you've actually got and "
-        "your own power numbers, from Clevedon and online across the UK and worldwide.</p>"
+        "your own power numbers, located in the South West of the UK and coaching online across "
+        "the UK and worldwide.</p>"
         "<p>Every plan is written by me and delivered straight into TrainingPeaks, the load built "
         "in three-week blocks and every target set as a percentage of your own numbers so it fits "
         "you and not some average. Climbing, time trialling, endurance and the race craft that "
-        "wins the day. No nonsense, quality over quantity.</p>")
+        "wins the day. No nonsense, quality over quantity.</p>"
+        # WS-SITE23 punch-list c: ~150 words of unique head-term copy, Tom's voice.
+        "<h2>What cycling coaching with me actually covers</h2>"
+        "<p>Bike racing rewards the rider who has trained the right thing, not simply the most. So "
+        "we build the engine with structured endurance and threshold work, then sharpen it for the "
+        "specific demands of your event, whether that is the repeatable climbing of a gran fondo, "
+        "the single savage effort of a hill climb, or the pacing discipline of a long time trial. "
+        "Position, fuelling and pacing get the same attention as the numbers, because on the day "
+        "they decide as much as your FTP ever does.</p>"
+        "<p>It suits the rider who knows there is more in there and wants a coach to find it: the "
+        "sportive rider stepping up to a first big alpine day, the time triallist chasing a "
+        "personal best, the ultra-distance rider learning to keep moving when it turns hard. It is "
+        "all delivered online from the South West of the UK, so wherever you ride, the coaching "
+        "comes with you.</p>")
     return render_sport_landing(
         slug="cycling-coaching",
         h1="Cycling Coaching",
-        eyebrow="Cycling coaching, Clevedon and online",
+        eyebrow="Cycling coaching, South West UK and online",
         hero_img="alpine-ridge", og_name="alpine-ridge",
-        title="Cycling Coaching | Clevedon and Online, UK | Horsepower Coaching",
+        title=fit_title("Cycling Coaching | South West UK and Online"),
         desc=("Cycling coaching from sportives and hill climbs to 100 mile time trials and "
-              "ultra-distance racing, based in Clevedon, UK and online. Coaching by Tom Cooling."),
+              "ultra racing, located in the South West of the UK and online. By Tom Cooling."),
         lede=("Cycling coaching built for your event, from sportives and hill climbs to 100 mile "
               "TTs and ultra racing. Written by me and delivered through TrainingPeaks."),
         intro_html=intro,
@@ -2140,7 +2371,7 @@ def render_cycling_coaching(cat) -> str:
         service_name="Cycling coaching",
         service_desc=("Cycling coaching and training plans from sportives and hill climbs to 100 "
                       "mile time trials and ultra-distance racing, built for your target event by "
-                      "Tom Cooling. Based in Clevedon, UK; coaching online worldwide."))
+                      "Tom Cooling. Located in the South West of the UK; coaching online worldwide."))
 
 
 # ── Blog (WS-SITE14) ─────────────────────────────────────────────────────────
@@ -2367,9 +2598,19 @@ def render_blog_post(p):
   </article>
 </section>
 </main>"""
+    # WS-SITE23 punch-list e: meta descriptions must be <=158 chars or the SERP
+    # truncates them. The ceiling applies to the ESCAPED string that actually
+    # ships (an embedded quote becomes &quot;, six chars), so trim word by word
+    # against the escaped length and mark the cut with an ellipsis.
     desc = (p.get("description", "") or p["title"]).strip()
-    if len(desc) > 300:
-        desc = desc[:297].rsplit(" ", 1)[0] + "..."
+    if len(esc(desc)) > 158:
+        out = ""
+        for w in desc.split():
+            cand = (out + " " + w).strip()
+            if len(esc(cand.rstrip(".,;: ") + "...")) > 158:
+                break
+            out = cand
+        desc = out.rstrip(".,;: ") + "..."
     ld = {
         "@context": "https://schema.org", "@type": "BlogPosting",
         "headline": p["title"], "description": desc,
@@ -2383,7 +2624,7 @@ def render_blog_post(p):
     }
     crumbs = breadcrumb_node([("Home", "/"), ("Blog", "/blog/"), (p["title"], None)])
     extra = ld_script([ld, crumbs])
-    return page("blog", f'{p["title"]} | Horsepower Coaching', desc, canonical, body,
+    return page("blog", fit_title(p["title"]), desc, canonical, body,
                 og_image_name=DEFAULT_OG_IMAGE, og_type="article", extra=extra)
 
 
@@ -2422,8 +2663,8 @@ def render_llms_txt(cat) -> str:
     lines.append("")
     lines.append(
         "Horsepower Coaching is world class multisport, cycling and endurance coaching by "
-        "Tom Cooling. It is based in Truro, Cornwall, UK, and coaches athletes across the UK "
-        "(including Clevedon and the South West) and online worldwide.")
+        "Tom Cooling. Located in the South West of the UK and based in Truro, Cornwall, it "
+        "coaches athletes across the UK (including Clevedon) and online worldwide.")
     lines.append("")
     lines.append("## Coaching and plans")
     lines.append("")
@@ -2551,7 +2792,7 @@ def build():
                "CCBot", "Applebot-Extended", "Bytespider", "Amazonbot",
                "meta-externalagent", "cohere-ai", "Diffbot", "Timpibot", "YouBot"]
     rb = ["# Horsepower Coaching",
-          "# Triathlon, cycling and endurance coaching | Clevedon, UK + online worldwide",
+          "# Triathlon, cycling and endurance coaching | South West UK + online worldwide",
           "",
           "User-agent: *",
           "Allow: /",
@@ -2649,6 +2890,19 @@ def run_gates(cat, written):
     for t, paths in titles.items():
         if len(paths) > 1:
             errors.append(f"duplicate <title> {t!r}: {paths}")
+
+    # Gate 3b (WS-SITE23): SERP title-length ceiling. Every page <title> must be
+    # <=65 rendered characters so it does not truncate in the search result. The
+    # keyword-rich /female-performance/ page is the single documented exception.
+    for path, content in html_pages.items():
+        if path in TITLE_CAP_EXEMPT:
+            continue
+        m = re.search(r"<title>(.*?)</title>", content, re.S)
+        if m:
+            tlen = len(html.unescape(m.group(1)))
+            if tlen > TITLE_HARD_CAP:
+                errors.append(f"title too long ({tlen}>{TITLE_HARD_CAP} chars) in {path}: "
+                              f"{html.unescape(m.group(1))!r}")
 
     # Gate 4: every <img> has non-empty alt.
     for path, content in html_pages.items():
