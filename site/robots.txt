@@ -1,5 +1,5 @@
 # Horsepower Coaching
-# Triathlon, cycling and endurance coaching | Clevedon, UK + online worldwide
+# Triathlon, cycling and endurance coaching | South West UK + online worldwide
 
 User-agent: *
 Allow: /
