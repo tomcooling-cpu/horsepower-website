@@ -194,11 +194,58 @@ SUPPORT_LEVELS = [
      "coach in your corner the whole way."),
 ]
 
+# ── Home tier cards (WS-SITE21 item 2: the money moment, distilled) ──────────
+# The HOME tier cards are distilled to a verdict + 3-4 sharp bullets so the three
+# read at a glance and align to equal height. Every line here compresses copy that
+# is already approved (the TIER_*_BODY paragraphs and the SUPPORT_LEVELS
+# descriptors); no new claim is introduced. The FULL descriptions still live on
+# each tier's own page (/plans/, /coached/, /coaching/), so this is the home cards
+# only. Tom's voice: warm, direct, British, no em-dashes.
+HOME_TIER_CARDS = [
+    {"name": TIER1_NAME, "cls": "tier-card--store", "tag_cls": "support-tag--none",
+     "support": SUPPORT_LEVELS[0][1], "btn_cls": "btn--store",
+     "href": "/plans/", "cta": "Browse the library",
+     "price_main": "From &pound;39.99,", "price_qual": " one-off",
+     "verdict": "A proven plan for your race, ready to start today.",
+     "bullets": [
+         "Over 150 plans, each written for a specific event and goal",
+         "The same session design my coached athletes follow",
+         "Delivered straight into your TrainingPeaks",
+         "Built for the athlete who just wants a plan to get on with",
+     ]},
+    {"name": TIER2_NAME, "cls": "feature tier-card--plan", "tag_cls": "support-tag--mid",
+     "support": SUPPORT_LEVELS[1][1], "btn_cls": "btn--plan",
+     "href": "/coached/", "cta": "How Plan Only works",
+     "price_main": "&pound;120 a month", "price_qual": "",
+     "verdict": "A plan I build for you, block by block, not pulled off a shelf.",
+     "bullets": [
+         "Written by me, the same way I work with my coached athletes",
+         "Honest feedback at the end of every block",
+         "The next block built around where you actually are",
+         "Everything but the day to day contact and calls",
+     ]},
+    {"name": "Coached by Tom", "cls": "tier-card--tom", "tag_cls": "support-tag--full",
+     "support": SUPPORT_LEVELS[2][1], "btn_cls": "btn--tom",
+     "href": "/coaching/", "cta": "Coach with Tom",
+     "price_main": "&pound;185 a month", "price_qual": "",
+     "verdict": "The full thing, with a professional coach in your corner the whole way.",
+     "bullets": [
+         "A bespoke programme built around your race, life and body",
+         "Weekly feedback and analysis of the sessions that matter",
+         "Pacing, fuelling, race craft, bike fit and the mental side",
+         "Just 15 places, so the support stays personal",
+     ]},
+]
+
 # Strings that must appear byte-exact in the built output (copy-verbatim gate).
+# WS-SITE21 item 2: TIER_TOM_BODY_2 was ONLY ever on the home Coached-by-Tom card,
+# which is now distilled, so it no longer ships verbatim and is dropped from this
+# lock. Its substance (the 15-place limit) survives on /coaching/ ("Why places are
+# limited" band) and in the distilled card bullet, so no claim is lost.
 VERBATIM_REQUIRED = [
     HERO_HEADLINE, HERO_BODY, FEMALE_FIRST_BODY,
     TIER_PLANS_BODY, TIER_COACHED_BODY, TIER_COACHED_BODY_2,
-    TIER_TOM_BODY, TIER_TOM_BODY_2, RESULTS_LINE,
+    TIER_TOM_BODY, RESULTS_LINE,
     WHICH_PLANS, WHICH_COACHED, WHICH_TOM, PLANS_INTRO,
 ]
 
@@ -736,11 +783,9 @@ VERIFIED_QUOTES = {
 
 # The Madison S result, rendered as a distinct slide in every carousel.
 MADDISON_SLIDE = {"kind": "result"}
-# A clearly-styled "more reviews" state (WS-SITE9, 3d). The female carousel holds
-# every genuine female review in the repo (currently one, Emma N); rather than
-# fabricate testimonials, we append this honest placeholder so the carousel reads
-# as intentional and is ready to take the review screenshots Tom is sending.
-MORE_SLIDE = {"kind": "more"}
+# WS-SITE21 item 1: the "more reviews on the way" placeholder slide is retired.
+# Emma N's genuine review now leads the female carousel on its own; a single real
+# review reads as a featured pull-quote (no arrows/dots), never as a placeholder.
 
 
 def _review_cta(cls="btn on-dark ghost"):
@@ -764,13 +809,6 @@ def quotes_for(page):
 
 
 def _slide_html(item):
-    if item.get("kind") == "more":
-        return (
-            '<figure class="review-slide result-slide review-slide--more">'
-            '<blockquote>More reviews from the women we coach are on the way. In the '
-            'meantime, read what Horsepower athletes say on Google.</blockquote>'
-            '<figcaption>Horsepower Coaching <span>Verified Google reviews</span></figcaption>'
-            '</figure>')
     if item.get("kind") == "result":
         return (
             '<figure class="review-slide result-slide">'
@@ -791,14 +829,13 @@ _CAROUSEL_SEQ = [0]
 
 
 def carousel(page, heading="What athletes say", subhead="Real athletes, real finish lines",
-             on_dark=True, include_result=True, more_state=False):
+             on_dark=True, include_result=True):
     """Accessible auto-advancing review carousel for `page`. Vanilla JS
-    (assets/carousel.js) drives auto-advance, arrows, dots, hover/focus pause."""
+    (assets/carousel.js) drives auto-advance, arrows, dots, hover/focus pause.
+    A single slide renders as a static featured pull-quote (arrows/dots hidden)."""
     slides = list(quotes_for(page))
     if include_result:
         slides = slides + [MADDISON_SLIDE]
-    if more_state:
-        slides = slides + [MORE_SLIDE]
     if not slides:
         return ""
     _CAROUSEL_SEQ[0] += 1
@@ -851,6 +888,30 @@ def reviews_band():
     return carousel("home", include_result=False)
 
 
+def home_tier_cards() -> str:
+    """WS-SITE21 item 2: the distilled HOME tier cards. Each is name, one-line
+    price (the 'one-off' qualifier is a smaller inline span so it never wraps),
+    the support tag, one verdict sentence, 3-4 benefit bullets, then the button.
+    All three flex to equal height with the button pinned to the card bottom."""
+    cards = []
+    for t in HOME_TIER_CARDS:
+        qual = (f'<span class="price-qual">{t["price_qual"]}</span>'
+                if t["price_qual"] else "")
+        bullets = "".join(f"<li>{esc(b)}</li>" for b in t["bullets"])
+        cards.append(
+            f'<div class="tier-card {t["cls"]}">'
+            f'<h3>{esc(t["name"])}</h3>'
+            f'<div class="price">{t["price_main"]}{qual}</div>'
+            f'<p class="support-line"><span class="support-tag {t["tag_cls"]}">'
+            f'Support: {esc(t["support"])}</span></p>'
+            f'<p class="tier-verdict">{esc(t["verdict"])}</p>'
+            f'<ul class="tier-benefits">{bullets}</ul>'
+            f'<a class="btn {t["btn_cls"]}" href="{BASE_PATH}{t["href"]}">'
+            f'{esc(t["cta"])}</a>'
+            f'</div>')
+    return "".join(cards)
+
+
 # The four live Female-First plan SKUs, cross-linked to the female performance page.
 FEMALE_FIRST_SLUGS = {
     "female-first-70-3-training-plan",
@@ -892,31 +953,7 @@ def render_home(cat) -> str:
     how much of me you get, from a proven plan you run yourself, to feedback on every block, to the full
     coaching relationship. No nonsense, no upselling, just the right level of support for where you are.</p>
     <div class="support-ladder" role="list" aria-label="Support increases across the three tiers">{ladder}</div>
-    <div class="tier-grid">
-      <div class="tier-card tier-card--store">
-        <h3>{esc(TIER1_NAME)}</h3>
-        <div class="price">From &pound;39.99, one-off</div>
-        <p class="support-line"><span class="support-tag support-tag--none">Support: {esc(SUPPORT_LEVELS[0][1])}</span>{esc(SUPPORT_LEVELS[0][2])}</p>
-        <p>{esc(TIER_PLANS_BODY)}</p>
-        <a class="btn btn--store" href="{BASE_PATH}/plans/">Browse the library</a>
-      </div>
-      <div class="tier-card feature tier-card--plan">
-        <h3>{esc(TIER2_NAME)}</h3>
-        <div class="price">&pound;120 a month</div>
-        <p class="support-line"><span class="support-tag support-tag--mid">Support: {esc(SUPPORT_LEVELS[1][1])}</span>{esc(SUPPORT_LEVELS[1][2])}</p>
-        <p>{esc(TIER_COACHED_BODY)}</p>
-        <p>{esc(TIER_COACHED_BODY_2)}</p>
-        <a class="btn btn--plan" href="{BASE_PATH}/coached/">How Plan Only works</a>
-      </div>
-      <div class="tier-card tier-card--tom">
-        <h3>Coached by Tom</h3>
-        <div class="price">&pound;185 a month</div>
-        <p class="support-line"><span class="support-tag support-tag--full">Support: {esc(SUPPORT_LEVELS[2][1])}</span>{esc(SUPPORT_LEVELS[2][2])}</p>
-        <p>{esc(TIER_TOM_BODY)}</p>
-        <p>{esc(TIER_TOM_BODY_2)}</p>
-        <a class="btn btn--tom" href="{BASE_PATH}/coaching/">Coach with Tom</a>
-      </div>
-    </div>
+    <div class="tier-grid tier-grid--distilled">{home_tier_cards()}</div>
   </div>
 </section>
 
@@ -952,12 +989,17 @@ def render_home(cat) -> str:
   </div>
 </section>
 
-<section>
-  <div class="wrap">
-    <h2>Over {total} plans, every one built for its event</h2>
-    <p class="section-intro">First marathon to Ironman, hill climbs to 100 mile TTs, every plan in
-    the library is written for one specific race and one specific goal. Find yours and get to work.</p>
-    <p style="margin-top:22px"><a class="btn" href="{BASE_PATH}/plans/">{esc(CTA_FIND)}</a></p>
+<section class="plans-stat-band">
+  <div class="wrap plans-stat-grid">
+    <div class="plans-stat-figure" aria-hidden="true">
+      <span class="plans-stat-num" data-total="{total}"></span>
+    </div>
+    <div class="plans-stat-copy">
+      <h2>Over {total} plans, every one built for its event</h2>
+      <p class="section-intro">First marathon to Ironman, hill climbs to 100 mile TTs, every plan in
+      the library is written for one specific race and one specific goal. Find yours and get to work.</p>
+      <p style="margin-top:22px"><a class="btn" href="{BASE_PATH}/plans/">{esc(CTA_FIND)}</a></p>
+    </div>
   </div>
 </section>
 </main>"""
@@ -1300,8 +1342,8 @@ def render_coaching(cat) -> str:
   <div class="wrap">
     <p class="eyebrow">Race support</p>
     <h2>A proper race plan, before every start line</h2>
-    <div class="raceplan-grid">
-      <div class="prose">
+    <div class="raceplan-showcase">
+      <div class="prose raceplan-intro">
         <p>Before every event you get a race plan built for that day: pacing for the climbs and
         the flats, a fuelling strategy you have rehearsed, heat and weather contingencies, and
         the race craft that decides close finishes. These are the same detailed race-plan
@@ -1314,7 +1356,7 @@ def render_coaching(cat) -> str:
         <p>We build the strategy together, so on the day you are not hoping it goes well. You know
         the plan, because it is yours.</p>
       </div>
-      <figure class="raceplan">
+      <figure class="raceplan raceplan--artefact">
         {raceplan_svg()}
         <figcaption>The bike leg of IRONMAN Wales, one of the toughest courses my athletes race,
         straight from the real course file: roughly {RACEPLAN_KM} km and {RACEPLAN_ASCENT} of
@@ -1326,9 +1368,10 @@ def render_coaching(cat) -> str:
   </div>
 </section>
 
-<section class="alt">
-  <div class="wrap">
-    <div class="callout callout--wide">
+<section class="limited-band">
+  <div class="wrap limited-band-inner">
+    <div class="limited-band-figure" aria-hidden="true"></div>
+    <div class="limited-band-copy">
       <h2>Why places are limited</h2>
       <p>I keep this group small on purpose. I only ever open 15 Coached by Tom spots, because
       this level of support, weekly feedback, unlimited contact and a coach reading every
@@ -1560,6 +1603,27 @@ FEMALE_FAQ = [
 ]
 
 
+def _honour_tile(h):
+    """WS-SITE21 item 5: one aligned honours tile. The top three results show, the
+    rest live in a native <details> ("More results") so every line stays in the DOM
+    and is visible with JS off (details content is parsed by crawlers and captured
+    by the freeze snapshot). Equal tile heights come from CSS flex, not truncation."""
+    lines = h["lines"]
+    top = lines[:3]
+    rest = lines[3:]
+    top_html = "".join(f"<li>{esc(l)}</li>" for l in top)
+    more = ""
+    if rest:
+        rest_html = "".join(f"<li>{esc(l)}</li>" for l in rest)
+        more = (f'<details class="honour-more"><summary>More results</summary>'
+                f'<ul class="honour-stats honour-stats--more">{rest_html}</ul></details>')
+    return (f'<div class="honour">'
+            f'<div class="honour-media">{img(h["img"])}</div>'
+            f'<div class="honour-body"><h3 class="honour-name">{esc(h["name"])}</h3>'
+            f'<ul class="honour-stats">{top_html}</ul>{more}'
+            f'</div></div>')
+
+
 def render_female(cat) -> str:
     fem = [p for p in cat["plans"] if p["slug"] in FEMALE_FIRST_SLUGS]
     fem.sort(key=lambda p: p["title"])
@@ -1655,15 +1719,10 @@ def render_female(cat) -> str:
     <p class="section-intro" style="color:#CFCFCF">Horsepower is proud to have supported some amazing
     women on their journey to Ironman wins, XTRI podiums and course records. Every name below is one
     of them.</p>
-    <div class="honours-grid">{"".join(
-      f'<div class="honour">'
-      f'<div class="honour-media">{img(h["img"])}</div>'
-      f'<div class="honour-body"><h3 class="honour-name">{esc(h["name"])}</h3>'
-      f'<ul class="honour-stats">{"".join(f"<li>{esc(l)}</li>" for l in h["lines"])}</ul>'
-      f'</div></div>' for h in FEMALE_HONOURS)}</div>
+    <div class="honours-grid">{"".join(_honour_tile(h) for h in FEMALE_HONOURS)}</div>
   </div>
 </section>
-{carousel("female", subhead="In her words", include_result=False, on_dark=False, more_state=True)}
+{carousel("female", subhead="In her words", include_result=False, on_dark=False)}
 <section>
   <div class="wrap prose">
     <h2>Female performance, answered</h2>
@@ -1680,7 +1739,7 @@ def render_female(cat) -> str:
     health. What they do not do is claim to sync to your menstrual cycle: an off-the-shelf plan
     cannot know where you are in yours, so I won't pretend it does. That's what coaching
     is for. One-off, delivered through TrainingPeaks.</p>
-    <div class="card-grid" style="margin-top:26px">{plan_cards}</div>
+    <div class="card-grid card-grid--female2x2" style="margin-top:26px">{plan_cards}</div>
     <div class="callout callout--wide" style="margin-top:34px">
       <h2>Want it built around your body?</h2>
       <p>Pick your way in. Start with a proven plan off the shelf, have me write and read your
@@ -1853,7 +1912,9 @@ def render_contact(cat) -> str:
 
 <section>
   <div class="wrap contact-grid">
-    <div>
+    <div class="contact-intro">
+      <figure class="photo-fig photo-fig--land contact-portrait">{img("tom-portrait")}
+        <figcaption>Tom Cooling, founder and head coach of Horsepower Coaching</figcaption></figure>
       <h2>Talk to me directly</h2>
       <ul class="contact-channels">
         <li><a href="{WHATSAPP_URL}" rel="noopener" target="_blank">
@@ -1869,7 +1930,7 @@ def render_contact(cat) -> str:
       <p style="color:var(--grey-mid);margin-top:22px">Based in Truro, Cornwall, coaching athletes
       across the UK and online worldwide.</p>
     </div>
-    <div>
+    <div class="contact-panel">
       <h2>Send me a message</h2>
       <form name="contact" method="POST" data-netlify="true" netlify-honeypot="bot-field" class="contact-form" action="{BASE_PATH}/contact/">
         <input type="hidden" name="form-name" value="contact">
@@ -1907,7 +1968,7 @@ def render_contact(cat) -> str:
 # tiers. Not a duplicate of the tiers page; a focused door in.
 def _funnel_cards():
     tiers = [
-        (TIER1_NAME, "From &pound;39.99, one-off", SUPPORT_LEVELS[0][1], "/plans/", "Browse the plans"),
+        (TIER1_NAME, 'From &pound;39.99,<span class="price-qual"> one-off</span>', SUPPORT_LEVELS[0][1], "/plans/", "Browse the plans"),
         (TIER2_NAME, "&pound;120 a month", SUPPORT_LEVELS[1][1], "/coached/", "How Plan Only works"),
         ("Coached by Tom", "&pound;185 a month", SUPPORT_LEVELS[2][1], "/coaching/", "Coach with Tom"),
     ]
