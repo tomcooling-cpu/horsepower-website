@@ -93,7 +93,10 @@ HERO_BODY = ("Whether it's your first Ironman, a Haute Route podium or the perfe
              "at the right dose, and having the sense to adjust when life gets in the way. "
              "That's what I do, and I take your dream every bit as seriously as you do.")
 CTA_FIND = "Find your plan"
-CTA_GET = "Get coached"
+# WS-SITE19: every CTA names the tier it leads to. This one points at /coaching/
+# (the Coached by Tom page), so it reads "Coach with Tom", not the old generic
+# "Get coached" (which no longer says which tier).
+CTA_GET = "Coach with Tom"
 
 # (Removed 2026-08-13: the "written by a professional coach / not a machine" home band was
 # dropped. Protesting that the coaching is not AI is itself an AI tell; the site sells the
@@ -896,7 +899,7 @@ def render_home(cat) -> str:
         <p class="support-line"><span class="support-tag support-tag--full">Support: {esc(SUPPORT_LEVELS[2][1])}</span>{esc(SUPPORT_LEVELS[2][2])}</p>
         <p>{esc(TIER_TOM_BODY)}</p>
         <p>{esc(TIER_TOM_BODY_2)}</p>
-        <a class="btn btn--tom" href="{BASE_PATH}/coaching/">See if there is a place</a>
+        <a class="btn btn--tom" href="{BASE_PATH}/coaching/">Coach with Tom</a>
       </div>
     </div>
   </div>
@@ -1239,7 +1242,7 @@ def render_coaching(cat) -> str:
     <h1>A coach in your corner for all&nbsp;of&nbsp;it</h1>
     <p class="lede">{esc(TIER_TOM_BODY)}</p>
     <div class="cta-row">
-      <a class="btn" href="{esc(CONTACT_URL)}">Ask about a place</a>
+      <a class="btn" href="{esc(CONTACT_URL)}">Ask about a Coached by Tom place</a>
       <a class="btn on-dark ghost" href="#what-you-get">See what you get</a>
     </div>
   </div>
@@ -1314,7 +1317,7 @@ def render_coaching(cat) -> str:
       this level of support, weekly feedback, unlimited contact and a coach reading every
       session, is not something I can give properly to more than a small cohort. When those 15
       are taken, it is full.</p>
-      <p style="margin-top:18px"><a class="btn btn--tom" href="{esc(CONTACT_URL)}">Ask about a place</a></p>
+      <p style="margin-top:18px"><a class="btn btn--tom" href="{esc(CONTACT_URL)}">Ask about a Coached by Tom place</a></p>
     </div>
   </div>
 </section>
@@ -1331,7 +1334,7 @@ def render_coaching(cat) -> str:
         <li>Three-month minimum</li>
         <li>Limited places, taken one at a time</li>
       </ul>
-      <p style="margin-top:6px"><a class="btn" href="{esc(CONTACT_URL)}">Apply for a place</a></p>
+      <p style="margin-top:6px"><a class="btn" href="{esc(CONTACT_URL)}">Apply for Coached by Tom</a></p>
       <p class="pricing-note">Not quite ready for this level? <a href="{BASE_PATH}/coached/">{esc(TIER2_NAME)} is &pound;120 a month</a>.</p>
     </div>
   </div>
@@ -1456,7 +1459,7 @@ def render_about(cat) -> str:
     from £120 a month, or ask about a limited place with me directly.</p>
     <div class="cta-row" style="margin-top:20px">
       <a class="btn" href="{BASE_PATH}/plans/">Browse plans</a>
-      <a class="btn ghost" href="{BASE_PATH}/coached/">Get coached</a>
+      <a class="btn ghost" href="{BASE_PATH}/coached/">Explore Plan Only</a>
     </div>
   </div>
 </section>
@@ -1573,7 +1576,7 @@ def render_female(cat) -> str:
     <h1>{esc(FEMALE_LEAD)}</h1>
     <p class="lede">{esc(FEMALE_FIRST_BODY)}</p>
     <div class="cta-row">
-      <a class="btn" href="{BASE_PATH}/coached/">Get coached</a>
+      <a class="btn" href="{BASE_PATH}/coached/">Explore Plan Only</a>
       <a class="btn on-dark ghost" href="#female-plans">See the plans</a>
     </div>
   </div>
@@ -1619,8 +1622,8 @@ def render_female(cat) -> str:
       female-specific performance development, built from years of working with female athletes
       from first finish lines to the front of the race.</p>
       <p style="margin-top:20px">
-        <a class="btn" href="{BASE_PATH}/coached/">How coaching works</a>
-        <a class="btn ghost" href="{BASE_PATH}/coaching/" style="margin-left:10px">Coached by Tom</a>
+        <a class="btn btn--plan" href="{BASE_PATH}/coached/">Explore Plan Only</a>
+        <a class="btn btn--tom" href="{BASE_PATH}/coaching/" style="margin-left:10px">Coach with Tom</a>
       </p>
     </div>
   </div>
@@ -1631,9 +1634,9 @@ def render_female(cat) -> str:
     <p class="eyebrow">The women who prove it</p>
     <h2>Real names, real results</h2>
     <p style="color:var(--teal-soft);font-family:'Oswald',sans-serif;font-size:1.15rem;letter-spacing:0.04em;margin:6px 0 14px">Female results, not female participation.</p>
-    <p class="section-intro" style="color:#CFCFCF">These are women I coach, not stock-photo athletes.
-    Two of them, Hannah S and Madison S, have won Ironman Wales outright, and every line below comes
-    straight from their race results.</p>
+    <p class="section-intro" style="color:#CFCFCF">Horsepower is proud to have supported some amazing
+    women on their journey to Ironman wins, XTRI podiums and course records. Every name below is one
+    of them.</p>
     <div class="honours-grid">{"".join(
       f'<div class="honour">'
       f'<div class="honour-media">{img(h["img"])}</div>'
@@ -1749,7 +1752,7 @@ def _opt_hero(slot, name):
     {eyebrow}<h1>{esc(slot["headline"])}</h1>
     <p class="lede">{esc(slot["lede"])}</p>
     <div class="cta-row"><a class="btn" href="#">Find your plan</a>
-      <a class="btn on-dark ghost" href="#">Get coached</a></div>
+      <a class="btn on-dark ghost" href="#">Coach with Tom</a></div>
   </div>
 </section>"""
 
@@ -1886,8 +1889,8 @@ def render_contact(cat) -> str:
 def _funnel_cards():
     tiers = [
         (TIER1_NAME, "From &pound;39.99, one-off", SUPPORT_LEVELS[0][1], "/plans/", "Browse the plans"),
-        (TIER2_NAME, "&pound;120 a month", SUPPORT_LEVELS[1][1], "/coached/", "How it works"),
-        ("Coached by Tom", "&pound;185 a month", SUPPORT_LEVELS[2][1], "/coaching/", "See if there's a place"),
+        (TIER2_NAME, "&pound;120 a month", SUPPORT_LEVELS[1][1], "/coached/", "How Plan Only works"),
+        ("Coached by Tom", "&pound;185 a month", SUPPORT_LEVELS[2][1], "/coaching/", "Coach with Tom"),
     ]
     # WS-SITE18 tier colour theme: store (white/bordered), plan (teal), tom (gold).
     tier_cls = ["tier-card--store", "feature tier-card--plan", "tier-card--tom"]
@@ -1913,7 +1916,7 @@ def render_sport_landing(*, slug, h1, eyebrow, hero_img, og_name, title, desc,
     <p class="lede">{esc(lede)}</p>
     <div class="cta-row">
       <a class="btn" href="{BASE_PATH}/plans/">Find your plan</a>
-      <a class="btn on-dark ghost" href="{BASE_PATH}/coached/">Get coached</a>
+      <a class="btn on-dark ghost" href="{BASE_PATH}/coached/">Explore Plan Only</a>
     </div>
   </div>
 </section>
