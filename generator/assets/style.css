@@ -1,6 +1,20 @@
 /* Horsepower Coaching website. Brand system from the race-plan documents:
    Oswald headings, Source Sans 3 body, JetBrains Mono for numbers, teal accent. */
-@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap');
+
+/* Self-hosted brand fonts (WS-SITE20). Latin-subset woff2, font-display:swap,
+   only the weights the site uses. Replaces the render-blocking Google Fonts
+   @import (the site's last external dependency, now removed). URLs are relative
+   to this file (/assets/style.css) so they hold at any base path. Critical
+   weights (Oswald 600, Source Sans 3 400) are <link rel=preload>'d in the head. */
+@font-face { font-family: 'Oswald'; font-style: normal; font-weight: 400; font-display: swap; src: url(fonts/oswald-400.woff2) format('woff2'); }
+@font-face { font-family: 'Oswald'; font-style: normal; font-weight: 500; font-display: swap; src: url(fonts/oswald-500.woff2) format('woff2'); }
+@font-face { font-family: 'Oswald'; font-style: normal; font-weight: 600; font-display: swap; src: url(fonts/oswald-600.woff2) format('woff2'); }
+@font-face { font-family: 'Oswald'; font-style: normal; font-weight: 700; font-display: swap; src: url(fonts/oswald-700.woff2) format('woff2'); }
+@font-face { font-family: 'Source Sans 3'; font-style: normal; font-weight: 400; font-display: swap; src: url(fonts/sourcesans3-400.woff2) format('woff2'); }
+@font-face { font-family: 'Source Sans 3'; font-style: normal; font-weight: 600; font-display: swap; src: url(fonts/sourcesans3-600.woff2) format('woff2'); }
+@font-face { font-family: 'Source Sans 3'; font-style: normal; font-weight: 700; font-display: swap; src: url(fonts/sourcesans3-700.woff2) format('woff2'); }
+@font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 500; font-display: swap; src: url(fonts/jetbrainsmono-500.woff2) format('woff2'); }
+@font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 700; font-display: swap; src: url(fonts/jetbrainsmono-700.woff2) format('woff2'); }
 
 :root {
   --black: #0F0F0F;
@@ -21,6 +35,34 @@
   --gold-dark: #9C6F15;
   --gold-soft: #F7EAD0;
   --tier-store-bg: #FFFDF8;
+
+  /* ── WS-SITE20 craft tokens ──────────────────────────────────────────────
+     One easing + duration scale (motion discipline), a coherent fluid type
+     scale (clamp), and shared vertical-rhythm / measure variables. */
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);        /* refined ease-out for UI */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);     /* long, settled reveal ease */
+  --dur-fast: 0.18s;
+  --dur-mid: 0.32s;
+  --reveal-dur: 0.9s;
+  --reveal-shift: 24px;
+
+  --section-pad: clamp(48px, 6.5vw, 88px);
+  --measure: 68ch;                                /* body measure ~65-75ch */
+
+  /* Fluid type scale (min .. max via clamp). Large display gets negative
+     tracking; uppercase labels get deliberate positive tracking. */
+  --step-eyebrow: clamp(0.78rem, 0.74rem + 0.18vw, 0.9rem);
+  --step-h3:      clamp(1.15rem, 1.06rem + 0.44vw, 1.4rem);
+  --step-h2:      clamp(1.7rem, 1.24rem + 2.3vw, 2.5rem);
+  --step-h1:      clamp(2.1rem, 1.4rem + 3.4vw, 3.5rem);
+  --step-hero:    clamp(2.3rem, 1.45rem + 4.2vw, 4rem);
+  --step-lede:    clamp(1.06rem, 0.99rem + 0.62vw, 1.34rem);
+  --step-stat:    clamp(1.5rem, 1.22rem + 1.5vw, 2.1rem);
+  --step-price:   clamp(1.45rem, 1.22rem + 1.2vw, 1.85rem);
+
+  --track-tight: -0.022em;      /* h1 / large display */
+  --track-snug: -0.012em;       /* h2 */
+  --track-label: 0.2em;         /* uppercase eyebrows */
 }
 
 * { box-sizing: border-box; }
@@ -39,14 +81,15 @@ body {
 h1, h2, h3, h4 {
   font-family: 'Oswald', sans-serif;
   font-weight: 600;
-  line-height: 1.1;
+  line-height: 1.08;
   margin: 0 0 0.5em;
-  letter-spacing: 0.01em;
+  letter-spacing: 0;
+  text-wrap: balance;
 }
 
-h1 { font-size: clamp(2rem, 6vw, 3.4rem); text-transform: uppercase; }
-h2 { font-size: clamp(1.5rem, 4vw, 2.3rem); text-transform: uppercase; }
-h3 { font-size: 1.25rem; }
+h1 { font-size: var(--step-h1); text-transform: uppercase; letter-spacing: var(--track-tight); }
+h2 { font-size: var(--step-h2); text-transform: uppercase; letter-spacing: var(--track-snug); }
+h3 { font-size: var(--step-h3); }
 
 p { margin: 0 0 1rem; }
 a { color: var(--teal-dark); }
@@ -133,8 +176,8 @@ a { color: var(--teal-dark); }
   background: var(--black); color: var(--white);
   padding: 72px 0 80px;
 }
-.hero h1 { color: var(--white); max-width: 16ch; }
-.hero .lede { font-size: clamp(1.05rem, 2.4vw, 1.35rem); max-width: 60ch; color: #E7E7E7; }
+.hero h1 { color: var(--white); max-width: 16ch; font-size: var(--step-hero); letter-spacing: var(--track-tight); }
+.hero .lede { font-size: var(--step-lede); max-width: 60ch; color: #E7E7E7; }
 .hero .cta-row { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 28px; }
 
 /* ---- Sections ---- */
@@ -142,8 +185,8 @@ section { padding: 56px 0; }
 section.alt { background: var(--grey-bg); }
 .section-intro { max-width: 62ch; color: var(--grey-dark); font-size: 1.1rem; }
 .eyebrow {
-  font-family: 'Oswald', sans-serif; text-transform: uppercase;
-  letter-spacing: 0.14em; color: var(--teal); font-size: 0.85rem; margin: 0 0 10px;
+  font-family: 'Oswald', sans-serif; text-transform: uppercase; font-weight: 600;
+  letter-spacing: var(--track-label); color: var(--teal); font-size: var(--step-eyebrow); margin: 0 0 10px;
 }
 
 /* ---- Tier cards ---- */
@@ -751,3 +794,186 @@ section { padding: 64px 0; }
 .blog-prose img { max-width: 100%; height: auto; border-radius: 8px; }
 .blog-rule { border: none; border-top: 1px solid var(--rule); margin: 34px 0 20px; }
 .link-plain.on-dark { color: var(--teal-soft); }
+
+/* ============================================================================
+   WS-SITE20 CRAFT PASS: fluid rhythm, scroll-reveal, motion discipline.
+   Presentation only. No layout restructuring, no copy. Everything below is
+   additive and overrides the earlier ad-hoc transitions with one easing token.
+   ========================================================================== */
+
+/* ---- Vertical rhythm + measure (shared variables applied site-wide) ---- */
+section { padding: var(--section-pad) 0; }
+.results { padding: calc(var(--section-pad) + 8px) 0; }
+.section-intro { max-width: var(--measure); }
+.prose { max-width: var(--measure); }
+.hero { padding: clamp(64px, 9vw, 104px) 0 clamp(72px, 10vw, 112px); }
+
+/* ---- Fluid display sizes for stats + prices (coherent with the type scale) ---- */
+.result-stats .n { font-size: var(--step-stat); }
+.pricing-figure .amount { font-size: clamp(2.6rem, 1.8rem + 3.6vw, 3.6rem); letter-spacing: var(--track-tight); }
+.tier-card .price,
+.plan-card .price { font-size: var(--step-price); letter-spacing: -0.01em; }
+.buy-row .price { font-size: clamp(1.5rem, 1.2rem + 1.4vw, 1.8rem); letter-spacing: -0.01em; }
+.spec-box .v { font-size: clamp(1.1rem, 1rem + 0.5vw, 1.3rem); }
+
+/* ============================================================================
+   MOTION DISCIPLINE: one easing (--ease) + duration scale on every hover.
+   Hover lift uses the independent `translate` property so it never collides
+   with the reveal system's `transform`. GPU-friendly (transform/opacity only).
+   ========================================================================== */
+.btn { transition: background var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease), translate var(--dur-fast) var(--ease); }
+.btn:hover { transform: none; translate: 0 -2px; box-shadow: 0 10px 24px rgba(0,0,0,0.18); }
+.btn:active { translate: 0 0; }
+
+.tier-card, .plan-card, .blog-card, .get-card, .quote-card, .cred {
+  transition: opacity var(--reveal-dur) var(--ease-out),
+              transform var(--reveal-dur) var(--ease-out),
+              box-shadow var(--dur-mid) var(--ease),
+              border-color var(--dur-mid) var(--ease),
+              translate var(--dur-mid) var(--ease);
+}
+.tier-card:hover, .plan-card:hover, .blog-card:hover, .get-card:hover {
+  transform: none; translate: 0 -4px; box-shadow: 0 18px 40px rgba(0,0,0,0.12);
+}
+.plan-card:hover, .blog-card:hover { border-color: var(--teal); }
+
+/* Nav links: colour + an underline that wipes in from the left (desktop). */
+.site-nav a { transition: color var(--dur-fast) var(--ease); }
+@media (min-width: 821px) {
+  .site-nav a:not(.cta) { position: relative; }
+  .site-nav a:not(.cta)::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: -3px; height: 2px;
+    background: var(--teal); transform: scaleX(0); transform-origin: left center;
+    transition: transform var(--dur-mid) var(--ease);
+  }
+  .site-nav a:not(.cta):hover::after,
+  .site-nav a:not(.cta)[aria-current="page"]::after { transform: scaleX(1); }
+}
+.site-nav a.cta { transition: background var(--dur-fast) var(--ease), translate var(--dur-fast) var(--ease); }
+.site-nav a.cta:hover { translate: 0 -1px; }
+
+/* Social icons, carousel arrows/dots, contact channels: same token language. */
+.social-icon { transition: border-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease), translate var(--dur-fast) var(--ease); }
+.social-icon:hover { transform: none; translate: 0 -2px; }
+.carousel-arrow { transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease), translate var(--dur-fast) var(--ease); }
+.carousel-arrow:hover { transform: none; translate: 0 -1px; }
+.carousel-dot { transition: background var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease); }
+.contact-channels a { transition: border-color var(--dur-fast) var(--ease), translate var(--dur-fast) var(--ease); }
+.contact-channels a:hover { transform: none; translate: 0 -1px; }
+.link-plain { transition: color var(--dur-fast) var(--ease); }
+
+/* ============================================================================
+   SCROLL-REVEAL SYSTEM (progressive enhancement).
+   Hidden-start states are gated behind `html.js ...:not(.in)`, so with JS off
+   or before reveal.js runs NOTHING matches and all content is fully visible.
+   reveal.js adds `.in` as elements enter the viewport; the transition lives on
+   the always-matching base rule so the settle animates. Reveal moves only
+   transform + opacity. Keep this selector list in step with reveal.js.
+   ========================================================================== */
+
+/* (1) transition carrier: on the base element, so add/remove of .in animates. */
+html.js .reveal,
+html.js section > .wrap > .eyebrow,
+html.js section > .wrap > h2,
+html.js section > .wrap > .section-intro,
+html.js .tier-card, html.js .which-item, html.js .plan-card, html.js .honour,
+html.js .blog-card, html.js .get-card, html.js .cred, html.js .quote-card,
+html.js .photo-fig, html.js .spec-box, html.js .feature-media,
+html.js .feature-copy, html.js .result-stats, html.js .raceplan,
+html.js .carousel, html.js .about-list li, html.js .step-list li {
+  transition: opacity var(--reveal-dur) var(--ease-out),
+              transform var(--reveal-dur) var(--ease-out);
+}
+
+/* (2) hidden-start state (only until .in is added). */
+html.js .reveal:not(.in),
+html.js section > .wrap > .eyebrow:not(.in),
+html.js section > .wrap > h2:not(.in),
+html.js section > .wrap > .section-intro:not(.in),
+html.js .tier-card:not(.in), html.js .which-item:not(.in),
+html.js .plan-card:not(.in), html.js .honour:not(.in),
+html.js .blog-card:not(.in), html.js .get-card:not(.in),
+html.js .cred:not(.in), html.js .quote-card:not(.in),
+html.js .photo-fig:not(.in), html.js .spec-box:not(.in),
+html.js .feature-media:not(.in), html.js .feature-copy:not(.in),
+html.js .result-stats:not(.in), html.js .raceplan:not(.in),
+html.js .carousel:not(.in), html.js .about-list li:not(.in),
+html.js .step-list li:not(.in) {
+  opacity: 0;
+  transform: translateY(var(--reveal-shift));
+}
+
+/* Cards keep the combined transition (reveal + hover) defined above; re-assert
+   the reveal transition here for the card group so the slow settle is not lost
+   to the hover rule (identical transform timing, hover props added). */
+html.js .tier-card, html.js .plan-card, html.js .blog-card,
+html.js .get-card, html.js .quote-card, html.js .cred {
+  transition: opacity var(--reveal-dur) var(--ease-out),
+              transform var(--reveal-dur) var(--ease-out),
+              box-shadow var(--dur-mid) var(--ease),
+              border-color var(--dur-mid) var(--ease),
+              translate var(--dur-mid) var(--ease);
+}
+
+/* Stagger: a small left-to-right cascade for grid children. */
+html.js .tier-grid > *:nth-child(2),
+html.js .honours-grid > *:nth-child(2),
+html.js .blog-list > *:nth-child(2),
+html.js .get-grid > *:nth-child(2),
+html.js .cred-band > *:nth-child(2),
+html.js .which-grid > *:nth-child(2),
+html.js .about-gallery > *:nth-child(2) { transition-delay: 0.08s; }
+html.js .tier-grid > *:nth-child(3),
+html.js .honours-grid > *:nth-child(3),
+html.js .blog-list > *:nth-child(3),
+html.js .get-grid > *:nth-child(3),
+html.js .cred-band > *:nth-child(3),
+html.js .which-grid > *:nth-child(3),
+html.js .about-gallery > *:nth-child(3) { transition-delay: 0.16s; }
+html.js .honours-grid > *:nth-child(4),
+html.js .blog-list > *:nth-child(4) { transition-delay: 0.24s; }
+/* Plan library grid (3 columns, many rows): column-position cascade per row. */
+html.js .card-grid > *:nth-child(3n+2) { transition-delay: 0.06s; }
+html.js .card-grid > *:nth-child(3n) { transition-delay: 0.12s; }
+
+/* ---- Image treatment: slow scale-at-rest -> settle on reveal. GPU only. ---- */
+html.js .feature-media img,
+html.js .photo-fig img,
+html.js .honour-media img,
+html.js .blog-card-media img { transition: transform var(--reveal-dur) var(--ease-out); }
+html.js .feature-media:not(.in) img,
+html.js .photo-fig:not(.in) img,
+html.js .honour:not(.in) .honour-media img,
+html.js .blog-card:not(.in) .blog-card-media img { transform: scale(1.045); }
+
+/* Tasteful hover on athlete / honours / blog tiles (overflow already hidden). */
+.honour-media img, .blog-card-media img, .feature-media img { will-change: transform; }
+.honour:hover .honour-media img,
+.blog-card:hover .blog-card-media img { transform: scale(1.05); }
+
+/* ============================================================================
+   REDUCED MOTION: no reveals, no non-essential transitions, static + visible.
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  html.js .reveal,
+  html.js section > .wrap > .eyebrow,
+  html.js section > .wrap > h2,
+  html.js section > .wrap > .section-intro,
+  html.js .tier-card, html.js .which-item, html.js .plan-card, html.js .honour,
+  html.js .blog-card, html.js .get-card, html.js .cred, html.js .quote-card,
+  html.js .photo-fig, html.js .spec-box, html.js .feature-media,
+  html.js .feature-copy, html.js .result-stats, html.js .raceplan,
+  html.js .carousel, html.js .about-list li, html.js .step-list li {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  html.js .feature-media img, html.js .photo-fig img,
+  html.js .honour-media img, html.js .blog-card-media img { transform: none !important; }
+}
