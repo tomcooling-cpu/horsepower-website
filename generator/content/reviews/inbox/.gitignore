@@ -1,0 +1,4 @@
+# Review screenshots dropped here are never committed (WS-SITE22 intake).
+# The folder itself is kept via this file; everything else is ignored.
+*
+!.gitignore

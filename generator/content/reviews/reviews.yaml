@@ -1,0 +1,50 @@
+# Horsepower Coaching verified reviews - SINGLE SOURCE OF TRUTH (WS-SITE22).
+# Every quote here is transcribed VERBATIM from Tom's Google Business profile
+# (5.0 from 15 reviews). A review that is not in this file NEVER renders
+# (build gate). Names render first-name + surname initial only. Do not edit a
+# quote to 'tidy' or complete it; transcribe exactly what the reviewer wrote.
+#
+# Fields per record:
+#   text             the review, VERBATIM (JSON-quoted string)
+#   reviewer_display first name + surname initial, e.g. "Ian C"
+#   source           where the review came from (google)
+#   gender_tag       female | male | unknown
+#   event_note       optional short context, e.g. "Cycling athlete" ("" if none)
+#   pages            which pages the quote is routed to (comma separated):
+#                    home is implicit (all quotes); plus any of
+#                    coached | coaching | female | plans | about
+
+- text: "Tom is a great coach and has helped massively with my cycling, helping me achieve results I wouldn't have thought possible previously."
+  reviewer_display: "Ian C"
+  source: google
+  gender_tag: male
+  event_note: "Cycling athlete"
+  pages: coached, coaching
+
+- text: "I can't recommend Tom enough. Over the past year, the support, structure, and guidance I received helped me progress massively and achieve my Ironman goal, finishing in 11h13."
+  reviewer_display: "jc b"
+  source: google
+  gender_tag: unknown
+  event_note: "Ironman finisher, 11h13"
+  pages: coached, coaching
+
+- text: "Really enjoyed being coached by Horsepower Coaching. Tom really knows his stuff and is easy to talk to. If ever I had any questions, Tom was always quick to answer & provided detailed race plans for my various events. Would highly recommend."
+  reviewer_display: "Emma N"
+  source: google
+  gender_tag: female
+  event_note: "Multi-event athlete"
+  pages: female, coaching
+
+- text: "The dream was to finish a 70.3 before turning 50 with a personal best."
+  reviewer_display: "Google review"
+  source: google
+  gender_tag: unknown
+  event_note: "70.3 athlete"
+  pages: coaching
+
+- text: "The sessions are tough but always enjoyable I would highly recommend him"
+  reviewer_display: "Google review"
+  source: google
+  gender_tag: unknown
+  event_note: ""
+  pages: coaching
