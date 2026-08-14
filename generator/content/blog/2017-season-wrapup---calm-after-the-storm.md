@@ -4,13 +4,18 @@ slug: 2017-season-wrapup---calm-after-the-storm
 date: 2021-01-25
 datetime: 2021-01-25T15:35:21.516Z
 description: "Bar a few cross country runs, my triathlon season is all but over."
+hero_blog: 2017-season-wrapup---calm-after-the-storm__hero
 ---
 
 Bar a few cross country runs, my triathlon season is all but over.
 
 I'm staring down the barrel of a much needed break from structured training and 4 months in Indonesia and South Easy Asia. I'm buzzing about the adventure, being able to sea swim every day and taking a break from the accumulated mental fatigue from what has been a very testing year.
 
+{{fig:2017-season-wrapup---calm-after-the-storm__1}}
+
 **Looking forward to swapping this...**
+
+{{fig:2017-season-wrapup---calm-after-the-storm__2}}
 
 **For this!**
 
@@ -22,11 +27,15 @@ Taking a 4 month gap from training initially worried me but now I think it may a
 
 **50 Weeks To Get Lei'd**
 
+{{fig:2017-season-wrapup---calm-after-the-storm__3}}
+
 I know if I'm going to stand a chance at jumping into my finest flowery shirt, getting Lei'd and being given the opportunity to empty my bank account into the Ironman coffers for a coveted ticket to Kona I will need to be faster than a greased weasel.... So how am I going to do it???
 
 **Phase 1 - Off Season Rebuild**
 
 In my four month break from the miserable UK weather I'm going to be stranded on this island for 10 weeks;
+
+{{fig:2017-season-wrapup---calm-after-the-storm__4}}
 
 Not only is this place surrounded by some of the last remaining coral reefs that humans haven't managed to f\*ck up yet, its miles from anywhere, and its conveniently shaped like a running track... A sandy 1100m running track to be exact. The plan is to focus on rebuilding my running technique and lose my sloppy loafing style and hit next season a high cadence machine.
 
@@ -36,15 +45,21 @@ Other than the swimming and running I'll be putting some quality time into flexi
 
 **Phase 2 - Easy Does It!**
 
+{{fig:2017-season-wrapup---calm-after-the-storm__5}}
+
 When I return from playing Robinson Crusoe we're going to be moving to what I've dubbed as the triathlon mecca of the South West... No its not Boulder, Colorado... its Clevedon! Complete with a marine lake perfect for open water swimming, some great running routes, cycling hills in close proximity and a beautiful 15 mile ride into Bristol.
 
 After analysing the hell out of my training from this year with my new Training Peaks Platinum account I've realised one thing; I tried to model myself as triathlon's version of Emil Zápotek who was famous for the high load HIGH intensity training approach. This did one thing.... cooked me by the time I got to July and left me feeling flat not to mention constantly knackered and unable to walk up stairs.
 
 The most telling piece of information from my Training Peaks analysis session was this;
 
+{{fig:2017-season-wrapup---calm-after-the-storm__6}}
+
 My 5 minute power to weight ratio (watts/kg) was on the cusp of domestic pro standards and 20 minute wasn't too shabby either. My ability dropped off as the efforts got longer as shown by my 60 minutes watts/kg falling into the Cat 2 region. This confirmed that my training has made me great at big short distance efforts but I can't sustain it.
 
 I've been reading quite a lot lately on the [80/20 technique](https://www.trainingpeaks.com/blog/using-the-80-20-rule-to-balance-triathlon-training-intensity/) where 80% of your training load is easy (Z2) and 20% is a mix of moderate (Z3) and hard (Z4). I feel like this might be the key to helping me manage a higher training load and improve my ability to sustain a high output for longer.
+
+{{fig:2017-season-wrapup---calm-after-the-storm__8}}
 
 Matt Fitzgerald's book 80/20 running provides a good insight into the technique.
 

@@ -4,6 +4,7 @@ slug: psychology---use-your-head
 date: 2021-01-25
 datetime: 2021-01-25T14:53:21.677Z
 description: "So we're 4 days until Ironman Wales... the tension, excitement and anxiety are building and at this late stage in the game there is a quiet calmness because you know nothing more can be done to improve your physical perf..."
+hero_blog: psychology---use-your-head__hero
 ---
 
 So we're 4 days until Ironman Wales... the tension, excitement and anxiety are building and at this late stage in the game there is a quiet calmness because you know nothing more can be done to improve your physical performance. All of the hard training sessions have been banked and now while the body takes time to process and absorb the hours you've put in... you mind starts to wander.
@@ -18,11 +19,15 @@ This feels especially apparent to me this year because my list of fears is diffe
 
 What if I don't put in a performance that will do myself justice, a performance that shows those closest to me that all of the times I've said "no I can't do that" or "I can't go there because I'm training" have been worth it.
 
+{{fig:psychology---use-your-head__0}}
+
 What that subtle change has taught me is fear doesn't go away. Fear is like perspective, it changes as you change. As a rule, your mind will always find something new to worry about no matter what you're doing... maybe this is an inherent human weakness.
 
 **Are You Sitting Comfortably?**
 
 You shouldn't be. Your dream should scare the sh\*t out of you. It should both instil a deep fear but give you tingles of excitement at the same time. The thing with pushing yourself and doing big things is trying to manage fear, self belief, staying true to your dream and life all at the same time. That's probably why only a few actually get to truly live their dream.
+
+{{fig:psychology---use-your-head__1}}
 
 But no matter how much it scares you, if you truly believe you can accomplish it and you're prepared to put in the hours of work that it will take to get there, then you can.
 
@@ -35,6 +40,8 @@ But no matter how much it scares you, if you truly believe you can accomplish it
 **The Chip On My Shoulder**
 
 I was lucky enough to have a great great man as a Grandfather. One with stories of adventures, daring and bravery. A lifetime of stories that showed a strength of character that you don't find. As my mum will know, his value was above rubies.
+
+{{fig:psychology---use-your-head__2}}
 
 **Derrick Cooling - The Legend**
 
@@ -58,6 +65,8 @@ This is where you can get busy proving them wrong, or sometimes right (be prepar
 
 One of my favourite quotes that I think embodies self belief;
 
+{{fig:psychology---use-your-head__4}}
+
 The general idea is, if you want to do something bigger, or go faster than anyone has ever gone before, then you're going to need to do things people have never done before. Be that training harder, hurting more, more hours training, something will need to be different for you to get a different result to everyone else... Unless you're incredibly lucky and genetically gifted that is!
 
 My one piece of advice is cut away the people who let fear guide them. No matter how hard you try, there will be times when your strength wavers and when you need people around you to remind you that you can do it. Remember, your vibe attracts your tribe. Be positive, believe in yourself and you will attract people who do the same.
@@ -73,6 +82,8 @@ A truer statement is something along the lines of;
 There is a reason the race is called an Ironman and not a Diamondman. Yes diamond is harder than Iron, but it's so hard it's brittle. Iron is malleable and can bend and change shape but remains strong.
 
 Life has a funny way of throwing a spanner into the intricate works of your best thought out plan. That is something that you need to prepare and account for. From an athlete's perspective this usually appears as some unforeseen engagement that you're obliged to attend, illness, injury or broken equipment.
+
+{{fig:psychology---use-your-head__5}}
 
 All of these things can stop you training and could leave you feeling like you're falling behind. You need to be honest with yourself about your program and what you can realistically fit around life. If you're constantly beating yourself up about not having time for that brick run or that lunch swim session then training will end up being a negative experience.
 
@@ -94,11 +105,19 @@ There isn't really much to say about the support network because if you're readi
 
 Here are a few shout outs to my support crew, who have accompanied me on my journey so far and who I couldn't have done it without;
 
+{{fig:psychology---use-your-head__6}}
+
 Jo, my babe of a fiancée and the Chairwoman of my fan club. She needs a medal for the amount of times she has picked me up off the floor after I've overdosed on exercise. Thank you for supporting me at all of my races, keeping me fed and helping me keep my sh\*t together. Definitely couldn't do it without you!
+
+{{fig:psychology---use-your-head__7}}
 
 Mum & Huw, for not only supporting me at my events, but covering every fence post, lamppost and tree on 'The Tumble' with motivational posters for my Everesting attempt, and half of the time participating in the events too! I think you've both probably loathed me at times thanks to some of the challenges I've laid down so you both get brownie points for sense of humour and cheerfulness in the face of adversity.
 
+{{fig:psychology---use-your-head__8}}
+
 Chief, for being my own personal Mr Motivator; always reminding me that there's something special inside and a reason to believe, giving me endless motivational quotes and for the hours upon hours of phone calls listening to me talking through training plans, equipment and race tactics. Think you could probably write a book with all the triathlon knowledge you've got!
+
+{{fig:psychology---use-your-head__9}}
 
 Sister, for believing in me, worrying I'm going to drop dead at a moments notice for pushing too hard and pestering Jo through every minute of every race. Can't forget Georgia aka Treasures... my own little race mascot!
 

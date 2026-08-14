@@ -35,10 +35,52 @@
   event_note: "Multi-event athlete"
   pages: female, coaching
 
-- text: "The dream was to finish a 70.3 before turning 50 with a personal best."
-  reviewer_display: "Google review"
+- text: "I've been working with Tom at Horsepower Coaching for the past year, it was the best decision I made for my cycling and I cannot recommend Tom highly enough to anyone seeking a cycling coach. His personalised approach, attention to detail, and unwavering support have been amazing. What sets Tom apart is his genuine passion for both coaching and wanting you to succeed. His training is a great balance between professional and friendly, and is always able to adapt to anything and everything. He always takes the time to provide personalised regular and understandable feedback, being there to answer any questions no matter how small. Lastly the level of support he provided on the day of the event was amazing. If you're looking for a coach who will go the extra mile and genuinely care about your progress, Tom is the one to choose."
+  reviewer_display: "Rebecca W"
+  source: google
+  gender_tag: female
+  event_note: "Cycling athlete"
+  pages: female, coaching, coached
+
+- text: "I've been working with Tom for over a year now, and after initially being apprehensive about investing in a coach, it's turned out to be a great decision, made all the better by how good of a coach Tom is. Having decided to train for another Ironman with ever increasing work and family commitments, it was important that my training sessions were efficient and high quality, and Tom has delivered this, and more. Tom is a wealth of knowledge, friendly, adaptable, patient with injuries, and a great mentor. Highly recommended."
+  reviewer_display: "Guy L"
+  source: google
+  gender_tag: male
+  event_note: "Ironman athlete"
+  pages: coached, coaching
+
+- text: "I've recently started working with Tom and his attention to detail is second to none. I've been coached for 10 years and Tom is the first coach I've had that has really listened, paid attention to detail, identified issues and then tries to figure out a logical way to address them that works for me as an individual. Really looking forward to working through some mental barriers with Tom and see where that takes me on my triathlon journey. Brilliant coaching service and guidance with incredible knowledge and detail."
+  reviewer_display: "Naomi S"
+  source: google
+  gender_tag: female
+  event_note: "Triathlete"
+  pages: female, coaching
+
+- text: "Tom and I worked together for 2 seasons, covering sprint and middle distance triathlons and a road racing season. During that time, my running came on beyond my wildest expectations and I hit the start line on my first 70.3 fully prepared and in the best shape I've been in a while. His thorough and detailed approach gave my a tangible roadmap for the work ahead, and his open and friendly nature helped me engage with the process throughout. I would thoroughly recommend Tom as a coach, whatever your goal or current standard."
+  reviewer_display: "Rob T"
+  source: google
+  gender_tag: male
+  event_note: "Triathlon and road racing"
+  pages: coached, coaching
+
+- text: "Tom has been an absolutely epic coach. His knowledge is mega and I've learnt so much through being coached by Horsepower. Impressively have podiumed at every Triathlon I've done since working with Tom and still seeing mega gains month on month."
+  reviewer_display: "Get Bent Yoga"
   source: google
   gender_tag: unknown
+  event_note: "Triathlete"
+  pages: coached, coaching
+
+- text: "Tom has been a great coach, who has developed me towards being the best I can be at road cycling. A very friendly, but firm approach that gets the best out of you. I fully recommend Tom to anybody who would be interested in improving themselves as an athlete."
+  reviewer_display: "Mike G"
+  source: google
+  gender_tag: male
+  event_note: "Road cyclist"
+  pages: coached, coaching
+
+- text: "Grateful for Tom's support and amazing guidance towards a successful IM 70.3 in Aix. My last 70.3 was 10 years ago. Work and family took priority, and a broken collarbone and hip didn't help. Over the last 1.5 years, I made fitness a priority again, lost 12 kg, and got ready for the challenge. The dream was to finish a 70.3 before turning 50 with a personal best. Tom's professional guidance, training plans, personal coaching, and practical tips made all the difference and got me proudly across the finish line. The dream came true!"
+  reviewer_display: "Jan Willem V"
+  source: google
+  gender_tag: male
   event_note: "70.3 athlete"
   pages: coaching
 

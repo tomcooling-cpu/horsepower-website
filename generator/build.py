@@ -2386,6 +2386,49 @@ import datetime as _dt
 _MD_SPECIAL = "\\`*_[]"
 _SENT = "\x00"
 
+# ── Original blog photography (WS-SITE24) ────────────────────────────────────
+# The 13 posts migrated from the WordPress-era GoDaddy site (July 2017 to 31 Jan
+# 2021) carry their ORIGINAL photographs, restored to the exact positions they
+# hold on the current live site: the post's featured image as the hero, and every
+# in-body photo inline where the author placed it. The images were recovered from
+# the live pages' embedded Draft.js content (WordPress-hosted originals, largest
+# rendition), re-encoded to WebP (heroes <=1200px, inline <=880px, quality-tuned)
+# and shipped under assets/img/blog/ on their OWN budget line (gate 9b), separate
+# from the site-wide image budget which is untouched. blog_images.json maps each
+# derivative -> {file, w, h, alt}; the md bodies reference inline photos with a
+# "{{fig:<name>}}" directive at the original position, so the author's words stay
+# byte-identical (freeze gate) and only the images are (re)inserted. The four
+# newer 2026 posts keep their WS-SITE18 hero picks (BLOG_HERO, below).
+BLOG_IMG_MANIFEST = os.path.join(HERE, "content", "blog_images.json")
+
+
+def _load_blog_images():
+    if os.path.exists(BLOG_IMG_MANIFEST):
+        with open(BLOG_IMG_MANIFEST, encoding="utf-8") as fh:
+            return json.load(fh)
+    return {}
+
+
+BLOG_IMAGES = _load_blog_images()
+
+
+def blog_img_tag(name, cls="", lazy=True, fetchpriority=None):
+    """One <img> for an original blog derivative (src assets/img/blog/<file>),
+    with intrinsic width/height (no CLS) and factual alt, both from the manifest."""
+    d = BLOG_IMAGES[name]
+    c = f' class="{cls}"' if cls else ""
+    loading = ' loading="lazy" decoding="async"' if lazy else ' decoding="async"'
+    fp = f' fetchpriority="{fetchpriority}"' if fetchpriority else ""
+    return (f'<img src="{IMG_BASE}/blog/{d["file"]}" alt="{esc(d["alt"])}"{c}'
+            f' width="{d["w"]}" height="{d["h"]}"{loading}{fp}>')
+
+
+def blog_figure(name):
+    """An inline blog photo rendered as a lazy-loaded <figure> (dimensions set so
+    the reflow-free space is reserved). Captions, where the original had one, are
+    the author's own bold lines already in the post body, so none is added here."""
+    return f'<figure class="blog-figure">{blog_img_tag(name, lazy=True)}</figure>'
+
 
 def _md_inline(text):
     """Inline Markdown -> HTML for a single logical line. Handles backslash
@@ -2429,6 +2472,11 @@ def _md_to_html(body):
         s = lines[i].strip()
         if not s:
             flush(); i += 1; continue
+        if s.startswith("{{fig:") and s.endswith("}}"):
+            # Inline original blog photo (WS-SITE24): a whole-line directive that
+            # renders a <figure> in place. Not text, so it leaves the frozen body
+            # text unchanged; a bad name fails the build loudly (KeyError).
+            flush(); out.append(blog_figure(s[6:-2].strip())); i += 1; continue
         if s.startswith("### "):
             flush(); out.append("<h3>" + _md_inline(s[4:].strip()) + "</h3>"); i += 1; continue
         if s.startswith("## "):
@@ -2522,11 +2570,25 @@ def blog_hero(slug):
     return BLOG_HERO.get(slug, BLOG_HERO_FALLBACK)
 
 
+def blog_hero_media(post, cls="media-bg", lazy=True, fetchpriority=None):
+    """Hero image for a post. The 13 migrated posts (2017-2021) carry their
+    ORIGINAL featured photograph via the front-matter `hero_blog` field; the four
+    newer posts fall back to their WS-SITE18 shared derivative (blog_hero)."""
+    hb = post.get("hero_blog")
+    if hb and hb in BLOG_IMAGES:
+        return blog_img_tag(hb, cls=cls, lazy=lazy, fetchpriority=fetchpriority)
+    # Fallback (the 4 newer 2026 posts): reproduce their WS-SITE18 shared hero
+    # byte-for-byte (index card carried fetchpriority="low"; the post hero none),
+    # so restoring the migrated posts leaves the newer posts untouched.
+    extra = ' fetchpriority="low"' if lazy else ""
+    return img(blog_hero(post["slug"]), cls=cls, lazy=lazy, extra=extra)
+
+
 def render_blog_index(posts):
     cards = []
     for p in posts:
         url = f'{BASE_PATH}/blog/f/{p["slug"]}/'
-        media = img(blog_hero(p["slug"]), extra=f' fetchpriority="low"')
+        media = blog_hero_media(p, cls="", lazy=True, fetchpriority="low")
         cards.append(
             f'<article class="blog-card">'
             f'<a class="blog-card-media" href="{url}" aria-hidden="true" tabindex="-1">{media}</a>'
@@ -2583,7 +2645,7 @@ def render_blog_post(p):
     <p class="blog-meta">By Tom Cooling &middot; <time datetime="{esc(p["date"])}">{esc(human_date(p["date"]))}</time></p>
   </div>
 </section>
-<div class="media-band blog-hero-media">{img(blog_hero(slug), cls="media-bg", lazy=False)}</div>
+<div class="media-band blog-hero-media">{blog_hero_media(p, cls="media-bg", lazy=False, fetchpriority="high")}</div>
 <section>
   <article class="wrap prose blog-prose">
     {p["body_html"]}
@@ -3199,6 +3261,23 @@ def run_gates(cat, written):
     if img_bytes > img_budget:
         errors.append(f"image weight {img_bytes/1024:.0f}KB exceeds 3.5MB budget")
 
+    # Gate 9b (WS-SITE24): original blog photography has its OWN budget line. The
+    # restored 2017-2021 photos ship under assets/img/blog/ and are counted here,
+    # separately, against a 6MB allowance. os.listdir on img_dir above is
+    # non-recursive, so these never touch the 3.5MB site-wide budget (gate 9). No
+    # silent raise: this line is the documented ceiling for the full blog set.
+    blog_dir = os.path.join(img_dir, "blog")
+    blog_bytes = 0
+    blog_count = 0
+    if os.path.isdir(blog_dir):
+        for f in os.listdir(blog_dir):
+            if f.lower().endswith((".jpg", ".jpeg", ".png", ".webp")):
+                blog_bytes += os.path.getsize(os.path.join(blog_dir, f))
+                blog_count += 1
+    blog_budget = 6 * 1024 * 1024
+    if blog_bytes > blog_budget:
+        errors.append(f"blog image weight {blog_bytes/1024:.0f}KB exceeds 6MB budget")
+
     if errors:
         print("BUILD GATES FAILED:")
         for e in errors:
@@ -3211,6 +3290,7 @@ def run_gates(cat, written):
     print(f"  - internal links resolve; {n_cards} cards == {n_live} live SKUs; {n_detail} detail pages")
     print(f"  - female performance page: lead line + FAQPage schema + 4 plan links")
     print(f"  - {img_count} images shipped, {img_bytes/1024:.0f}KB total (budget 3584KB); no fabricated ratings")
+    print(f"  - {blog_count} original blog photos, {blog_bytes/1024:.0f}KB total (separate budget 6144KB)")
     print(f"  - zero 'domestiq' occurrences across all generated output")
     print(f"  - zero client surnames across all generated output (first name + initial policy)")
     ld_total = sum(len(re.findall(r'application/ld\+json', v)) for v in html_pages.values())

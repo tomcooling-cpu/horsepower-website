@@ -4,6 +4,7 @@ slug: how-to-improve-your-triathlon-swim
 date: 2021-02-02
 datetime: 2021-02-02T08:14:24.330Z
 description: "The Black Magic of Swimming"
+hero_blog: how-to-improve-your-triathlon-swim__hero
 ---
 
 ### The Black Magic of Swimming
@@ -26,6 +27,8 @@ So, water is everywhere, we're made of it, we need it to survive... we need to s
 
 There are several forces at work as you try to swim, some you are in control of and others not. For the purposes of this we're going to work on the assumption that you're floating (**yes your legs might sink - covered later**) but you're at the top of the water column and not stuck on the bottom of the pool.
 
+{{fig:how-to-improve-your-triathlon-swim__1}}
+
 So the two we're interested in are **thrust force** (your kick and pull) and the **drag force** (how hydrodynamic (read: slippery) you are).
 
 This is the key...different things moving through the water experience different drag coefficients: a rough brick would experience more drag than a smooth sphere for example or a human wearing baggy shorts would experience more drag than one wearing swim trunks. Even if you don the most slippery swimsuit on the market, you're still going to need to use 80% of your energy just to get through the wet stuff. Ever walked across the shallow end of a pool? How hard does that feel?
@@ -33,6 +36,8 @@ This is the key...different things moving through the water experience different
 The amount of drag you experience, in a similar way to cycling aerodynamics is down to frontal area - viewed head on, the amount of you trying to break a path through the water. Minimising this frontal area is fundamental to improving your swim efficiency.
 
 The way I explain this to my coached athletes is to imagine they are a bullet punching through a piece of paper (the paper being the water). The size of the bullet hole created in the paper is usually dictated by the size of their hips and shoulders because you cant make them smaller. The idea is to make everything else (arms, legs and head) fit through that hole.
+
+{{fig:how-to-improve-your-triathlon-swim__2}}
 
 Now if you imagine every time you're moving through the water you need to fit everything through that hole to maintain your minimum frontal area, when your legs and hips sink a bit you need to break a bit more paper and create a bigger hole, that's more drag... maybe as much as 20-40% more drag.
 
@@ -64,6 +69,10 @@ As a rule, if you try and exhale and inhale when you turn your head to breathe y
 
 That sounds obvious but its the first step in the process. What we're looking for is for you to develop an appreciation of what streamlined feels like so you can identify when you're doing it wrong.
 
+{{fig:how-to-improve-your-triathlon-swim__3}}
+
+{{fig:how-to-improve-your-triathlon-swim__4}}
+
 The key for this is channelling that tip toe body tension you practiced in point one into the pool. You want to be pushing off the wall and gliding as far as you can without kicking or moving into a full stroke. Feel the water moving across your back and shoulders, focus on how that changes when you're gliding through it quickly and when you eventually slow down. Keep practicing that trying to glide further and further and further. The key isn't pushing of the wall harder, its about making your body as slippery and as long as possible.
 
 **4 - Hips Don't Lie**
@@ -92,6 +101,8 @@ Try and breathe in every three rotations so you end up with a nice balanced bila
 
 **\*Check Yourself\* - Its not a bad time to work back through the points you have already covered. At this point we haven't added the biggest disruptor to your hydrodynamic drag so providing you can kick, rotate and breathe without impacting on your streamlined shape, you're doing well. A good way of checking this is you should be covering much more distance now you're kicking than at the start. It should also feel pretty relaxed and easy. You should be able to feel the water and might be enjoying the experience.**
 
+{{fig:how-to-improve-your-triathlon-swim__5}}
+
 **7 - Arms, Elbows & Polar Bears**
 
 Ok now hopefully you have a long, slender, tense torpedo like body and have mastered rotating from the hips while you're gliding (and exhaling) and now you can also breathe bilaterally. Now you need to introduce your arms into it. This is the bit that usually messes up that perfect streamline.
@@ -106,13 +117,19 @@ There are two points to an effective propulsive arm movement:
 
 **Wide Arms - **One of the biggest issues swimmers suffer from is hand crossover by swimming with too narrow a hand entry. This absolutely robs you of propulsive power because it stops you recruiting your lats to drive you forward.
 
+{{fig:how-to-improve-your-triathlon-swim__6}}
+
 The red line is your centre line, this is your axis of rotation and a line you must not let your hands cross. If you exaggerate swimming with a slightly wider than you think you need hand entry, you will probably come out with the perfect entry (obviously don't go too crazy). Moving your hand along its yellow line is its most efficient path to generating force.
 
 **High Elbows - **Now this is commonly confused with the shape of your arm on the recovery part of your freestlye stroke (the bit that happens when your arm moves back from your side to the front of your stroke). Within reason, what happens above the water is pretty immaterial. You might have a beautiful looking stroke above the water but that wont make you fast through it.
 
 What high elbow actually refers to is what's happening at the front of your stroke.
 
+{{fig:how-to-improve-your-triathlon-swim__7}}
+
 You need to concentrate on when your hand enters the water (wider than your shoulder) that your hand cuts deep into the water, that will naturally drive it lower in the water column as your momentum pushes you over your arm. If you don't observe the high wrist, high elbow rule you will end up overgliding and your fingers will glide up to the surface. When you do this you're effectively giving the water a big high 5.... something which is tantamount to a handbrake.
+
+{{fig:how-to-improve-your-triathlon-swim__8}}
 
 The last element that is important to the propulsive part of your swim stroke is you actually pushing the water behind you to drive you forwards.
 
@@ -124,7 +141,11 @@ This may seem like a lack of emphasis on propulsion but usually, when you sort o
 
 **Finis Axis Pull Buoy **- Now this isn't any pull buoy (no this isn't a sponsored plug), its actually a genuinely great bit of kit that completely supports the hip drive freestyle stroke. You could effectively recreate it with a pull buoy between your calfs and a rubber band but I've used this extensively and can totally vouch for its effectiveness.
 
+{{fig:how-to-improve-your-triathlon-swim__9}}
+
 **Tempo Trainer - **I'll cover more on this in the last point.
+
+{{fig:how-to-improve-your-triathlon-swim__10}}
 
 **8 - Cadence **
 
@@ -151,3 +172,5 @@ Pretty early on in my swim journey I turned up at the University of Bristol swim
 The words in my blog aren't his, they are my logical take on how to swim faster but he needs mentioning because not only was he a friend, he inspired me to look further into swimming faster and supported me as an athlete in the pool. Its fair to say the way he coached swimming had a massive impact on the way I coach and approach athlete development.
 
 It truly was an honour to have shared a lane with him!
+
+{{fig:how-to-improve-your-triathlon-swim__12}}
