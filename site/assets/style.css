@@ -977,3 +977,159 @@ html.js .blog-card:not(.in) .blog-card-media img { transform: scale(1.045); }
   html.js .feature-media img, html.js .photo-fig img,
   html.js .honour-media img, html.js .blog-card-media img { transform: none !important; }
 }
+
+/* ============================================================================
+   WS-SITE21 EDITORIAL PASS. Presentation only (plus the sanctioned copy changes
+   handled in build.py). Implements the ranked design crit: distilled tier cards,
+   race-plan artefact, unified figures, aligned honours, orphan fixes, stronger
+   bands, contact warmth, pull-quote reviews.
+   ========================================================================== */
+
+/* ---- (2) HOME tier cards: distilled, equal height, one-line price ---- */
+.tier-grid--distilled { align-items: stretch; }
+.tier-card .price { white-space: nowrap; }
+.price-qual {
+  font-family: 'Oswald', sans-serif; text-transform: uppercase;
+  font-size: 0.5em; font-weight: 600; letter-spacing: 0.06em; color: var(--grey-mid);
+}
+.tier-card--tom .price-qual { color: var(--gold-dark); }
+.tier-verdict {
+  font-family: 'Oswald', sans-serif; font-weight: 500;
+  font-size: 1.08rem; line-height: 1.32; color: var(--black) !important;
+  margin: 2px 0 16px;
+}
+.tier-benefits { list-style: none; padding: 0; margin: 0 0 24px; display: flex;
+  flex-direction: column; gap: 10px; }
+.tier-benefits li { position: relative; padding-left: 26px; font-size: 0.95rem;
+  line-height: 1.42; color: var(--grey-dark); }
+.tier-benefits li::before { content: "\2713"; position: absolute; left: 0; top: 0;
+  font-weight: 700; color: var(--teal-dark); }
+.tier-card--store .tier-benefits li::before { color: var(--grey-mid); }
+.tier-card--tom .tier-benefits li::before { color: var(--gold-dark); }
+.tier-card .btn { margin-top: auto; }
+
+/* ---- (7b) HOME "153 plans" stat band: a big number beside the copy ---- */
+.plans-stat-grid { display: grid; gap: 34px; grid-template-columns: 1fr; align-items: center; }
+@media (min-width: 820px) { .plans-stat-grid { grid-template-columns: 0.75fr 1.25fr; } }
+.plans-stat-figure { display: flex; flex-direction: column; align-items: flex-start;
+  line-height: 0.86; }
+.plans-stat-num::before {
+  content: attr(data-total); display: block;
+  font-family: 'Oswald', sans-serif; font-weight: 700;
+  font-size: clamp(5.5rem, 4rem + 12vw, 11rem); letter-spacing: -0.03em;
+  color: var(--teal);
+}
+.plans-stat-num::after {
+  content: "plans, one per race"; display: block; max-width: 8ch;
+  font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 0.1em;
+  font-size: 0.92rem; color: var(--grey-mid); margin-top: 10px; line-height: 1.25;
+}
+@media (max-width: 819px) { .plans-stat-num::after { max-width: none; } }
+
+/* ---- (4) Unify FIGURE language: framed editorial figures everywhere ---- */
+.feature-media { border: 1px solid var(--rule); background: var(--white); }
+
+/* ---- (5) Female honours: top 3 visible, the rest in a native <details> ---- */
+.honour-more { margin-top: 4px; }
+.honour-more summary {
+  list-style: none; cursor: pointer; display: inline-flex; align-items: center;
+  padding: 10px 0 2px; font-family: 'Oswald', sans-serif; text-transform: uppercase;
+  letter-spacing: 0.05em; font-size: 0.78rem; color: var(--teal-soft);
+}
+.honour-more summary::-webkit-details-marker { display: none; }
+.honour-more summary::before { content: "+"; margin-right: 8px; font-size: 1rem;
+  line-height: 1; color: var(--teal-soft); }
+.honour-more[open] summary::before { content: "\2013"; }
+.honour-stats--more { margin-top: 2px; }
+.honour-stats--more li:first-child { border-top: 1px solid #262626; }
+
+/* ---- (6b) Female-first plan cards: 2x2, no orphan row (4-up only when wide) ---- */
+@media (min-width: 620px) { .card-grid--female2x2 { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 960px) { .card-grid--female2x2 { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1240px) { .card-grid--female2x2 { grid-template-columns: repeat(4, 1fr); } }
+
+/* ---- (6c) "Which one am I?" strip: carry the tier colours ---- */
+.which-item { border-left-width: 4px; padding: 14px 0 14px 20px; border-radius: 0 8px 8px 0; }
+.which-item--store { border-left-color: var(--grey-mid);
+  background: linear-gradient(90deg, rgba(107,107,107,0.07), transparent 62%); }
+.which-item--plan { border-left-color: var(--teal);
+  background: linear-gradient(90deg, rgba(13,148,136,0.09), transparent 62%); }
+.which-item--plan strong { color: var(--teal-dark); }
+.which-item--tom { border-left-color: var(--gold);
+  background: linear-gradient(90deg, rgba(184,132,26,0.11), transparent 62%); }
+.which-item--tom strong { color: var(--gold-dark); }
+
+/* ---- (7a) HOME teal results band: a designed pull-quote moment ---- */
+.results { padding: clamp(72px, 10vw, 118px) 0; }
+.results--image::after { background: rgba(13,148,136,0.82); }
+.results p { font-size: clamp(1.7rem, 1.05rem + 3.4vw, 3rem); font-weight: 500;
+  max-width: 19ch; letter-spacing: -0.01em; line-height: 1.18; }
+.results p.results-sub { font-size: clamp(1rem, 0.95rem + 0.4vw, 1.18rem);
+  max-width: 48ch; opacity: 0.94; }
+
+/* ---- (3) Race-plan snapshot: framed artefact, intro above, SVG full-width ---- */
+.raceplan-showcase { margin-top: 10px; }
+.raceplan-intro { max-width: 74ch; margin: 0 0 32px; }
+.raceplan--artefact { max-width: 1040px; margin: 0 auto; padding: clamp(14px, 2.4vw, 26px);
+  background: var(--white); border: 1px solid var(--rule); border-radius: 16px;
+  box-shadow: 0 26px 64px rgba(15,15,15,0.15); }
+.raceplan--artefact .raceplan-svg { box-shadow: none; }
+.raceplan--artefact figcaption { max-width: 84ch; margin: 16px auto 4px; text-align: center; }
+
+/* ---- (6a) Coaching "Why places are limited": full-width gold band ---- */
+.limited-band { background: var(--gold-soft); border-top: 4px solid var(--gold);
+  border-bottom: 1px solid var(--gold); }
+.limited-band h2 { color: var(--gold-dark); }
+.limited-band p { color: #4a3810; max-width: 60ch; }
+.limited-band-inner { display: grid; gap: 30px; grid-template-columns: 1fr; align-items: center; }
+@media (min-width: 820px) { .limited-band-inner { grid-template-columns: 0.7fr 1.3fr; } }
+.limited-band-figure { display: flex; flex-direction: column; align-items: flex-start;
+  line-height: 0.82; }
+.limited-band-figure::before { content: "15"; font-family: 'Oswald', sans-serif;
+  font-weight: 700; font-size: clamp(5.5rem, 4rem + 13vw, 10.5rem); letter-spacing: -0.03em;
+  color: var(--gold); }
+.limited-band-figure::after { content: "places only"; font-family: 'Oswald', sans-serif;
+  text-transform: uppercase; letter-spacing: 0.12em; font-size: 0.92rem; color: var(--gold-dark);
+  margin-top: 8px; }
+@media (max-width: 819px) { .limited-band-figure { align-items: center; text-align: center; } }
+
+/* ---- (8) Contact: warm portrait + a proper form panel ---- */
+.contact-portrait { margin-bottom: 24px; }
+.contact-portrait img { aspect-ratio: 3 / 2; }
+.contact-panel { background: var(--white); border: 1px solid var(--rule);
+  border-radius: 16px; padding: clamp(22px, 3vw, 34px); box-shadow: 0 18px 44px rgba(15,15,15,0.08); }
+.contact-panel h2 { margin-top: 0; }
+.contact-form input, .contact-form textarea { border: 1px solid var(--grey-light);
+  border-radius: 9px; transition: border-color var(--dur-fast) var(--ease),
+  box-shadow var(--dur-fast) var(--ease); }
+.contact-form input:focus, .contact-form textarea:focus { outline: none;
+  border-color: var(--teal); box-shadow: 0 0 0 3px rgba(13,148,136,0.16); }
+.contact-form .btn { margin-top: 4px; }
+
+/* ---- (9) Pull-quote review treatment (home / coaching / coached / female) ---- */
+.review-slide { position: relative; overflow: hidden; padding: 40px 40px 34px; }
+.review-slide::before {
+  content: "\201C"; position: absolute; top: -8px; right: 20px;
+  font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 7rem; line-height: 1;
+  color: rgba(13,148,136,0.13); pointer-events: none;
+}
+.review-slide blockquote { font-size: clamp(1.28rem, 1rem + 1.5vw, 1.85rem);
+  line-height: 1.34; position: relative; z-index: 1; }
+.review-slide:not(.result-slide) blockquote::before {
+  content: "\2605\2605\2605\2605\2605"; display: block;
+  font-family: 'JetBrains Mono', monospace; color: var(--gold);
+  font-size: 0.95rem; letter-spacing: 0.3em; margin: 0 0 16px; text-shadow: none;
+}
+.review-slide blockquote::after { content: none; }
+.review-slide figcaption { font-family: 'JetBrains Mono', monospace;
+  text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.76rem;
+  color: var(--teal-dark); margin-top: 20px; }
+.review-slide figcaption span { font-family: 'Source Sans 3', sans-serif;
+  text-transform: none; letter-spacing: 0.01em; color: var(--grey-mid); }
+
+/* (1) A lone genuine review reads as a featured, centred pull-quote. */
+.carousel.is-single .review-slide { max-width: 760px; margin: 0 auto; text-align: center;
+  padding: 44px 46px 38px; }
+.carousel.is-single .review-slide::before { right: 50%; transform: translateX(50%); top: -14px; }
+@media (max-width: 640px) { .review-slide { padding: 30px 24px 26px; }
+  .carousel.is-single .review-slide { padding: 32px 24px 28px; } }
