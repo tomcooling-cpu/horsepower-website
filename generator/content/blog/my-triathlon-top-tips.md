@@ -4,6 +4,7 @@ slug: my-triathlon-top-tips
 date: 2021-01-25
 datetime: 2021-01-25T20:49:38.946Z
 description: "So since Covid-19 is trying to derail any hopes of a long race season in 2021, I thought it was worth sharing a few of my top 10 triathlon mistakes to make sure you hit the ground running when you can toe the start line."
+hero_blog: my-triathlon-top-tips__hero
 ---
 
 So since Covid-19 is trying to derail any hopes of a long race season in 2021, I thought it was worth sharing a few of my top 10 triathlon mistakes to make sure you hit the ground running when you can toe the start line.
@@ -19,6 +20,8 @@ It's probably fair to say you could rock up at a triathlon with no prep and just
 - One of the best ways to learn more about triathlon is to join a club, there you can share knowledge with other athletes. You can use the [club search tool on British Triathlon to find one](https://www.britishtriathlon.org/clubs/search).
 - Get a Training Plan - Understanding the kind of training, the quantity of training and the intensity of that training isn't easy. It sounds obvious, but speaking from my own training/coaching experience, most people will avoid the training they find difficult and revert to the stuff they like or that makes them feel good. Annoyingly the things they find hard are usually the ones that will make them better. Getting a plan will help you understand what an effective plan should look like, but that is only a 2 dimensional image. Read on to find out how to go 3D.
 - There are plenty of athletes who have reached great success being self coached, but get a good coach and they can help make your triathlon journey much more enjoyable by guiding you through the pitfalls of multisport. Part of the benefit of getting a coach is to have someone understand you and design a training plan around your life and target event. Getting that specificity and volume right can make all the difference in success or failure. But for me the main benefit of being coached is being accountable to someone and having someone look at your training and progress objectively. This is something that's almost impossible to do for yourself and is the reason although I'm a coach, I'm being coached for my main event in 2021. [You can get in touch with any triathlon training or preparation questions here.](https://horsepowercoaching.co.uk/contact-us) Hot Tip - Either enter a warm up race or if you can't, arrange a mini event where you trial all of the kit, equipment and nutrition you aim to use on race day.
+
+{{fig:my-triathlon-top-tips__2}}
 
 ### **Tip #2 - Don't be a Magpie**
 
@@ -54,6 +57,8 @@ One thing I think most coaches miss, is understanding that to get the best out o
 
 So this tip is about listening to yourself and recognising when you need to back off in order to go forward stronger.
 
+{{fig:my-triathlon-top-tips__3}}
+
 **Tip #4 Don't Follow the Herd**
 
 This one links to the above point about being hungry. Its all too easy to see what everyone else is doing and try to do the same. This might be because you don't want to get left behind or doubt your own direction. What I'm telling you is you are most likely different and might need something different in order for you to succeed. Have courage to strike out on your own.
@@ -68,9 +73,13 @@ My coach at the time thought it wouldn't work as did many other athletes who clo
 
 [More than happy for anyone to get in touch to talk through 1x and its application for triathlon racing. ](https://horsepowercoaching.co.uk/contact-us)
 
+{{fig:my-triathlon-top-tips__5}}
+
 ### **2. Training & Intensity**
 
 Now Covid has stranded most of us in our homes so training has largely migrated into the virtual world. Now I LOVE Zwift, Rouvy and anything that breaks the boredom of turbo time and gives you an opportunity to scratch that competitive itch but I think it might actually turn out to be a thorn in many budding triathletes side.
+
+{{fig:my-triathlon-top-tips__7}}
 
 In the last few months I've seen a massive momentum toward racing regularly on Zwift, this is something that should be celebrated but also treated with caution. Being part of a team and racing community is a great way of beating Covid lockdown blues and something I thoroughly enjoyed in the summer, but it also might be the fast lane to overtraining.
 
@@ -92,6 +101,8 @@ I certainly wasn't calm and problem solving on the fly... I carried on riding pa
 
 What I should have done is stopped at the first feed stop on the bike course. Accepted I'd lose a little bit of time grabbing enough nutrition to see me the whole way through the course instead of blindly riding on.
 
+{{fig:my-triathlon-top-tips__8}}
+
 That silly oversight cost me my dream finish. Something I'd rather avoid happening to any of you.
 
 The key with triathlon isn't necessarily being the fittest, sometimes it comes down to who can problem solve on the fly and keep going.
@@ -103,6 +114,8 @@ Be calm, keep thinking and just maybe you'll get the race result you want.
 My last tip is about being humble. When you're dealing with something as uncertain as multisport, being anything other than humble is a sure fire way to trip yourself up and look like a tit. I think there is a key transition for competitive triathletes when they stop thinking so much about everyone else who is racing on the day and turn up focussed on racing themselves.
 
 Everyone dreams of an age group or overall finish position, but the thing I've learned is there is always someone faster. You need to focus on the variables that are in your control and try to forget the ones out of your control. That is really the only way to consistently achieve a positive race outcome. That positive race outcome might equate to an age group or overall position, but don't make that your focus.
+
+{{fig:my-triathlon-top-tips__9}}
 
 The other thing about this sport is the sacrifice you have to make to get in shape to participate. There are always people around you supporting you on that journey, be it family or friends and its worth remembering them and how your journey might impact their lives.
 

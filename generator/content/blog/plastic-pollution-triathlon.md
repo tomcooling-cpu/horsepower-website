@@ -4,6 +4,7 @@ slug: plastic-pollution-triathlon
 date: 2021-01-25
 datetime: 2021-01-25T15:48:48.242Z
 description: "The knock at the door..."
+hero_blog: plastic-pollution-triathlon__hero
 ---
 
 **The knock at the door...**
@@ -24,9 +25,15 @@ That is without even taking into account the water bottles, coffee cups, food wr
 
 **The journey...**
 
+{{fig:plastic-pollution-triathlon__1}}
+
 **Dropped here...  **
 
+{{fig:plastic-pollution-triathlon__2}}
+
 **Confused for food here...   **
+
+{{fig:plastic-pollution-triathlon__3}}
 
 **Dies here.**
 
@@ -42,6 +49,8 @@ Plastic is great, it's strong, flexible and durable...but it can last for 450 ye
 
 Just consider this... by 2050 there will be more plastic in the sea than fish ([Ellen MacArthur Foundation](https://www.theguardian.com/business/2016/jan/19/more-plastic-than-fish-in-the-sea-by-2050-warns-ellen-macarthur)). What are you going to have for your high protein lunch then? A plastic bottle and quinoa?
 
+{{fig:plastic-pollution-triathlon__6}}
+
 *(Ellen MacArthur Foundation)*
 
 Triathletes spend countless hours training their bodies, eating clean and honing their performance so on race day they can go for the win or the PB of their dreams. Do we really think that eating food laced with plastic and chemicals a good foundation for our performance? All caused by us not being able to spend a few pounds on a keep cup for that coffee you need after a big session, or remembering to take a water bottle with you rather than buying a plastic one because you feel a bit dehydrated.
@@ -52,11 +61,19 @@ Laziness is the killer people. It just takes some thought, a little bit of time 
 
 So over last winter I was lucky enough to travel to Indonesia and West Papua to learn to scuba dive and assist with a marine conservation project.
 
+{{fig:plastic-pollution-triathlon__7}}
+
 Now this place place was like a dream, like something from one of those 10 places you need to go before you die. It has been dubbed THE epicentre for marine biodiversity and is one of the last places on earth you can see live coral.
+
+{{fig:plastic-pollution-triathlon__8}}
 
 I remember being at 29 meters deep at a dive site called [Blue Magic.](https://www.theguardian.com/global/the-coral-triangle/2018/apr/10/raja-ampat-survey-reveals-new-species-key-manta-ray-data) This dive site is in a deep channel located an hour boat ride from any form of civilisation. I was sat there watching a beautiful Oceanic Manta Ray cruise by and I turned around to see 3 plastic bags and a pink coat hanger. I just felt angry... angry that not everyone could see that something as trivial as accepting a plastic bag in a shop or a straw in a bar is ruining one of the true remaining wonders of the world.
 
 It wasn't just at depth that plastic was to be found. On every beach at every high tide another wave of plastic arrived. Straws, cups, flipflops, lighters, toothbrushes, rope, earbuds, bottles, bags... the list goes on...
+
+{{fig:plastic-pollution-triathlon__10}}
+
+{{fig:plastic-pollution-triathlon__11}}
 
 **This is what laziness causes!**
 
@@ -79,6 +96,10 @@ So I'm already heavily invested in going low plastic but there are a few areas t
 At the start of the blog I mentioned energy gels. For me this is my go to source of energy for Ironman racing. I usually buy packs of gels then work out how many I need for the race, empty them into my drinks bottles and water down. This leaves me with sometimes 20 plastic gel packets that cant be recycled.
 
 So I know I need 415g of carbohydrate for my 5 hour 30 minute bike split at Ironman Wales. At the moment this comes in the form of 16 gels but after much researching I've found that a 3:1 ratio combination of Honey (82g carbs per 100ml) and Blackstrap Molasses (74g carbs per 100ml) would give me everything I need.
+
+{{fig:plastic-pollution-triathlon__13}}
+
+{{fig:plastic-pollution-triathlon__14}}
 
 The recipe for each of my 750ml water bottles looks like this;
 

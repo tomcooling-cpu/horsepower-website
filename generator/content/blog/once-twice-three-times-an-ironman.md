@@ -4,6 +4,7 @@ slug: once-twice-three-times-an-ironman
 date: 2021-01-25
 datetime: 2021-01-25T15:40:22.834Z
 description: "It's 4 days since Ironman Wales and the whole weekend is beginning to sink in."
+hero_blog: once-twice-three-times-an-ironman__hero
 ---
 
 It's 4 days since Ironman Wales and the whole weekend is beginning to sink in.
@@ -22,7 +23,11 @@ So we headed down to Tenby on Saturday morning to get checked into our hotel and
 
 I'd managed to book me and the family into hotels on the Esplanade overlooking the finish line, a very good choice in terms of proximity to the transition area and a very short walk to your bed at the end of the race.
 
+{{fig:once-twice-three-times-an-ironman__0}}
+
 After a little mooch around Tenby showing my family where the good spectating spots were, race registration, bike check in and a go on the NormaTec Recovery boots at the Ironman expo I was ready for a pizza and bed and headed back to the Hotel for some downtime.
+
+{{fig:once-twice-three-times-an-ironman__1}}
 
 I slept very well and woke up calm and ready to go, ate my usual pre-race breakfast and headed to transition at 5 am to give the bike one last check over and load up my water bottles. I was pleasantly surprised that at this point in the morning the weather was calm and wind was low... I couldn't believe we had lucked out with a clear day... how wrong I way.
 
@@ -32,6 +37,8 @@ One of the best parts of competing in Ironman Wales is the national anthem befor
 
 I ran into the sea making sure I kept to the right of the archway so I had a bit of clear water. With my most recent 4km swim performance in mind I seeded myself in the 57 minute swim group hoping that I could hold my own. I focused on swimming a smooth and rhythmic stroke and the first lap passed without incident. I hit the Australian exit in 33 minutes and headed out for the second lap. This was a good few minutes behind where I wanted to be. Thinking about it I wonder if I was consciously swimming at an easier pace to avoid a panic attack as happened in Alpe d'Huez... who knows. Onto the second lap and the water had changed... yes it was still cold (around 17 degrees apparently) but had a great deal more swell. The swim out to the first buoy seemed to take forever, almost like I was swimming through treacle. I finally made it back to the beach and stopped the watch.... 1 hour 9 minutes?! What?!
 
+{{fig:once-twice-three-times-an-ironman__2}}
+
 I ran up the beach pulling off my wetsuit, I dealt with a quick flash of cramp in my left quad and jumped into my running shoes to head through town to T1...
 
 **Bike**
@@ -39,6 +46,8 @@ I ran up the beach pulling off my wetsuit, I dealt with a quick flash of cramp i
 As soon as I got out of T1 onto the bike course I was 100% pleased that I'd taken the time to stick on some arm warmers. The cold swim had sapped my body heat and with the constant wind hitting my body as I rode, the shivers began.
 
 The IM Wales bike course is tight, technical and hilly with a mix of smooth and rough road surfaces. It consists of two loops, one 70 miles and the second 40 miles. The first section of the big loop is fast and lets you build up a good average speed before hitting the technical sections that are to come... I say fast, but definitely not today! The wind was absolutely howling in from the Atlantic making everyone around me twitchy as hell. Every time I approached a gap in the hedge, our only shelter from the wind, I saw other riders swing wildly across the road. This made overtaking a very dangerous endeavour.
+
+{{fig:once-twice-three-times-an-ironman__3}}
 
 In addition to the twitchy riders, the road was narrow, twisty, and covered in fallen leaves. Danger bells were ringing on every descent. This highlighted a bit of a fear I've got with descending in anything other than bone dry conditions. A few years ago I had a nasty stack on some ice and since then, anytime I'm pressing on downhill I end up visualising the bike sliding out from underneath me... not ideal when you're trying to keep your head in the game.
 
@@ -50,21 +59,29 @@ https://www.instagram.com/p/BY58G42jKb8/?hl=en
 
 The one thing that really ground on me the entire route was the constant string of riders drafting. The motorbike marshals didn't seem to care as people hitched on for a free ride. My enemy on the bike was bib # 315... a fella wearing full Russian team kit who decided to hang onto the back of me for 105 miles before overtaking on the way back into Tenby with what I'm sure were very fresh legs. It was like a scene that Icarus doping/ cheating documentary.
 
+{{fig:once-twice-three-times-an-ironman__4}}
+
 I rolled back into Tenby with a 5 hour 55 minute bike split. .. a cool 30 minutes behind my desired target time. I knew I'd been holding back a lot to get around safely but looking down at my bike computer revealed my average power was only 213 watts and intensity factor down at 73%. Morale at this point was pretty low because I knew my hopes of a Kona spot were out of the window unless I turned into Haile Gebrselassie... pretty unlikely at this stage in an Ironman.
 
 **Run**
 
 Out onto the run course and my legs felt good... they bloody should have after riding the bike with an intensity factor 8% lower than my race plan.
 
+{{fig:once-twice-three-times-an-ironman__5}}
+
 My run load this year was pretty short and focused on speed work as I'd concentrated on 70.3 distance events all year so I knew I wasn't going to be breaking any records even with a gentle effort on the bike.
 
 Tip tapping out of Tenby heading up the climb for the first time I was doing the maths in my head.... 'so if I hold for a 3 hour 26 minute run split I could still make a 10 hour 45 minute finish...'. My legs still felt pretty good so I tried to stick to this plan and hold an average of 7 minutes 52/mile.
+
+{{fig:once-twice-three-times-an-ironman__6}}
 
 The first two laps ticked by smoothly and I collected a blue and green armband on my wrist. I knew the fatigue was going to come, I just didn't know when. My furthest run this year was the 13.2 mile run leg of the Brecon Titan half Ironman in June. I think I've averaged 15 miles a week since then so was in no way marathon fit.
 
 POW! The third time I hit the road climbing out of Tenby and my legs just said no. I stopped and had to take a seat at the side of the road munching on crisps and drinking flat coke. I couldn't stand the idea of anymore sugar so headed for the savoury stuff.
 
 I gave myself a bit of a mental kick up the arse and started running again when I remembered I could still make it home in under 11 hours if I could get my pace back up.
+
+{{fig:once-twice-three-times-an-ironman__7}}
 
 This pace chart tells the story; plain sailing until mile 14 when I was reduced to the crisp raid.
 

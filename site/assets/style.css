@@ -792,6 +792,12 @@ section { padding: 64px 0; }
   border-left: 3px solid var(--teal); color: var(--grey-dark); font-style: italic; }
 .blog-prose a { color: var(--teal-dark); text-decoration: underline; text-underline-offset: 2px; }
 .blog-prose img { max-width: 100%; height: auto; border-radius: 8px; }
+/* WS-SITE24: original in-body blog photographs. Centred, reader-width, with the
+   intrinsic width/height on the <img> reserving space (no layout shift). Portrait
+   shots are height-capped so a tall image never dominates the reading column. */
+.blog-figure { margin: 26px auto; text-align: center; }
+.blog-figure img { max-width: 100%; max-height: 78vh; width: auto; height: auto;
+  border-radius: 8px; display: inline-block; box-shadow: 0 2px 14px rgba(0,0,0,.12); }
 .blog-rule { border: none; border-top: 1px solid var(--rule); margin: 34px 0 20px; }
 .link-plain.on-dark { color: var(--teal-soft); }
 
