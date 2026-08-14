@@ -210,11 +210,23 @@ def esc(s) -> str:
     return html.escape(str(s), quote=True)
 
 
-def head(title, description, canonical, og_image_name=None, og_type="website", extra="") -> str:
+def head(title, description, canonical, og_image_name=None, og_type="website", extra="",
+         preload_img=None) -> str:
     name = og_image_name or DEFAULT_OG_IMAGE
     og_img = og_image_url(name)
     og_alt = IMG_ALT.get(name, SITE_NAME)
     w, h = IMG_DIMS.get(name, (1200, 800))
+    # WS-SITE20 craft pass: set the `js` class as early as possible so every
+    # reveal hidden-start state is gated behind it (content is fully visible with
+    # JS off or before this runs); preload the two critical self-hosted font
+    # weights (Oswald 600 headings, Source Sans 3 400 body) to kill FOUT; and,
+    # when given, preload this page's LCP hero image. Font/hero preloads are
+    # additive <link>s and are NOT part of the frozen head-metadata set.
+    hero_preload = ""
+    if preload_img:
+        hero_preload = (f'<link rel="preload" as="image" '
+                        f'href="{IMG_BASE}/{preload_img}.webp" '
+                        f'type="image/webp" fetchpriority="high">\n')
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -240,9 +252,10 @@ def head(title, description, canonical, og_image_name=None, og_type="website", e
 <meta name="twitter:image" content="{esc(og_img)}">
 <meta name="twitter:image:alt" content="{esc(og_alt)}">
 <meta name="theme-color" content="#0F0F0F">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="{BASE_PATH}/assets/style.css">
+<script>document.documentElement.classList.add('js');</script>
+<link rel="preload" as="font" type="font/woff2" href="{BASE_PATH}/assets/fonts/oswald-600.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="{BASE_PATH}/assets/fonts/sourcesans3-400.woff2" crossorigin>
+{hero_preload}<link rel="stylesheet" href="{BASE_PATH}/assets/style.css">
 {extra}</head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -332,13 +345,15 @@ def footer() -> str:
   </div>
 </footer>
 <script src="{BASE_PATH}/assets/carousel.js" defer></script>
+<script src="{BASE_PATH}/assets/reveal.js" defer></script>
 </body>
 </html>"""
 
 
 def page(active, title, description, canonical, body,
-         og_image_name=None, og_type="website", extra="") -> str:
-    return (head(title, description, canonical, og_image_name, og_type, extra)
+         og_image_name=None, og_type="website", extra="", preload_img=None) -> str:
+    return (head(title, description, canonical, og_image_name, og_type, extra,
+                 preload_img=preload_img)
             + header(active) + body + footer())
 
 
@@ -950,7 +965,8 @@ def render_home(cat) -> str:
             "Over 150 plans, plus coaching from £120 a month.")
     extra = ld_script([org_node(with_rating=True), website_node()])
     return page("home", "Horsepower Coaching | Training plans and coaching for your race",
-                desc, prod_url("/"), body, og_image_name="hero-alpine-mist", extra=extra)
+                desc, prod_url("/"), body, og_image_name="hero-alpine-mist", extra=extra,
+                preload_img="hero-alpine-mist")
 
 
 def _filter_options(plans, key):
@@ -1044,7 +1060,8 @@ def render_plans_index(cat) -> str:
         collection, service])
     return page("plans", f"Training Plan Library | {total} plans built for your race | Horsepower Coaching",
                 desc, prod_url("/plans/"), body,
-                og_image_name="plans-izoard-trio", extra=extra)
+                og_image_name="plans-izoard-trio", extra=extra,
+                preload_img="plans-izoard-trio")
 
 
 def render_plan_detail(cat, p) -> str:
@@ -1363,7 +1380,8 @@ def render_coaching(cat) -> str:
     extra = ld_script([
         breadcrumb_node([("Home", "/"), ("Coached by Tom", None)]), svc])
     return page("coaching", "Coached by Tom | £185 a month | Horsepower Coaching", desc,
-                prod_url("/coaching/"), body, og_image_name="coached-tom-dolomites-arch", extra=extra)
+                prod_url("/coaching/"), body, og_image_name="coached-tom-dolomites-arch", extra=extra,
+                preload_img="coached-tom-dolomites-arch")
 
 
 def render_about(cat) -> str:
@@ -1682,7 +1700,8 @@ def render_female(cat) -> str:
     return page("female",
                 "Female Performance Coaching | Female-Specific Triathlon, Cycling and Running Training | Horsepower Coaching",
                 desc, prod_url("/female-performance/"), body,
-                og_image_name="female-hero", extra=extra)
+                og_image_name="female-hero", extra=extra,
+                preload_img="female-hero")
 
 
 # ── Banner option previews (hidden /options/ page) ───────────────────────────
@@ -1941,7 +1960,7 @@ def render_sport_landing(*, slug, h1, eyebrow, hero_img, og_name, title, desc,
     extra = ld_script([
         breadcrumb_node([("Home", "/"), (h1, None)]), svc, org_node(with_rating=False)])
     return page("", title, desc, prod_url(f"/{slug}/"), body,
-                og_image_name=og_name, extra=extra)
+                og_image_name=og_name, extra=extra, preload_img=hero_img)
 
 
 def render_triathlon_coaching(cat) -> str:
@@ -2365,8 +2384,24 @@ def build():
     write("_redirects", "\n".join(redirects), written)
 
     run_gates(cat, written)
+    freeze_check()
     print("Built %d pages into %s" % (len(written), SITE))
     return cat, written
+
+
+def freeze_check():
+    """WS-SITE20 freeze gate: the craft pass must not change any page's frozen
+    <head> metadata, visible body text, or the shipped URL set. Runs the committed
+    snapshot against the just-written site/ (base-path independent, so it holds in
+    both build modes). If the snapshot is absent (pre-WS-SITE20 tree) it is skipped
+    with a warning rather than failing an otherwise-valid build."""
+    import freeze_gate
+    if not os.path.exists(freeze_gate.SNAPSHOT):
+        print("Freeze gate: no snapshot committed yet, skipped "
+              "(run 'python3 generator/freeze_gate.py snapshot').")
+        return
+    if freeze_gate.verify(SITE) != 0:
+        raise SystemExit(1)
 
 
 def run_gates(cat, written):
