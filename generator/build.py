@@ -74,6 +74,28 @@ def prod_url(path: str = "") -> str:
     return PROD_ORIGIN + path
 
 
+# ── Unified JSON-LD @graph node @ids (WS-SITE22) ─────────────────────────────
+# The site used to repeat scattered per-page JSON-LD blocks with an inline copy
+# of the Organization / Person on every page and ZERO "@id" anywhere. WS-SITE22
+# restructures each page into ONE @graph carrying stable global identifiers, so
+# every page references the SAME Organization (#org), the SAME Person (#tom) and
+# the SAME WebSite (#website) by @id instead of duplicating them. Nothing is
+# fabricated: the node bodies keep exactly the fields they already had.
+ORG_ID = prod_url("/") + "#org"          # https://horsepowercoaching.co.uk/#org
+TOM_ID = prod_url("/") + "#tom"          # https://horsepowercoaching.co.uk/#tom
+WEBSITE_ID = prod_url("/") + "#website"  # https://horsepowercoaching.co.uk/#website
+
+
+def _tom_ref():
+    """A by-@id reference to the single #tom (Person) node."""
+    return {"@id": TOM_ID}
+
+
+def _org_ref():
+    """A by-@id reference to the single #org (Organization) node."""
+    return {"@id": ORG_ID}
+
+
 def og_image_url(name: str) -> str:
     """Absolute production URL for an image derivative used as an OG/Twitter card."""
     return f"{PROD_ORIGIN}/assets/img/{name}.webp"
@@ -409,15 +431,27 @@ def page(active, title, description, canonical, body,
 # Blocks are emitted verbatim as application/ld+json; a build gate parses every
 # block and asserts zero "domestiq".
 def ld_script(objs) -> str:
+    """One JSON-LD block per page: a single {"@context", "@graph":[...]} document
+    (WS-SITE22). Every node passed in becomes a top-level member of the shared
+    @graph; the @context is hoisted to the document root so each node drops its
+    own (semantically identical, one context for the whole graph). Page nodes
+    reference #org / #tom / #website by @id rather than carrying inline copies."""
     if isinstance(objs, dict):
         objs = [objs]
-    return "".join(
-        f'<script type="application/ld+json">{json.dumps(o)}</script>\n'
-        for o in objs)
+    graph = []
+    for o in objs:
+        node = dict(o)
+        node.pop("@context", None)
+        graph.append(node)
+    doc = {"@context": "https://schema.org", "@graph": graph}
+    return f'<script type="application/ld+json">{json.dumps(doc)}</script>\n'
 
 
 def _org_provider():
-    return {"@type": "Organization", "name": SITE_NAME, "url": prod_url("/")}
+    """A by-@id reference to the single #org node (WS-SITE22). Kept under its old
+    name so every existing provider / publisher / about call site now emits the
+    reference instead of an inline Organization copy."""
+    return {"@id": ORG_ID}
 
 
 def _area_served():
@@ -429,6 +463,7 @@ def org_node(with_rating=False):
     """Organization / LocalBusiness (SportsActivityLocation) for Horsepower."""
     node = {
         "@context": "https://schema.org",
+        "@id": ORG_ID,
         "@type": ["SportsActivityLocation", "LocalBusiness"],
         "name": SITE_NAME,
         "alternateName": "Horsepower Coaching | Triathlon, Cycling and Endurance Coaching",
@@ -438,7 +473,7 @@ def org_node(with_rating=False):
         "description": ("Triathlon, cycling and endurance coaching and training plans built "
                         "for your target race, with a particular emphasis on female-specific "
                         "performance. Based in Truro, Cornwall, UK; coaching athletes online worldwide."),
-        "founder": {"@type": "Person", "name": "Tom Cooling"},
+        "founder": _tom_ref(),
         # WS-SITE18: business now based in Truro, Cornwall. Clevedon (plus Cornwall and
         # the wider South West) is deliberately kept in areaServed so the long-standing
         # Clevedon search signal / Google listing is not lost.
@@ -464,14 +499,14 @@ def org_node(with_rating=False):
 
 
 def website_node():
-    return {"@context": "https://schema.org", "@type": "WebSite",
+    return {"@context": "https://schema.org", "@id": WEBSITE_ID, "@type": "WebSite",
             "name": SITE_NAME, "url": prod_url("/"),
             "inLanguage": "en-GB", "publisher": _org_provider()}
 
 
 def person_node():
     return {
-        "@context": "https://schema.org", "@type": "Person",
+        "@context": "https://schema.org", "@id": TOM_ID, "@type": "Person",
         "name": "Tom Cooling",
         "jobTitle": "Founder and Head Coach",
         "worksFor": _org_provider(),
@@ -742,44 +777,67 @@ REVIEW_COUNT = 15                           # verified Google Business profile
 CLIENT_RESULT_LINE = ("Coached athlete Madison S won Ironman Wales 2025, "
                       "and placed 10th at the Ironman World Championships in Nice 2024.")
 
-# Verified verbatim quotes from Tom's Google Business profile (5.0, 15 reviews).
-# Ian's real review runs on mid-sentence; per the spec it is closed at a natural
-# earlier point and never invented past it. Every string here must appear in
-# VERIFIED_QUOTES byte-exact (carousel-data gate).
-CLIENT_QUOTES = [
-    {"name": "Ian C", "context": "Cycling athlete", "pages": ["coached", "coaching"],
-     "quote": ("Tom is a great coach and has helped massively with my cycling, helping me "
-               "achieve results I wouldn't have thought possible previously.")},
-    {"name": "jc b", "context": "Ironman finisher, 11h13", "pages": ["coached", "coaching"],
-     "quote": ("I can't recommend Tom enough. Over the past year, the support, structure, "
-               "and guidance I received helped me progress massively and achieve my "
-               "Ironman goal, finishing in 11h13.")},
-    {"name": "Emma N", "context": "Multi-event athlete", "pages": ["female", "coaching"],
-     "quote": ("Really enjoyed being coached by Horsepower Coaching. Tom really knows his "
-               "stuff and is easy to talk to. If ever I had any questions, Tom was always "
-               "quick to answer & provided detailed race plans for my various events. "
-               "Would highly recommend.")},
-    {"name": "Google review", "context": "70.3 athlete", "pages": ["coaching"],
-     "quote": "The dream was to finish a 70.3 before turning 50 with a personal best."},
-    {"name": "Google review", "context": "", "pages": ["coaching"],
-     "quote": "The sessions are tough but always enjoyable I would highly recommend him"},
-]
+# Verified verbatim quotes now live in ONE source of truth,
+# generator/content/reviews/reviews.yaml (WS-SITE22). Tom drops a review
+# screenshot into generator/content/reviews/inbox/ (gitignored) and transcribes
+# it VERBATIM into reviews.yaml; CLIENT_QUOTES and VERIFIED_QUOTES are derived
+# from that file here, so a review that is not in reviews.yaml can never render
+# (carousel-data + rendered-quote gates). The 5 existing verified quotes were
+# migrated byte-for-byte, and the freeze gate proves the rendered output is
+# unchanged. Ian's real review runs on mid-sentence; it is transcribed closed at
+# a natural earlier point and never invented past it.
+REVIEWS_DIR = os.path.join(HERE, "content", "reviews")
+REVIEWS_PATH = os.path.join(REVIEWS_DIR, "reviews.yaml")
 
-# Canonical spec-verified quote strings; the carousel-data gate asserts every
-# CLIENT_QUOTES quote is one of these, byte-exact (no inventing or paraphrasing).
-VERIFIED_QUOTES = {
-    ("Tom is a great coach and has helped massively with my cycling, helping me "
-     "achieve results I wouldn't have thought possible previously."),
-    ("I can't recommend Tom enough. Over the past year, the support, structure, "
-     "and guidance I received helped me progress massively and achieve my "
-     "Ironman goal, finishing in 11h13."),
-    ("Really enjoyed being coached by Horsepower Coaching. Tom really knows his "
-     "stuff and is easy to talk to. If ever I had any questions, Tom was always "
-     "quick to answer & provided detailed race plans for my various events. "
-     "Would highly recommend."),
-    "The dream was to finish a 70.3 before turning 50 with a personal best.",
-    "The sessions are tough but always enjoyable I would highly recommend him",
-}
+
+def _load_reviews(path=REVIEWS_PATH):
+    """Parse reviews.yaml. Deliberately dependency-free (no PyYAML on the build
+    host): a small, strict subset - a list of "- key: value" records where string
+    values are JSON-quoted (so verbatim text with punctuation round-trips exactly)
+    and bare tokens (source, gender_tag, pages) are taken as-is. Comments (#) and
+    blank lines are ignored."""
+    records = []
+    cur = None
+    with open(path, encoding="utf-8") as fh:
+        for raw in fh:
+            stripped = raw.rstrip("\n").strip()
+            if not stripped or stripped.startswith("#"):
+                continue
+            if stripped == "-":
+                cur = {}
+                records.append(cur)
+                continue
+            if stripped.startswith("- "):
+                cur = {}
+                records.append(cur)
+                stripped = stripped[2:].strip()
+            if cur is None:
+                raise ValueError(f"reviews.yaml: key before first record: {stripped!r}")
+            key, sep, val = stripped.partition(":")
+            if not sep:
+                raise ValueError(f"reviews.yaml: expected 'key: value', got {stripped!r}")
+            val = val.strip()
+            cur[key.strip()] = json.loads(val) if val.startswith('"') else val
+    return records
+
+
+def _reviews_to_quotes(records):
+    """Rebuild the CLIENT_QUOTES shape from reviews.yaml records, preserving order
+    and every string byte-for-byte: name<-reviewer_display, context<-event_note,
+    quote<-text, pages<-the comma-separated routing list."""
+    quotes = []
+    for r in records:
+        pages = [p.strip() for p in r.get("pages", "").split(",") if p.strip()]
+        quotes.append({"name": r["reviewer_display"], "context": r.get("event_note", ""),
+                       "pages": pages, "quote": r["text"]})
+    return quotes
+
+
+REVIEWS = _load_reviews()
+CLIENT_QUOTES = _reviews_to_quotes(REVIEWS)
+# Every text in reviews.yaml is, by definition, a verified quote; nothing else may
+# render (the carousel-data gate + the rendered-quote gate both check membership).
+VERIFIED_QUOTES = {r["text"] for r in REVIEWS}
 
 # The Madison S result, rendered as a distinct slide in every carousel.
 MADDISON_SLIDE = {"kind": "result"}
@@ -1113,7 +1171,7 @@ def render_plan_detail(cat, p) -> str:
     ld = {
         "@context": "https://schema.org", "@type": "Product",
         "name": p["title"], "description": p["description"],
-        "brand": {"@type": "Brand", "name": "Horsepower Coaching"},
+        "brand": _org_ref(),
         "category": f'{p["sport"]} training plan',
         "url": canonical,
         "offers": {"@type": "Offer", "price": f'{p["price"]:.2f}', "priceCurrency": "GBP",
@@ -2275,7 +2333,7 @@ def render_blog_index(posts):
             {"@type": "BlogPosting", "headline": p["title"],
              "url": prod_url(f'/blog/f/{p["slug"]}/'),
              "datePublished": p.get("datetime") or p["date"],
-             "author": {"@type": "Person", "name": "Tom Cooling"}}
+             "author": _tom_ref()}
             for p in posts],
     }
     extra = ld_script([breadcrumb_node([("Home", "/"), ("Blog", None)]), blog_ld])
@@ -2318,9 +2376,8 @@ def render_blog_post(p):
         "url": canonical, "mainEntityOfPage": canonical,
         "datePublished": p.get("datetime") or p["date"],
         "dateModified": p.get("datetime") or p["date"],
-        "author": {"@type": "Person", "name": "Tom Cooling", "url": prod_url("/about/")},
-        "publisher": {"@type": "Organization", "name": SITE_NAME,
-                      "logo": {"@type": "ImageObject", "url": OG_LOGO}},
+        "author": _tom_ref(),
+        "publisher": _org_ref(),
         "image": og_image_url(DEFAULT_OG_IMAGE),
         "inLanguage": "en-GB",
     }
@@ -2328,6 +2385,93 @@ def render_blog_post(p):
     extra = ld_script([ld, crumbs])
     return page("blog", f'{p["title"]} | Horsepower Coaching', desc, canonical, body,
                 og_image_name=DEFAULT_OG_IMAGE, og_type="article", extra=extra)
+
+
+# ── llms.txt (WS-SITE22, AI-crawl pass) ──────────────────────────────────────
+# A plain-markdown machine-facing summary served at the site root (the llms.txt
+# convention), so answer engines and AI crawlers get the core facts, prices and
+# verified results from ONE authoritative place. Additive file, shipped like
+# robots.txt (NOT listed in the sitemap). Every fact is derived from the same
+# constants the site renders from - prices from the tier cards, the plan count
+# from the catalogue, results from the honours band - so nothing is hand-typed
+# out of sync, and the surname / domestiq / em-dash gates cover it like any other
+# output.
+# The ten key URLs advertised to crawlers, in the order the spec lists them.
+LLMS_KEY_PATHS = ["/", "/coaching/", "/coached/", "/plans/", "/female-performance/",
+                  "/triathlon-coaching/", "/cycling-coaching/", "/about/", "/blog/",
+                  "/contact/"]
+
+
+def _tier_price_amounts():
+    """The pound amount for each home tier card, unescaped exactly as the site
+    states it (["£39.99", "£120", "£185"]). Derived, never hand-typed."""
+    amounts = []
+    for c in HOME_TIER_CARDS:
+        m = re.search(r"£\d[\d.]*", html.unescape(c["price_main"]))
+        amounts.append(m.group(0) if m else "")
+    return amounts
+
+
+def render_llms_txt(cat) -> str:
+    total = cat["stats"]["total"]
+    store_amt, plan_amt, tom_amt = _tier_price_amounts()
+    names = [c["name"] for c in HOME_TIER_CARDS]   # Plan Store / Plan Only / Coached by Tom
+
+    lines = []
+    lines.append("# Horsepower Coaching")
+    lines.append("")
+    lines.append(
+        "Horsepower Coaching is world class multisport, cycling and endurance coaching by "
+        "Tom Cooling. It is based in Truro, Cornwall, UK, and coaches athletes across the UK "
+        "(including Clevedon and the South West) and online worldwide.")
+    lines.append("")
+    lines.append("## Coaching and plans")
+    lines.append("")
+    lines.append("Horsepower offers three tiers:")
+    lines.append("")
+    lines.append(
+        f"- {names[0]}: training plans from {store_amt}, one-off. {total} plans, each written "
+        "for a specific target race and goal and delivered through TrainingPeaks.")
+    lines.append(
+        f"- {names[1]}: {plan_amt} a month. A bespoke plan built for you block by block, with "
+        "block-by-block feedback. No calls.")
+    lines.append(
+        f"- {names[2]}: {tom_amt} a month. Full one to one coaching with weekly feedback. "
+        "15 places only.")
+    lines.append("")
+    lines.append("## Contact")
+    lines.append("")
+    lines.append("- WhatsApp: +44 7780 008724")
+    lines.append("- Instagram: @horsepower.coaching")
+    lines.append(f"- Contact page: {prod_url('/contact/')}")
+    lines.append("")
+    lines.append("## Verified athlete results")
+    lines.append("")
+    lines.append(
+        "Coached athletes and their verified results (names as first name plus surname "
+        "initial only):")
+    lines.append("")
+    for h in FEMALE_HONOURS:
+        lines.append(f"### {h['name']}")
+        for l in h["lines"]:
+            lines.append(f"- {l}")
+        lines.append("")
+    lines.append("## Not published / do not infer")
+    lines.append("")
+    lines.append(
+        "- Horsepower has no physical training venue open to the public.")
+    lines.append(
+        "- Coaching is delivered remotely, worldwide, through TrainingPeaks.")
+    lines.append(
+        "- Anything not stated on this page or the website is not published. Please do not "
+        "infer it.")
+    lines.append("")
+    lines.append("## Key URLs")
+    lines.append("")
+    for path in LLMS_KEY_PATHS:
+        lines.append(f"- {prod_url(path)}")
+    lines.append("")
+    return "\n".join(lines)
 
 
 # ── Write + gates ────────────────────────────────────────────────────────────
@@ -2417,6 +2561,10 @@ def build():
         rb += [f"User-agent: {bot}", "Allow: /", "Disallow: /options/", ""]
     rb += [f"Sitemap: {prod_url('/sitemap.xml')}", ""]
     write("robots.txt", "\n".join(rb), written)
+
+    # llms.txt (WS-SITE22): machine-facing summary at the site root. Additive,
+    # shipped like robots.txt and deliberately NOT added to the sitemap.
+    write("llms.txt", render_llms_txt(cat), written)
 
     # _redirects (Netlify, WS-SITE13): true 301s from the old GoDaddy URLs to
     # their new equivalents. Ships inside the publish dir (site/). Destinations
@@ -2573,6 +2721,20 @@ def run_gates(cat, written):
             if GOOGLE_REVIEW_URL not in content:
                 errors.append(f"carousel page missing Google review URL: {path}")
 
+    # Gate 8g (WS-SITE22): no invented reviews. Every quote actually RENDERED in a
+    # review slide must exist byte-exact in reviews.yaml (the single source). This
+    # is stronger than 8c (which only checks the CLIENT_QUOTES data): it reads the
+    # built HTML, so a quote that reached a page any other way is caught too. The
+    # Madison result slide (review-slide result-slide) is a palmares stat block,
+    # not a review, so it is deliberately excluded by the exact class match.
+    review_texts = {r["text"] for r in REVIEWS}
+    for path, content in html_pages.items():
+        for q in re.findall(r'<figure class="review-slide"><blockquote>(.*?)</blockquote>',
+                            content, re.S):
+            if html.unescape(q) not in review_texts:
+                errors.append(f"rendered review quote not in reviews.yaml ({path}): "
+                              f"{html.unescape(q)[:48]}...")
+
     # Gate 8d: the old wrong Madison S claim must never reappear (it was never
     # in Tom's authoritative palmares: not a 45-minute AG lead, not 9th overall).
     BANNED_CLAIMS = ["by 45 minutes", ">45min<", "9th overall against the professional"]
@@ -2668,6 +2830,53 @@ def run_gates(cat, written):
             if "domestiq" in json.dumps(obj).lower():
                 errors.append(f"'domestiq' in JSON-LD of {path}")
 
+    # Gate 10e (WS-SITE22): unified JSON-LD @graph. Each page carries exactly ONE
+    # ld+json block, shaped {"@context", "@graph":[...]}. Every Organization /
+    # Person node in the graph is the single canonical entity (@id #org / #tom):
+    # no page repeats an inline copy, and org/person are otherwise referenced by
+    # @id only. This is the proof for "one #org reference chain per page".
+    def _iter_nodes(o):
+        if isinstance(o, dict):
+            yield o
+            for v in o.values():
+                yield from _iter_nodes(v)
+        elif isinstance(o, list):
+            for v in o:
+                yield from _iter_nodes(v)
+
+    for path, content in html_pages.items():
+        blocks = re.findall(r'<script type="application/ld\+json">(.*?)</script>',
+                            content, re.S)
+        if len(blocks) != 1:
+            errors.append(f"{path} has {len(blocks)} JSON-LD blocks (WS-SITE22 wants exactly 1 @graph)")
+            continue
+        doc = json.loads(blocks[0])
+        if not (isinstance(doc, dict) and isinstance(doc.get("@graph"), list)):
+            errors.append(f"{path} JSON-LD is not a single @graph document")
+            continue
+        n_org = n_tom = 0
+        for node in _iter_nodes(doc["@graph"]):
+            types = node.get("@type")
+            types = types if isinstance(types, list) else [types]
+            if node.get("name") is None and node.get("@type") is None:
+                continue  # a bare {"@id": ...} reference is fine
+            if any(t in ("Organization", "SportsActivityLocation", "LocalBusiness") for t in types):
+                if node.get("@id") != ORG_ID:
+                    errors.append(f"{path}: inline/foreign Organization node in @graph "
+                                  f"(must be a single #org @id reference): {node.get('name')}")
+                else:
+                    n_org += 1
+            if "Person" in types:
+                if node.get("@id") != TOM_ID:
+                    errors.append(f"{path}: inline/foreign Person node in @graph "
+                                  f"(must be a single #tom @id reference): {node.get('name')}")
+                else:
+                    n_tom += 1
+        if n_org > 1:
+            errors.append(f"{path}: {n_org} #org node definitions in one @graph (want <=1)")
+        if n_tom > 1:
+            errors.append(f"{path}: {n_tom} #tom node definitions in one @graph (want <=1)")
+
     # Gate 11: robots.txt allows the major AI crawlers, disallows /options/,
     # and references the sitemap.
     robots = written.get("robots.txt", "")
@@ -2688,6 +2897,32 @@ def run_gates(cat, written):
         errors.append("sitemap.xml still references the github.io preview host")
     if "/options/" in smx:
         errors.append("sitemap.xml must not list /options/")
+
+    # Gate 14 (WS-SITE22): llms.txt shipped at the site root and correct. It must
+    # exist, lead with the H1, carry every tier price byte-for-byte as the site
+    # states it (derived from the same tier cards, so the two can never drift),
+    # advertise the ten key URLs, and include the "do not infer" boundary. The
+    # em-dash (gate 1), domestiq (gate 8b) and client-surname (gate 8f) gates
+    # already scan it as part of `written`.
+    llms = written.get("llms.txt", "")
+    if not llms:
+        errors.append("llms.txt missing from built output")
+    else:
+        if not llms.startswith("# Horsepower Coaching"):
+            errors.append("llms.txt does not open with the '# Horsepower Coaching' H1")
+        site_unescaped = html.unescape(all_html)
+        for amt in _tier_price_amounts():
+            if amt not in llms:
+                errors.append(f"llms.txt missing tier price {amt!r}")
+            elif amt not in site_unescaped:
+                errors.append(f"llms.txt price {amt!r} does not match a price on the site")
+        for path in LLMS_KEY_PATHS:
+            if prod_url(path) not in llms:
+                errors.append(f"llms.txt missing key URL {prod_url(path)}")
+        if "Not published / do not infer" not in llms:
+            errors.append("llms.txt missing the 'Not published / do not infer' section")
+        if "TrainingPeaks" not in llms:
+            errors.append("llms.txt missing the TrainingPeaks delivery fact")
 
     # Gate 13: the live Plans page banner serves the Tom-chosen Izoard trio image
     # (WS-SITE11b; previously plans-pyrenees-switchback).
