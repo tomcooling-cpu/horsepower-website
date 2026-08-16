@@ -1,0 +1,68 @@
+Campaign,Campaign Type,Campaign Status,Budget,Budget Type,Bid Strategy Type,Ad Group,Ad Group Status,Max CPC,Keyword,Criterion Type,Ad Type,Headline 1,Headline 2,Headline 3,Headline 4,Headline 5,Headline 6,Headline 7,Headline 8,Headline 9,Headline 10,Headline 11,Headline 12,Headline 13,Headline 14,Headline 15,Description 1,Description 2,Description 3,Description 4,Path 1,Path 2,Final URL,Status
+HP | Search | UK,Search,Paused,2.10,Daily,Manual CPC,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+HP | Search | UK,,,,,,Triathlon Coaching,Enabled,1.00,,,,,,,,,,,,,,,,,,,,,,,,,,
+HP | Search | UK,,,,,,Cycling Coaching,Enabled,1.00,,,,,,,,,,,,,,,,,,,,,,,,,,
+HP | Search | UK,,,,,,Training Plans,Enabled,0.60,,,,,,,,,,,,,,,,,,,,,,,,,,
+HP | Search | UK,,,,,,Female Performance,Paused,1.00,,,,,,,,,,,,,,,,,,,,,,,,,,
+HP | Search | UK,,,,,,Coached 1 to 1,Paused,1.20,,,,,,,,,,,,,,,,,,,,,,,,,,
+HP | Search | UK,,,,,,Triathlon Coaching,,,triathlon coaching,Exact,,,,,,,,,,,,,,,,,,,,,,,,Enabled
+HP | Search | UK,,,,,,Triathlon Coaching,,,triathlon coach,Exact,,,,,,,,,,,,,,,,,,,,,,,,Enabled
+HP | Search | UK,,,,,,Triathlon Coaching,,,online triathlon coaching,Exact,,,,,,,,,,,,,,,,,,,,,,,,Enabled
+HP | Search | UK,,,,,,Triathlon Coaching,,,online triathlon coach,Exact,,,,,,,,,,,,,,,,,,,,,,,,Enabled
+HP | Search | UK,,,,,,Triathlon Coaching,,,triathlon coaching uk,Phrase,,,,,,,,,,,,,,,,,,,,,,,,Enabled
+HP | Search | UK,,,,,,Triathlon Coaching,,,triathlon coaches,Phrase,,,,,,,,,,,,,,,,,,,,,,,,Enabled
+HP | Search | UK,,,,,,Triathlon Coaching,,,ironman coach,Phrase,,,,,,,,,,,,,,,,,,,,,,,,Enabled
+HP | Search | UK,,,,,,Triathlon Coaching,,,ironman coaching,Phrase,,,,,,,,,,,,,,,,,,,,,,,,Enabled
+HP | Search | UK,,,,,,Cycling Coaching,,,cycling coach,Exact,,,,,,,,,,,,,,,,,,,,,,,,Enabled
+HP | Search | UK,,,,,,Cycling Coaching,,,cycling coaching,Exact,,,,,,,,,,,,,,,,,,,,,,,,Enabled
+HP | Search | UK,,,,,,Cycling Coaching,,,online cycling coach,Exact,,,,,,,,,,,,,,,,,,,,,,,,Enabled
+HP | Search | UK,,,,,,Cycling Coaching,,,cycle coaching,Exact,,,,,,,,,,,,,,,,,,,,,,,,Enabled
+HP | Search | UK,,,,,,Cycling Coaching,,,cycling coach uk,Phrase,,,,,,,,,,,,,,,,,,,,,,,,Enabled
+HP | Search | UK,,,,,,Cycling Coaching,,,cycling coaching uk,Phrase,,,,,,,,,,,,,,,,,,,,,,,,Enabled
+HP | Search | UK,,,,,,Cycling Coaching,,,cycle coach,Phrase,,,,,,,,,,,,,,,,,,,,,,,,Enabled
+HP | Search | UK,,,,,,Cycling Coaching,,,online cycle coaching,Phrase,,,,,,,,,,,,,,,,,,,,,,,,Enabled
+HP | Search | UK,,,,,,Training Plans,,,triathlon training plan,Phrase,,,,,,,,,,,,,,,,,,,,,,,https://horsepowercoaching.co.uk/plans/,Enabled
+HP | Search | UK,,,,,,Training Plans,,,cycling training plan,Phrase,,,,,,,,,,,,,,,,,,,,,,,https://horsepowercoaching.co.uk/plans/,Enabled
+HP | Search | UK,,,,,,Training Plans,,,ironman training plan,Phrase,,,,,,,,,,,,,,,,,,,,,,,https://horsepowercoaching.co.uk/plans/,Enabled
+HP | Search | UK,,,,,,Training Plans,,,ironman 70.3 training plan,Phrase,,,,,,,,,,,,,,,,,,,,,,,https://horsepowercoaching.co.uk/plans/,Enabled
+HP | Search | UK,,,,,,Training Plans,,,ironman wales training plan,Exact,,,,,,,,,,,,,,,,,,,,,,,https://horsepowercoaching.co.uk/plans/ironman-wales-training-plan/,Enabled
+HP | Search | UK,,,,,,Training Plans,,,ridelondon training plan,Exact,,,,,,,,,,,,,,,,,,,,,,,https://horsepowercoaching.co.uk/plans/ridelondon-surrey-100-training-plan/,Enabled
+HP | Search | UK,,,,,,Training Plans,,,fred whitton training plan,Exact,,,,,,,,,,,,,,,,,,,,,,,https://horsepowercoaching.co.uk/plans/fred-whitton-challenge-training-plan/,Enabled
+HP | Search | UK,,,,,,Training Plans,,,london marathon training plan,Exact,,,,,,,,,,,,,,,,,,,,,,,https://horsepowercoaching.co.uk/plans/london-marathon-training-plan/,Enabled
+HP | Search | UK,,,,,,Training Plans,,,century ride training plan,Phrase,,,,,,,,,,,,,,,,,,,,,,,https://horsepowercoaching.co.uk/plans/,Enabled
+HP | Search | UK,,,,,,Training Plans,,,sportive training plan,Phrase,,,,,,,,,,,,,,,,,,,,,,,https://horsepowercoaching.co.uk/plans/,Enabled
+HP | Search | UK,,,,,,Female Performance,,,female triathlon coach,Phrase,,,,,,,,,,,,,,,,,,,,,,,,Enabled
+HP | Search | UK,,,,,,Female Performance,,,women's triathlon coach,Phrase,,,,,,,,,,,,,,,,,,,,,,,,Enabled
+HP | Search | UK,,,,,,Female Performance,,,female cycling coach,Phrase,,,,,,,,,,,,,,,,,,,,,,,,Enabled
+HP | Search | UK,,,,,,Female Performance,,,women's cycling coach,Phrase,,,,,,,,,,,,,,,,,,,,,,,,Enabled
+HP | Search | UK,,,,,,Female Performance,,,female specific training plan,Phrase,,,,,,,,,,,,,,,,,,,,,,,,Enabled
+HP | Search | UK,,,,,,Female Performance,,,menstrual cycle training plan,Exact,,,,,,,,,,,,,,,,,,,,,,,,Enabled
+HP | Search | UK,,,,,,Coached 1 to 1,,,121 triathlon coaching,Phrase,,,,,,,,,,,,,,,,,,,,,,,,Enabled
+HP | Search | UK,,,,,,Coached 1 to 1,,,one to one triathlon coaching,Phrase,,,,,,,,,,,,,,,,,,,,,,,,Enabled
+HP | Search | UK,,,,,,Coached 1 to 1,,,personal triathlon coach,Phrase,,,,,,,,,,,,,,,,,,,,,,,,Enabled
+HP | Search | UK,,,,,,Coached 1 to 1,,,121 cycling coaching,Phrase,,,,,,,,,,,,,,,,,,,,,,,,Enabled
+HP | Search | UK,,,,,,,,,how to swim faster,Campaign Negative Phrase,,,,,,,,,,,,,,,,,,,,,,,,Enabled
+HP | Search | UK,,,,,,,,,how to train for a triathlon,Campaign Negative Phrase,,,,,,,,,,,,,,,,,,,,,,,,Enabled
+HP | Search | UK,,,,,,,,,how to,Campaign Negative Phrase,,,,,,,,,,,,,,,,,,,,,,,,Enabled
+HP | Search | UK,,,,,,,,,free,Campaign Negative Phrase,,,,,,,,,,,,,,,,,,,,,,,,Enabled
+HP | Search | UK,,,,,,,,,jobs,Campaign Negative Phrase,,,,,,,,,,,,,,,,,,,,,,,,Enabled
+HP | Search | UK,,,,,,,,,salary,Campaign Negative Phrase,,,,,,,,,,,,,,,,,,,,,,,,Enabled
+HP | Search | UK,,,,,,,,,career,Campaign Negative Phrase,,,,,,,,,,,,,,,,,,,,,,,,Enabled
+HP | Search | UK,,,,,,,,,youtube,Campaign Negative Phrase,,,,,,,,,,,,,,,,,,,,,,,,Enabled
+HP | Search | UK,,,,,,,,,strava,Campaign Negative Phrase,,,,,,,,,,,,,,,,,,,,,,,,Enabled
+HP | Search | UK,,,,,,,,,zwift,Campaign Negative Phrase,,,,,,,,,,,,,,,,,,,,,,,,Enabled
+HP | Search | UK,,,,,,,,,garmin,Campaign Negative Phrase,,,,,,,,,,,,,,,,,,,,,,,,Enabled
+HP | Search | UK,,,,,,,,,app,Campaign Negative Phrase,,,,,,,,,,,,,,,,,,,,,,,,Enabled
+HP | Search | UK,,,,,,,,,plan free,Campaign Negative Phrase,,,,,,,,,,,,,,,,,,,,,,,,Enabled
+HP | Search | UK,,,,,,,,,pdf,Campaign Negative Phrase,,,,,,,,,,,,,,,,,,,,,,,,Enabled
+HP | Search | UK,,,,,,,,,reddit,Campaign Negative Phrase,,,,,,,,,,,,,,,,,,,,,,,,Enabled
+HP | Search | UK,,,,,,,,,forum,Campaign Negative Phrase,,,,,,,,,,,,,,,,,,,,,,,,Enabled
+HP | Search | UK,,,,,,,,,running coach,Campaign Negative Phrase,,,,,,,,,,,,,,,,,,,,,,,,Enabled
+HP | Search | UK,,,,,,,,,diy,Campaign Negative Phrase,,,,,,,,,,,,,,,,,,,,,,,,Enabled
+HP | Search | UK,,,,,,,,,template,Campaign Negative Phrase,,,,,,,,,,,,,,,,,,,,,,,,Enabled
+HP | Search | UK,,,,,,,,,ironman,Campaign Negative Exact,,,,,,,,,,,,,,,,,,,,,,,,Enabled
+HP | Search | UK,,,,,,Triathlon Coaching,,,,,Responsive search ad,Triathlon Coaching by Tom,Bespoke Triathlon Plans,Plan Only £120 a Month,Full Coaching £185 a Month,Ironman Wales Winners Coached,Coach Behind XTRI Podiums,Block by Block Feedback,Built Around Your Race,"UK Coach, Online Anywhere",Delivered via TrainingPeaks,5.0 Rated on Google,Ironman and 70.3 Coaching,Message Tom to Get Started,Enquire About Coaching,Get in Touch Today,Bespoke triathlon plans with block by block feedback. Plan Only is £120 a month.,From the coach behind multiple Ironman Wales champions and XTRI podium athletes.,"Delivered via TrainingPeaks. UK based, coached online. 5.0 rated on Google.",Message Tom with your race and goals and he will point you at the right option.,triathlon,coaching,https://horsepowercoaching.co.uk/triathlon-coaching/,Enabled
+HP | Search | UK,,,,,,Cycling Coaching,,,,,Responsive search ad,Cycling Coaching by Tom,Bespoke Cycling Plans,Plan Only £120 a Month,Full Coaching £185 a Month,Welsh 100 TT Champions,"Road, TT and Endurance",Block by Block Feedback,Built Around Your Events,"UK Coach, Online Anywhere",Delivered via TrainingPeaks,5.0 Rated on Google,"Coach Led, Not App Led",Message Tom to Get Started,Enquire About Coaching,Get in Touch Today,Bespoke cycling plans with block by block feedback. Plan Only is £120 a month.,"From the coach behind Welsh 100 TT champions. Road, time trial and endurance.","Delivered via TrainingPeaks. UK based, coached online. 5.0 rated on Google.",Message Tom with your event and goals and he will point you at the right option.,cycling,coaching,https://horsepowercoaching.co.uk/cycling-coaching/,Enabled
+HP | Search | UK,,,,,,Training Plans,,,,,Responsive search ad,Training Plans From £39.99,Race Specific Training Plans,Written for Named Races,"One-Off Price, No Contract",Delivered on TrainingPeaks,Ironman Wales Winners Coached,"Ironman, 70.3 and Marathon",Cycling and Sportive Plans,"Buy Once, Start This Week",From a 5.0 Rated Coach,No Subscription Needed,Built for the Actual Course,Plans for UK Races,Find Your Race Plan,"Coach Built, Not Generic","Training plans written for named races. From £39.99, one off, no subscription.",From the coach behind multiple Ironman Wales champions. TrainingPeaks delivery.,"Ironman, 70.3, marathon and cycling events. Find the plan for your race.","Buy once, load it into TrainingPeaks and start this week. Built by a real coach.",plans,race-specific,https://horsepowercoaching.co.uk/plans/,Enabled
+HP | Search | UK,,,,,,Female Performance,,,,,Responsive search ad,Female First Coaching,Not Female Adapted,Coaching Built for Women,Cycle Aware Training Plans,Women's Triathlon Coaching,Women's Cycling Coaching,Plan Only £120 a Month,Full Coaching £185 a Month,Ironman Wales Winners Coached,Block by Block Feedback,Delivered via TrainingPeaks,5.0 Rated on Google,"UK Coach, Online Anywhere",Message Tom to Get Started,Get in Touch Today,"Female first, not female adapted. Training built around your physiology from day one.","Most coaching defaults to male athletes. Ours does not. Bespoke plans, real feedback.",From the coach behind multiple Ironman Wales champions. Plan Only is £120 a month.,"Message Tom to talk through your training. UK based, coached online worldwide.",female-first,coaching,https://horsepowercoaching.co.uk/female-performance/,Enabled
+HP | Search | UK,,,,,,Coached 1 to 1,,,,,Responsive search ad,"Coached by Tom, £185 a Month",3 Places Open,1:1 Triathlon Coaching,1:1 Cycling Coaching,"Full 1:1 Coaching, 3 Places",Ironman Wales Winners Coached,Coach Behind XTRI Podiums,Weekly 1:1 Feedback,Built Around Your Race,Delivered via TrainingPeaks,5.0 Rated on Google,"UK Coach, Online Anywhere",Message Tom About a Place,Enquire About Coaching,Get in Touch Today,Full 1:1 coaching with Tom Cooling. £185 a month and only 3 places open right now.,From the coach behind multiple Ironman Wales champions and XTRI podium athletes.,"Weekly 1:1 feedback, TrainingPeaks delivery, training built around your race.","Message Tom to ask about one of the 3 open places. UK based, coached online.",coached,3-places,https://horsepowercoaching.co.uk/coached/,Enabled
