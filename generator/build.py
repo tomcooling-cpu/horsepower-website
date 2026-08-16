@@ -1369,12 +1369,20 @@ def render_plan_detail(cat, p) -> str:
         f'<details class="faq"{" open" if i == 0 else ""}><summary>{esc(q)}</summary>'
         f'<p>{esc(a)}</p></details>'
         for i, (q, a) in enumerate(faqs))
+    # Sport-appropriate imagery (Tom 2026-08-16: a cycling image must not front a
+    # running or triathlon plan). Used for BOTH the Product schema image and the
+    # social-share og:image below.
+    plan_img = {
+        "Cycling": "plans-pyrenees-switchback",   # a lone cyclist on a Pyrenean switchback
+        "Triathlon": "ironman-wales-finish",       # an athlete crossing an Ironman finish line
+        "Running": "hero-torridon-ridge",          # two runners crossing a Torridon ridge
+    }.get(p["sport"], "plans-pyrenees-switchback")
     ld = {
         "@context": "https://schema.org", "@type": "Product",
         "name": p["title"], "description": p["description"],
         # Merchant-listing eligibility (GSC 2026-08-16): explicit image + named brand;
         # a digital training plan has no shipping cost and is non-returnable.
-        "image": og_image_url("plans-pyrenees-switchback"),
+        "image": og_image_url(plan_img),
         "brand": {"@type": "Brand", "name": "Horsepower Coaching"},
         "category": f'{p["sport"]} training plan',
         "url": canonical,
@@ -1440,7 +1448,7 @@ def render_plan_detail(cat, p) -> str:
 </main>"""
     desc = (p["blurb"][:150]).rsplit(" ", 1)[0]
     return page("plans", fit_title(p['title']), desc, canonical, body,
-                og_image_name="plans-pyrenees-switchback", og_type="product", extra=extra)
+                og_image_name=plan_img, og_type="product", extra=extra)
 
 
 COACHED_FAQ = [
