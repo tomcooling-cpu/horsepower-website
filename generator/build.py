@@ -1372,11 +1372,21 @@ def render_plan_detail(cat, p) -> str:
     ld = {
         "@context": "https://schema.org", "@type": "Product",
         "name": p["title"], "description": p["description"],
-        "brand": _org_ref(),
+        # Merchant-listing eligibility (GSC 2026-08-16): explicit image + named brand;
+        # a digital training plan has no shipping cost and is non-returnable.
+        "image": og_image_url("plans-pyrenees-switchback"),
+        "brand": {"@type": "Brand", "name": "Horsepower Coaching"},
         "category": f'{p["sport"]} training plan',
         "url": canonical,
         "offers": {"@type": "Offer", "price": f'{p["price"]:.2f}', "priceCurrency": "GBP",
-                   "availability": "https://schema.org/InStock", "url": p["buy_url"]},
+                   "availability": "https://schema.org/InStock", "url": p["buy_url"],
+                   "hasMerchantReturnPolicy": {
+                       "@type": "MerchantReturnPolicy", "applicableCountry": "GB",
+                       "returnPolicyCategory": "https://schema.org/MerchantReturnNotPermitted"},
+                   "shippingDetails": {
+                       "@type": "OfferShippingDetails",
+                       "shippingRate": {"@type": "MonetaryAmount", "value": "0", "currency": "GBP"},
+                       "shippingDestination": {"@type": "DefinedRegion", "addressCountry": "GB"}}},
     }
     crumbs_ld = breadcrumb_node([("Home", "/"), ("Training Plans", "/plans/"),
                                  (p["title"], None)])
