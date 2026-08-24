@@ -650,7 +650,7 @@ IMG_ALT = {
     "coached-tenby-swim": "Swimmers in pink caps crossing Tenby harbour below pastel houses during the Ironman Wales swim",
     "female-wales-podium": "The women's podium celebration at Ironman Wales with champagne mid-spray",
     "female-montblanc-hike": "An athlete in a Horsepower cap hiking alpine switchbacks with the Mont Blanc massif in the distance",
-    "female-welsh-tt": "Hannah S in an aero tuck during the Welsh 100 mile time trial championships",
+    "female-welsh-tt": "Sophie R riding in an aero tuck on an open road",
     "plans-izoard-trio": "Three cyclists rounding a hairpin below the rock pinnacles of the Col d'Izoard",
     "plans-pyrenees-switchback": "A lone cyclist on a switchback gravel road high in the Pyrenees",
     "plans-pyrenees-dawn": "Layered Pyrenean valleys in dawn mist",
@@ -710,9 +710,13 @@ IMG_POS = {
     "coaching-support-roadside": "50% 45%",  # Tom's thumbs up + the passing rider
     "coached-almere-finish": "50% 35%",  # arms-up roar at the top of the frame
     "coached-tenby-swim": "50% 60%",     # swim field low, pastel harbour houses above
-    "female-wales-podium": "50% 45%",    # the three podium steps
+    "female-wales-podium": "50% 15%",    # 2026-08-24: was 45%, which cut the
+                                         # winner's face off the top of the wide
+                                         # hero crop. Verified by rendering the crop:
+                                         # at 25% her cap still touched the frame edge,
+                                         # 15% holds all three faces with headroom.
     "female-montblanc-hike": "50% 55%",  # hiker on the switchbacks, massif behind
-    "female-welsh-tt": "60% 50%",        # Hannah aero-tucked right of centre
+    "female-welsh-tt": "60% 50%",        # Sophie R aero-tucked right of centre
     "plans-izoard-trio": "45% 60%",      # the trio low on the hairpin
     "plans-pyrenees-switchback": "50% 55%",
     "plans-pyrenees-dawn": "50% 50%",
@@ -2455,6 +2459,19 @@ def blog_img_tag(name, cls="", lazy=True, fetchpriority=None):
             f' width="{d["w"]}" height="{d["h"]}"{loading}{fp}>')
 
 
+def site_figure(name, caption=""):
+    """Inline a SITE image derivative (assets/img/<name>.webp) inside a post body.
+
+    The migrated 2021 posts carry their own recovered photo set under
+    assets/img/blog/ and use {{fig:}}. Newer posts have no such set, so this lets
+    them place any already-shipped site photograph in the flow of the writing,
+    reusing that photo's locked alt text and intrinsic dimensions. No new image
+    weight is added. An unknown name raises KeyError and fails the build loudly.
+    """
+    cap = f"<figcaption>{esc(caption)}</figcaption>" if caption else ""
+    return f'<figure class="blog-figure">{img(name, lazy=True)}{cap}</figure>'
+
+
 def blog_figure(name):
     """An inline blog photo rendered as a lazy-loaded <figure> (dimensions set so
     the reflow-free space is reserved). Captions, where the original had one, are
@@ -2504,6 +2521,14 @@ def _md_to_html(body):
         s = lines[i].strip()
         if not s:
             flush(); i += 1; continue
+        if s.startswith("{{img:") and s.endswith("}}"):
+            # Inline a shipped SITE photo, with an optional caption after a pipe:
+            # {{img:honours-hannah-wales|Hannah S wins Ironman Wales 2022}}
+            flush()
+            spec = s[6:-2].strip()
+            nm, _, cap = spec.partition("|")
+            out.append(site_figure(nm.strip(), cap.strip()))
+            i += 1; continue
         if s.startswith("{{fig:") and s.endswith("}}"):
             # Inline original blog photo (WS-SITE24): a whole-line directive that
             # renders a <figure> in place. Not text, so it leaves the frozen body
@@ -2576,6 +2601,7 @@ def human_date(iso):
 # image. The four recent posts use Tom's briefed picks.
 BLOG_HERO = {
     # Recent posts (Tom's brief)
+    "ironman-wales-how-to-beat-the-dragon": "female-wales-podium",  # two champions here
     "female-first-not-female-adapted": "female-welsh-tt",     # a female athlete racing (Welsh 100 TT)
     "make-the-plan-then-hold-it": "coached-band",             # a hard TT / pacing effort
     "train-easier-than-you-think": "plans-pyrenees-switchback",  # steady endurance on an alpine road
