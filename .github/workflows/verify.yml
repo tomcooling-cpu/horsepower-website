@@ -1,0 +1,46 @@
+name: Verify site build
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # The committed site/ IS what GitHub Pages serves, so a PR can change the
+      # generator and leave a stale tree behind. Build both modes and check the
+      # committed tree, so nothing reaches main unverified.
+      - name: Gate self-tests
+        run: python3 .github/scripts/test_assert_pages_noindex.py
+
+      - name: Committed site/ is not indexable
+        run: python3 .github/scripts/assert_pages_noindex.py site
+
+      - name: Committed site/ matches the generator output
+        run: |
+          python3 generator/build.py
+          if ! git diff --quiet -- site/; then
+            echo "::error::site/ is stale. Run 'python3 generator/build.py' and commit the result."
+            git diff --stat -- site/
+            exit 1
+          fi
+          echo "Committed site/ is byte-identical to a fresh preview build."
+
+      - name: Live build passes its own gates
+        run: HP_BASE_PATH='' python3 generator/build.py
+
+      - name: Restore the committed preview tree
+        if: always()
+        run: |
+          git checkout -- site/ 2>/dev/null || true
+          python3 generator/build.py >/dev/null

@@ -1,80 +1,8 @@
-# Horsepower Coaching
-# Triathlon, cycling and endurance coaching | South West UK + online worldwide
+# Horsepower Coaching PREVIEW BUILD, not the live site.
+# The live site is https://horsepowercoaching.co.uk
+# Every page here carries noindex; crawling stays allowed only so
+# that tag can be read. Do not submit this host to any search engine.
 
 User-agent: *
 Allow: /
 Disallow: /options/
-
-User-agent: GPTBot
-Allow: /
-Disallow: /options/
-
-User-agent: OAI-SearchBot
-Allow: /
-Disallow: /options/
-
-User-agent: ChatGPT-User
-Allow: /
-Disallow: /options/
-
-User-agent: ClaudeBot
-Allow: /
-Disallow: /options/
-
-User-agent: anthropic-ai
-Allow: /
-Disallow: /options/
-
-User-agent: Claude-Web
-Allow: /
-Disallow: /options/
-
-User-agent: PerplexityBot
-Allow: /
-Disallow: /options/
-
-User-agent: Perplexity-User
-Allow: /
-Disallow: /options/
-
-User-agent: Google-Extended
-Allow: /
-Disallow: /options/
-
-User-agent: CCBot
-Allow: /
-Disallow: /options/
-
-User-agent: Applebot-Extended
-Allow: /
-Disallow: /options/
-
-User-agent: Bytespider
-Allow: /
-Disallow: /options/
-
-User-agent: Amazonbot
-Allow: /
-Disallow: /options/
-
-User-agent: meta-externalagent
-Allow: /
-Disallow: /options/
-
-User-agent: cohere-ai
-Allow: /
-Disallow: /options/
-
-User-agent: Diffbot
-Allow: /
-Disallow: /options/
-
-User-agent: Timpibot
-Allow: /
-Disallow: /options/
-
-User-agent: YouBot
-Allow: /
-Disallow: /options/
-
-Sitemap: https://horsepowercoaching.co.uk/sitemap.xml

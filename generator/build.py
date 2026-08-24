@@ -53,6 +53,14 @@ def raceplan_svg() -> str:
 # Canonical / OG / sitemap / JSON-LD URLs use PROD_ORIGIN and are identical in
 # both builds, so switching BASE_PATH never changes the SEO tags.
 BASE_PATH = os.environ.get("HP_BASE_PATH", "/horsepower-website").rstrip("/")
+
+# PREVIEW BUILD = the GitHub Pages copy (BASE_PATH non-empty). Netlify, the real
+# site, always builds with HP_BASE_PATH="" so BASE_PATH is empty there.
+# The Pages copy is a public, fully-crawlable second copy of the whole site on a
+# different domain, which Google was treating as duplicate content and, on some
+# pages, overriding our canonical (Search Console, 2026-08-24). Everything gated
+# on IS_PREVIEW_BUILD below exists to keep that copy out of the index.
+IS_PREVIEW_BUILD = bool(BASE_PATH)
 BASE_URL = "https://tomcooling-cpu.github.io/horsepower-website"
 EXISTING = "https://www.horsepowercoaching.co.uk"   # current live site (phase 2 links)
 # The Contact CTA now points at the real on-site /contact/ page (WS-SITE13),
@@ -315,11 +323,17 @@ def head(title, description, canonical, og_image_name=None, og_type="website", e
         hero_preload = (f'<link rel="preload" as="image" '
                         f'href="{IMG_BASE}/{preload_img}.webp" '
                         f'type="image/webp" fetchpriority="high">\n')
+    # Preview build only: keep the GitHub Pages copy out of every search index.
+    # Crawling stays ALLOWED on that copy on purpose, because a blocked crawler
+    # can never read this tag and the pages would linger in the index.
+    noindex = ('\n<meta name="robots" content="noindex, nofollow">'
+               '\n<meta name="googlebot" content="noindex, nofollow">'
+               if IS_PREVIEW_BUILD else "")
     return f"""<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1">{noindex}
 <title>{esc(title)}</title>
 <meta name="description" content="{esc(description)}">
 <meta name="author" content="Tom Cooling">
@@ -2861,7 +2875,8 @@ def build():
     for post in posts:
         sm.append(sm_entry(prod_url(f"/blog/f/{post['slug']}/"), "monthly", "0.6"))
     sm.append("</urlset>")
-    write("sitemap.xml", "\n".join(sm), written)
+    if not IS_PREVIEW_BUILD:
+        write("sitemap.xml", "\n".join(sm), written)
 
     # robots.txt: allow all standard crawlers AND the major AI crawlers explicitly
     # (Tom wants AI training + answer-engine citation for reach). /options/ stays
@@ -2881,6 +2896,20 @@ def build():
     for bot in ai_bots:
         rb += [f"User-agent: {bot}", "Allow: /", "Disallow: /options/", ""]
     rb += [f"Sitemap: {prod_url('/sitemap.xml')}", ""]
+    if IS_PREVIEW_BUILD:
+        # Preview build (GitHub Pages). Crawling is deliberately still allowed so
+        # crawlers can READ the noindex tag on every page; blocking them here
+        # would freeze the copy in the index instead of removing it. No sitemap
+        # is advertised, because nothing on this copy should ever be submitted.
+        rb = ["# Horsepower Coaching PREVIEW BUILD, not the live site.",
+              "# The live site is https://horsepowercoaching.co.uk",
+              "# Every page here carries noindex; crawling stays allowed only so",
+              "# that tag can be read. Do not submit this host to any search engine.",
+              "",
+              "User-agent: *",
+              "Allow: /",
+              "Disallow: /options/",
+              ""]
     write("robots.txt", "\n".join(rb), written)
 
     # llms.txt (WS-SITE22): machine-facing summary at the site root. Additive,
@@ -2932,7 +2961,11 @@ def freeze_check():
         print("Freeze gate: no snapshot committed yet, skipped "
               "(run 'python3 generator/freeze_gate.py snapshot').")
         return
-    if freeze_gate.verify(SITE) != 0:
+    # The preview build deliberately omits sitemap.xml (an indexable sitemap on
+    # the GitHub Pages copy is exactly what we are stopping). Everything else
+    # stays frozen in both modes.
+    allow_missing = ("sitemap.xml",) if IS_PREVIEW_BUILD else ()
+    if freeze_gate.verify(SITE, allow_missing=allow_missing) != 0:
         raise SystemExit(1)
 
 
@@ -3212,25 +3245,56 @@ def run_gates(cat, written):
             errors.append(f"{path}: {n_tom} #tom node definitions in one @graph (want <=1)")
 
     # Gate 11: robots.txt allows the major AI crawlers, disallows /options/,
-    # and references the sitemap.
+    # and references the sitemap. LIVE BUILD ONLY: the preview copy deliberately
+    # advertises no sitemap and courts no crawlers beyond what is needed to read
+    # its noindex tag.
     robots = written.get("robots.txt", "")
-    for bot in ("GPTBot", "OAI-SearchBot", "ClaudeBot", "anthropic-ai", "PerplexityBot",
-                "Google-Extended", "CCBot", "Applebot-Extended", "Bytespider"):
-        if bot not in robots:
-            errors.append(f"robots.txt missing required AI crawler allow: {bot}")
+    if not IS_PREVIEW_BUILD:
+        for bot in ("GPTBot", "OAI-SearchBot", "ClaudeBot", "anthropic-ai", "PerplexityBot",
+                    "Google-Extended", "CCBot", "Applebot-Extended", "Bytespider"):
+            if bot not in robots:
+                errors.append(f"robots.txt missing required AI crawler allow: {bot}")
+        if "Sitemap:" not in robots:
+            errors.append("robots.txt missing Sitemap reference")
     if "Disallow: /options/" not in robots:
         errors.append("robots.txt missing 'Disallow: /options/'")
-    if "Sitemap:" not in robots:
-        errors.append("robots.txt missing Sitemap reference")
 
-    # Gate 12: sitemap uses the prod host and never lists /options/.
+    # Gate 12: sitemap uses the prod host and never lists /options/. The preview
+    # build ships no sitemap at all, which is checked by gate 13 instead.
     smx = written.get("sitemap.xml", "")
-    if PROD_ORIGIN not in smx:
-        errors.append("sitemap.xml not using production host")
-    if BASE_URL in smx:
-        errors.append("sitemap.xml still references the github.io preview host")
-    if "/options/" in smx:
-        errors.append("sitemap.xml must not list /options/")
+    if not IS_PREVIEW_BUILD:
+        if PROD_ORIGIN not in smx:
+            errors.append("sitemap.xml not using production host")
+        if BASE_URL in smx:
+            errors.append("sitemap.xml still references the github.io preview host")
+        if "/options/" in smx:
+            errors.append("sitemap.xml must not list /options/")
+
+    # Gate 13 (2026-08-24): the preview copy must never be indexable. This is the
+    # business-critical one: a second public copy of the whole site was competing
+    # with horsepowercoaching.co.uk for canonical in Google. Every page carries
+    # noindex, and no sitemap is shipped. Fails the BUILD, so it cannot regress.
+    if IS_PREVIEW_BUILD:
+        if "sitemap.xml" in written:
+            errors.append("preview build must not ship a sitemap.xml")
+        missing_noindex = [path for path, body in written.items()
+                           if path.endswith(".html")
+                           and 'name="robots" content="noindex' not in body]
+        if missing_noindex:
+            errors.append(
+                f"preview build: {len(missing_noindex)} page(s) missing the noindex tag, "
+                f"first: {missing_noindex[0]}")
+    else:
+        # And the live site must NEVER carry it, which would delist the business.
+        # /options/ is the one deliberate exception: it is a private surface,
+        # already Disallowed in robots.txt and absent from the sitemap.
+        indexed_off = [path for path, body in written.items()
+                       if path.endswith(".html") and 'content="noindex' in body
+                       and not path.startswith("options/")]
+        if indexed_off:
+            errors.append(
+                f"LIVE build carries noindex on {len(indexed_off)} page(s), "
+                f"first: {indexed_off[0]}")
 
     # Gate 14 (WS-SITE22): llms.txt shipped at the site root and correct. It must
     # exist, lead with the H1, carry every tier price byte-for-byte as the site
@@ -3316,7 +3380,10 @@ def run_gates(cat, written):
           f"({ld_total} JSON-LD blocks total)")
     print(f"  - robots.txt: {len([l for l in written['robots.txt'].splitlines() if l.startswith('User-agent:')])} "
           f"user-agent groups incl. AI crawlers; /options/ disallowed; sitemap referenced")
-    print(f"  - sitemap.xml: {written['sitemap.xml'].count('<url>')} URLs on prod host, /options/ excluded")
+    if "sitemap.xml" in written:
+        print(f"  - sitemap.xml: {written['sitemap.xml'].count('<url>')} URLs on prod host, /options/ excluded")
+    else:
+        print("  - sitemap.xml: not shipped (preview build, deliberately not indexable)")
 
 
 if __name__ == "__main__":
