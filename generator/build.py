@@ -650,7 +650,7 @@ IMG_ALT = {
     "coached-tenby-swim": "Swimmers in pink caps crossing Tenby harbour below pastel houses during the Ironman Wales swim",
     "female-wales-podium": "The women's podium celebration at Ironman Wales with champagne mid-spray",
     "female-montblanc-hike": "An athlete in a Horsepower cap hiking alpine switchbacks with the Mont Blanc massif in the distance",
-    "female-welsh-tt": "Hannah S in an aero tuck during the Welsh 100 mile time trial championships",
+    "female-welsh-tt": "Sophie R riding in an aero tuck on an open road",
     "plans-izoard-trio": "Three cyclists rounding a hairpin below the rock pinnacles of the Col d'Izoard",
     "plans-pyrenees-switchback": "A lone cyclist on a switchback gravel road high in the Pyrenees",
     "plans-pyrenees-dawn": "Layered Pyrenean valleys in dawn mist",
@@ -716,7 +716,7 @@ IMG_POS = {
                                          # at 25% her cap still touched the frame edge,
                                          # 15% holds all three faces with headroom.
     "female-montblanc-hike": "50% 55%",  # hiker on the switchbacks, massif behind
-    "female-welsh-tt": "60% 50%",        # Hannah aero-tucked right of centre
+    "female-welsh-tt": "60% 50%",        # Sophie R aero-tucked right of centre
     "plans-izoard-trio": "45% 60%",      # the trio low on the hairpin
     "plans-pyrenees-switchback": "50% 55%",
     "plans-pyrenees-dawn": "50% 50%",

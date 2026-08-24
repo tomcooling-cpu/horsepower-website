@@ -117,7 +117,7 @@ The single most common mistake I see is athletes riding that first loop **on oth
 
 **Ignore everyone else.** Genuinely. The person going past you at mile 30 is not racing you, and there is a decent chance they will be walking on the run.
 
-{{img:female-welsh-tt|Hannah S riding the Welsh 100 mile time trial championships. Holding your own number, whatever is happening around you, is the whole skill.}}
+{{img:female-welsh-tt|Sophie R in an aero tuck. Holding your own number, whatever is happening around you, is the whole skill.}}
 
 ### Fuel on a schedule, not on feel
 
@@ -140,8 +140,6 @@ On paper it is not a monster. In reality it is lined with people, several deep, 
 **That atmosphere is precisely the danger.** The crowd is effectively inviting you into the red, and it feels rude to decline. Years ago I rode up there myself on the wrong side of my heart rate limit for exactly that reason.
 
 So enjoy it, absolutely. Take the noise in, because it is one of the reasons you came. But hold your number. Sit down, spin, and **let the crowd carry you rather than push you**. The second time you meet it you will be 107 miles in and most people around you will be in trouble. The version of you who stayed disciplined the first time is the version who gets to enjoy it the second time.
-
-{{img:hero-welsh-climb|Welsh valley roads. Not the course itself, but the kind of terrain that shapes it.}}
 
 ## The run: how do you hold four laps together?
 
