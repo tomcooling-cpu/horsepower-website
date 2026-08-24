@@ -710,7 +710,11 @@ IMG_POS = {
     "coaching-support-roadside": "50% 45%",  # Tom's thumbs up + the passing rider
     "coached-almere-finish": "50% 35%",  # arms-up roar at the top of the frame
     "coached-tenby-swim": "50% 60%",     # swim field low, pastel harbour houses above
-    "female-wales-podium": "50% 45%",    # the three podium steps
+    "female-wales-podium": "50% 15%",    # 2026-08-24: was 45%, which cut the
+                                         # winner's face off the top of the wide
+                                         # hero crop. Verified by rendering the crop:
+                                         # at 25% her cap still touched the frame edge,
+                                         # 15% holds all three faces with headroom.
     "female-montblanc-hike": "50% 55%",  # hiker on the switchbacks, massif behind
     "female-welsh-tt": "60% 50%",        # Hannah aero-tucked right of centre
     "plans-izoard-trio": "45% 60%",      # the trio low on the hairpin
