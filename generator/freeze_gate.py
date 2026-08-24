@@ -120,7 +120,14 @@ def _canon(obj):
     return json.dumps(obj, sort_keys=True, ensure_ascii=False)
 
 
-def verify(site_dir):
+def verify(site_dir, allow_missing=()):
+    """Verify a built tree against the committed snapshot.
+
+    allow_missing names paths the caller has DELIBERATELY dropped, so the gate
+    does not read the omission as an accidentally-lost URL. The preview build
+    uses it for sitemap.xml, which must never ship on a non-indexable copy.
+    Every other path stays frozen in both build modes.
+    """
     if not os.path.exists(SNAPSHOT):
         print("FREEZE GATE: no snapshot at %s (run 'snapshot' first)" % SNAPSHOT)
         return 1
@@ -130,11 +137,11 @@ def verify(site_dir):
 
     errors = []
 
-    base_files = set(base["files"])
+    base_files = set(base["files"]) - set(allow_missing)
     cur_files = set(cur["files"])
     for missing in sorted(base_files - cur_files):
         errors.append("URL removed (page/path gone): %s" % missing)
-    for added in sorted(cur_files - base_files):
+    for added in sorted(cur_files - base_files - set(allow_missing)):
         errors.append("URL added (new page/path): %s" % added)
 
     base_pages, cur_pages = base["pages"], cur["pages"]

@@ -22,6 +22,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      # This job publishes a SECOND public copy of the whole site on
+      # tomcooling-cpu.github.io. Google was indexing that copy and, on some
+      # pages, overriding our canonical with it (Search Console, 2026-08-24).
+      # The copy must therefore never be indexable. Refuse to deploy otherwise:
+      # the generator gate can be bypassed by committing a stale site/, this
+      # cannot, because it inspects the exact bytes about to go live.
+      - name: Self-test the indexability gate
+        run: python3 .github/scripts/test_assert_pages_noindex.py
+
+      - name: Refuse to deploy an indexable copy
+        run: python3 .github/scripts/assert_pages_noindex.py site
+
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
