@@ -2941,6 +2941,30 @@ def build():
     ]
     for post in posts:
         redirects.append(f"/blog/f/{post['slug']}    /blog/f/{post['slug']}/    301")
+
+    # Root-level /f/<slug> (2026-08-24). GoDaddy also exposed every post at the
+    # bare /f/<slug> path, and Google is still crawling those: Search Console
+    # listed /f/into-the-unknown, /f/how-to-improve-your-triathlon-swim and
+    # /f/my-triathlon-top-tips as 404s in August 2026. The posts themselves are
+    # all live at /blog/f/<slug>/, so this is recoverable ranking, not dead
+    # weight. Rules are emitted for EVERY post, not just the three Google has
+    # found so far, so the rest are covered before they are ever crawled.
+    redirects.append("")
+    redirects.append("# Legacy root-level post URLs (GoDaddy served /f/<slug> too).")
+    for post in posts:
+        redirects.append(f"/f/{post['slug']}    /blog/f/{post['slug']}/    301")
+
+    # The old GoDaddy RSS feed. There is no feed in this build, so send it to
+    # the blog index rather than leaving a 404 on a URL feed readers may still
+    # hold. Deliberately NOT a rewrite: the content is not a feed.
+    redirects.append("")
+    redirects.append("/blog/f.rss    /blog/    301")
+
+    # NOTE: the old /m/* member-area URLs (/m/login, /m/account,
+    # /m/create-account) are deliberately left as 404. They are permanently
+    # gone with no equivalent on this site, so 404 is the correct signal.
+    # Redirecting them to / would create soft-404s and tell Google those pages
+    # moved to the homepage, which they did not.
     redirects.append("")
     write("_redirects", "\n".join(redirects), written)
 
@@ -3270,7 +3294,7 @@ def run_gates(cat, written):
         if "/options/" in smx:
             errors.append("sitemap.xml must not list /options/")
 
-    # Gate 13 (2026-08-24): the preview copy must never be indexable. This is the
+    # Gate 15 (2026-08-24): the preview copy must never be indexable. This is the
     # business-critical one: a second public copy of the whole site was competing
     # with horsepowercoaching.co.uk for canonical in Google. Every page carries
     # noindex, and no sitemap is shipped. Fails the BUILD, so it cannot regress.
@@ -3295,6 +3319,33 @@ def run_gates(cat, written):
             errors.append(
                 f"LIVE build carries noindex on {len(indexed_off)} page(s), "
                 f"first: {indexed_off[0]}")
+
+    # Gate 16 (2026-08-24): every _redirects destination must resolve to a page
+    # this build actually ships. A redirect pointing at a missing page is worse
+    # than the 404 it replaces: it burns crawl budget and Google reports it as a
+    # soft 404. Sources must also be unique, since Netlify applies first match
+    # wins and a duplicated source silently shadows the later rule.
+    rdr = written.get("_redirects", "")
+    seen_sources = {}
+    for line in rdr.splitlines():
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+        parts = line.split()
+        if len(parts) < 2:
+            errors.append(f"_redirects: unparseable rule: {line!r}")
+            continue
+        src, dest = parts[0], parts[1]
+        if src in seen_sources:
+            errors.append(f"_redirects: duplicate source {src} shadows a later rule")
+        seen_sources[src] = dest
+        if dest.startswith("http") or "*" in dest or ":" in dest:
+            continue
+        target = dest.strip("/")
+        candidate = f"{target}/index.html" if target else "index.html"
+        if candidate not in written and target not in written:
+            errors.append(f"_redirects: {src} points at {dest}, which this build "
+                          f"does not ship")
 
     # Gate 14 (WS-SITE22): llms.txt shipped at the site root and correct. It must
     # exist, lead with the H1, carry every tier price byte-for-byte as the site
