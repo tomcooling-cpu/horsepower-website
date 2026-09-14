@@ -747,7 +747,7 @@ IMG_DIMS = {
     "alpine-ridge": (1500, 1001),
     "female-hero": (1500, 1001), "ironman-wales-finish": (1500, 1000),
     "coached-band": (1500, 999), "tom-gravel": (1400, 1050),
-    "camp-group": (1400, 1050), "female-tt-v2": (733, 1100),
+    "camp-group": (1400, 1050), "female-tt-v2": (453, 680),
     "female-podium": (825, 1100), "female-trail": (675, 900),
     "tom-portrait": (825, 1100),
     # drop-2026-08-05
@@ -774,7 +774,7 @@ IMG_DIMS = {
     "tom-swim-kaolinite": (667, 1000),
     "tom-alps-signon": (800, 533),
     "coaching-support-roadside": (768, 1024),
-    "coached-hamburg-finish": (1100, 733),
+    "coached-hamburg-finish": (860, 573),
     "coached-tenby-swim": (1400, 931),
     "female-wales-podium": (1200, 801),
     "female-montblanc-hike": (750, 1000),

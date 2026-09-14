@@ -39,7 +39,7 @@ JOBS = {
     # source, full-frame downscale so no crop box is needed; art direction is the
     # CSS object-position in build.py. Optional 4th tuple element is a pixel crop
     # box (left, top, right, bottom).
-    "female-tt-v2":         ("madison-imwales-2026.jpeg", FEAT, 80),
+    "female-tt-v2":         ("madison-imwales-2026.jpeg", 680, 70),
     "female-trail":         ("female-trail.jpeg",        900, 58),
     "tom-portrait":         ("tom-portrait.jpeg",        FEAT, 80),
     # drop-2026-08-05: honours band (athlete identity verified per file)
@@ -67,7 +67,7 @@ JOBS = {
     # tom-alps-lead / hero-welsh-climb / coached-band are /options/-only preview
     # candidates (not live on any page), so their quality is tuned down here to
     # buy budget for the two new WS-SITE11b live banners below (gate-9 rebalance).
-    "tom-alps-lead":           (DROP + "/1-HR-ALPS-2019RCL_4825.jpg", 1000, 46),
+    "tom-alps-lead":           (DROP + "/1-HR-ALPS-2019RCL_4825.jpg", 1000, 30),
     "tom-alps-finish":         (DROP + "/5-HR-ALPS-2019DSC_1620.jpg", 1000, 62),
     # WS-SITE11b: Tom-chosen Coached-by-Tom TOP banner. Haute Route Dolomites
     # finish/timing arch (pink kit, snowy peaks, fisheye). Landscape banner
@@ -80,7 +80,7 @@ JOBS = {
     "coaching-alpine-hairpin": (DROP + "/74bc0ff2-16b0-4952-b3d6-de86488a4fa8.jpeg", 1200, 54),
     "tom-bottle-refill":       (DROP + "/7901535e-2f91-4d53-b57a-1fb930e63529.jpeg", 1000, 76),
     "coaching-support-roadside": (DROP + "/a2cd6f11-54dd-4d8c-8e3a-cf0ddbc787c2.jpeg", 1100, 78),
-    "coached-hamburg-finish":  ("coached-hamburg-2026.jpeg", 1100, 74),
+    "coached-hamburg-finish":  ("coached-hamburg-2026.jpeg", 860, 62),
     "female-wales-podium":     (DROP + "/0_IRONMAN-Wales.jpg", 1200, 52),
     "female-montblanc-hike":   (DROP + "/d78204b9-4429-404f-b1d6-45f5ce36e68a.jpeg", 850, 48),
     "female-welsh-tt":         (DROP + "/462639565_581577237629776_1513627609080372586_n.jpg", 1200, 66),
