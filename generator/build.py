@@ -747,7 +747,7 @@ IMG_DIMS = {
     "alpine-ridge": (1500, 1001),
     "female-hero": (1500, 1001), "ironman-wales-finish": (1500, 1000),
     "coached-band": (1500, 999), "tom-gravel": (1400, 1050),
-    "camp-group": (1400, 1050), "female-tt-v2": (453, 680),
+    "camp-group": (1400, 1050), "female-tt-v2": (587, 880),
     "female-podium": (825, 1100), "female-trail": (675, 900),
     "tom-portrait": (825, 1100),
     # drop-2026-08-05
