@@ -34,16 +34,12 @@ JOBS = {
     # ("disorganised group"), female-podium (results band removed) and
     # coached-tenby-swim (swimmers not visible; replaced by hero-tenby-swim).
     # Their old .webp files are deleted from assets/img so they stop shipping.
-    # female-tt-v2 (home "Female first" feature): the source frames Madison S
-    # against the right edge with empty blurred greenery left, so she reads
-    # off-centre in the portrait tile. WS-SITE9's crop (left=466) still left ~40%
-    # dead green on the left. WS-SITE11a re-crops tighter from the right edge so
-    # her helmet/face/hands cluster sits ~59% (visually centred, balanced by the
-    # forward aero-bar arms filling the lower-left) with the pink base bar, BRAV
-    # jersey and orange bear logo all in frame. Renamed to -v2 to cache-bust the
-    # CDN/browser (old female-tt.webp bytes were being served stale). Optional 4th
-    # tuple element is a pixel crop box (left, top, right, bottom).
-    "female-tt-v2":         ("female-tt.jpeg",           FEAT, 80, (760, 480, 1366, 1238)),
+    # female-tt-v2 (home "Female first" feature): Madison S racing the bike leg
+    # at Ironman Wales 2026, aero on her TT bike in the rain (bib 107). Portrait
+    # source, full-frame downscale so no crop box is needed; art direction is the
+    # CSS object-position in build.py. Optional 4th tuple element is a pixel crop
+    # box (left, top, right, bottom).
+    "female-tt-v2":         ("madison-imwales-2026.jpeg", FEAT, 80),
     "female-trail":         ("female-trail.jpeg",        900, 58),
     "tom-portrait":         ("tom-portrait.jpeg",        FEAT, 80),
     # drop-2026-08-05: honours band (athlete identity verified per file)
@@ -84,7 +80,7 @@ JOBS = {
     "coaching-alpine-hairpin": (DROP + "/74bc0ff2-16b0-4952-b3d6-de86488a4fa8.jpeg", 1200, 54),
     "tom-bottle-refill":       (DROP + "/7901535e-2f91-4d53-b57a-1fb930e63529.jpeg", 1000, 76),
     "coaching-support-roadside": (DROP + "/a2cd6f11-54dd-4d8c-8e3a-cf0ddbc787c2.jpeg", 1100, 78),
-    "coached-almere-finish":   (DROP + "/773897ce-9f4e-4e72-916f-2aa6b00e1ca8.jpeg", 1100, 74),
+    "coached-hamburg-finish":  ("coached-hamburg-2026.jpeg", 1100, 74),
     "female-wales-podium":     (DROP + "/0_IRONMAN-Wales.jpg", 1200, 52),
     "female-montblanc-hike":   (DROP + "/d78204b9-4429-404f-b1d6-45f5ce36e68a.jpeg", 850, 48),
     "female-welsh-tt":         (DROP + "/462639565_581577237629776_1513627609080372586_n.jpg", 1200, 66),
