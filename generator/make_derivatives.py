@@ -39,7 +39,7 @@ JOBS = {
     # source, full-frame downscale so no crop box is needed; art direction is the
     # CSS object-position in build.py. Optional 4th tuple element is a pixel crop
     # box (left, top, right, bottom).
-    "female-tt-v2":         ("madison-imwales-2026.jpeg", 680, 70),
+    "female-tt-v2":         ("madison-imwales-2026-hires.jpeg", 880, 74),
     "female-trail":         ("female-trail.jpeg",        900, 58),
     "tom-portrait":         ("tom-portrait.jpeg",        FEAT, 80),
     # drop-2026-08-05: honours band (athlete identity verified per file)
@@ -67,7 +67,7 @@ JOBS = {
     # tom-alps-lead / hero-welsh-climb / coached-band are /options/-only preview
     # candidates (not live on any page), so their quality is tuned down here to
     # buy budget for the two new WS-SITE11b live banners below (gate-9 rebalance).
-    "tom-alps-lead":           (DROP + "/1-HR-ALPS-2019RCL_4825.jpg", 1000, 30),
+    "tom-alps-lead":           (DROP + "/1-HR-ALPS-2019RCL_4825.jpg", 1000, 22),
     "tom-alps-finish":         (DROP + "/5-HR-ALPS-2019DSC_1620.jpg", 1000, 62),
     # WS-SITE11b: Tom-chosen Coached-by-Tom TOP banner. Haute Route Dolomites
     # finish/timing arch (pink kit, snowy peaks, fisheye). Landscape banner
