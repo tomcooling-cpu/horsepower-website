@@ -646,7 +646,7 @@ IMG_ALT = {
     "tom-swim-kaolinite": "Tom Cooling with his race number before the Kaolinite open-water swim race",
     "tom-alps-signon": "Tom Cooling giving a thumbs up while holding his rider board at Haute Route Alps sign-on",
     "coaching-support-roadside": "Tom Cooling in a Horsepower cap giving a thumbs up to a racing athlete from the roadside on the Ironman Wales bike course",
-    "coached-almere-finish": "A Horsepower athlete celebrating on the finish line at Challenge Almere-Amsterdam",
+    "coached-hamburg-finish": "A Horsepower athlete in branded kit finishing IRONMAN Hamburg",
     "coached-tenby-swim": "Swimmers in pink caps crossing Tenby harbour below pastel houses during the Ironman Wales swim",
     "female-wales-podium": "The women's podium celebration at Ironman Wales with champagne mid-spray",
     "female-montblanc-hike": "An athlete in a Horsepower cap hiking alpine switchbacks with the Mont Blanc massif in the distance",
@@ -662,7 +662,7 @@ IMG_ALT = {
     "coached-band": "A time triallist riding hard past a stone wall on a wet mountain road",
     "tom-gravel": "A cyclist riding a white gravel road towards the camera under a big blue sky",
     "tom-portrait": "Tom Cooling, founder and head coach of Horsepower Coaching",
-    "female-tt-v2": "A cyclist racing a time trial in an aero tuck on a country road",
+    "female-tt-v2": "Madison S racing the bike leg at Ironman Wales, aero on her TT bike in the rain",
     "female-podium": "Three athletes celebrating on a race podium",
     "female-trail": "A trail runner on a mountain path with an alpine range behind",
     "camp-group": "A group of coached cyclists riding together through an alpine village",
@@ -680,7 +680,7 @@ IMG_POS = {
     "coached-band": "50% 52%",           # TT rider mid-frame against the mountain
     "tom-gravel": "64% 46%",             # Tom riding toward camera, right of text
     "camp-group": "50% 58%",             # the bunch of riders low-centre
-    "female-tt-v2": "50% 50%",           # WS-SITE11a re-crop, Madison S centred in frame
+    "female-tt-v2": "50% 30%",           # Madison S at Ironman Wales 2026, aero on the TT bike
     "female-podium": "50% 30%",          # the three athletes' faces
     "female-trail": "50% 54%",           # runner on the trail, centre
     "tom-portrait": "50% 30%",           # Tom's face
@@ -708,7 +708,7 @@ IMG_POS = {
     "tom-swim-kaolinite": "50% 35%",     # Tom's face, race number lower
     "tom-alps-signon": "46% 40%",        # Tom + the THOMAS 2044 board centred
     "coaching-support-roadside": "50% 45%",  # Tom's thumbs up + the passing rider
-    "coached-almere-finish": "50% 35%",  # arms-up roar at the top of the frame
+    "coached-hamburg-finish": "50% 40%",  # runner dead-centre in the landscape source, center-crop
     "coached-tenby-swim": "50% 60%",     # swim field low, pastel harbour houses above
     "female-wales-podium": "50% 15%",    # 2026-08-24: was 45%, which cut the
                                          # winner's face off the top of the wide
@@ -747,7 +747,7 @@ IMG_DIMS = {
     "alpine-ridge": (1500, 1001),
     "female-hero": (1500, 1001), "ironman-wales-finish": (1500, 1000),
     "coached-band": (1500, 999), "tom-gravel": (1400, 1050),
-    "camp-group": (1400, 1050), "female-tt-v2": (606, 758),
+    "camp-group": (1400, 1050), "female-tt-v2": (453, 680),
     "female-podium": (825, 1100), "female-trail": (675, 900),
     "tom-portrait": (825, 1100),
     # drop-2026-08-05
@@ -774,7 +774,7 @@ IMG_DIMS = {
     "tom-swim-kaolinite": (667, 1000),
     "tom-alps-signon": (800, 533),
     "coaching-support-roadside": (768, 1024),
-    "coached-almere-finish": (734, 1100),
+    "coached-hamburg-finish": (860, 573),
     "coached-tenby-swim": (1400, 931),
     "female-wales-podium": (1200, 801),
     "female-montblanc-hike": (750, 1000),
@@ -1516,8 +1516,8 @@ def render_coached(cat) -> str:
           <li><strong>A race plan before every start line</strong>Pacing, fuelling and strategy for your event, in your hands before you get there.</li>
         </ol>
       </div>
-      <figure class="photo-fig photo-fig--port">{img("coached-almere-finish")}
-        <figcaption>A Horsepower athlete finishing Challenge Almere-Amsterdam</figcaption></figure>
+      <figure class="photo-fig photo-fig--port">{img("coached-hamburg-finish")}
+        <figcaption>A Horsepower athlete finishing IRONMAN Hamburg</figcaption></figure>
     </div>
   </div>
 </section>
@@ -1860,7 +1860,8 @@ FEMALE_HONOURS = [
                "Welsh 100 Mile Time Trial Championships 2023 - 1st",
                "XTRI Norseman 2022 - 3rd"]},
     {"name": "Madison S", "img": "honours-madison-finish",
-     "lines": ["Ironman Wales 2025 champion",
+     "lines": ["Ironman Wales 2026 - age group champion",
+               "Ironman Wales 2025 champion",
                "Overall women's age group champion, Ironman Wales 2025",
                "Welsh 100 Mile Time Trial Champion 2026",
                "10th, Ironman World Championships Nice 2024",
@@ -1876,7 +1877,9 @@ FEMALE_HONOURS = [
     # Tom's correction 2026-08-06: her Outlaw Half 2026 result is an age group
     # win, NOT the overall title; never present it as an overall win.
     {"name": "Elly B", "img": "honours-elly-outlaw",
-     "lines": ["Outlaw Half Triathlon 2026 - age group winner"]},
+     "lines": ["Ironman Wales 2026 - 2nd in age group",
+               "Welsh Championships 2026 - age group champion",
+               "Outlaw Half Triathlon 2026 - age group winner"]},
 ]
 
 FEMALE_FAQ = [
