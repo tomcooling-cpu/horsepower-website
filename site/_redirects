@@ -14,6 +14,7 @@
 # Blog: the old GoDaddy URLs were /blog and /blog/f/<slug> (no trailing
 # slash). Send them to the new trailing-slash pages so ranking is kept.
 /blog                      /blog/                   301
+/blog/f/ironman-wales-2027-what-i-saw-in-tenby    /blog/f/ironman-wales-2027-what-i-saw-in-tenby/    301
 /blog/f/ironman-wales-how-to-beat-the-dragon    /blog/f/ironman-wales-how-to-beat-the-dragon/    301
 /blog/f/female-first-not-female-adapted    /blog/f/female-first-not-female-adapted/    301
 /blog/f/make-the-plan-then-hold-it    /blog/f/make-the-plan-then-hold-it/    301
@@ -34,6 +35,7 @@
 /blog/f/psychology---use-your-head    /blog/f/psychology---use-your-head/    301
 
 # Legacy root-level post URLs (GoDaddy served /f/<slug> too).
+/f/ironman-wales-2027-what-i-saw-in-tenby    /blog/f/ironman-wales-2027-what-i-saw-in-tenby/    301
 /f/ironman-wales-how-to-beat-the-dragon    /blog/f/ironman-wales-how-to-beat-the-dragon/    301
 /f/female-first-not-female-adapted    /blog/f/female-first-not-female-adapted/    301
 /f/make-the-plan-then-hold-it    /blog/f/make-the-plan-then-hold-it/    301
