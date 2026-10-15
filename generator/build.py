@@ -197,10 +197,10 @@ WHICH_TOM = "Chasing something big and want a coach in your corner for all of it
 PLANS_INTRO = TIER_PLANS_BODY
 
 COACHED_INTRO = ("The same coaching my fully coached athletes get, written for you, block by "
-                 "block, for £120 a month. I build your programme myself and give you honest "
-                 "feedback on every session you complete. The only difference is the contact: "
-                 "no calls, and I am not on call day to day. The coaching in the plan is exactly "
-                 "the same.")
+                 "block, for £120 a month. I build your programme myself and, at the end of "
+                 "every block, give you honest feedback and build the next one around it. The "
+                 "only difference is the contact: no calls, and I am not on call day to day. "
+                 "The coaching in the plan is exactly the same.")
 
 # ── Tier 1 display name (the £39.99 off-the-shelf plan library) ───────────────
 # Renamed "Plans" -> "Plan Store" (WS-SITE13, Tom's ask). The route stays /plans/;
@@ -1480,6 +1480,13 @@ COACHED_FAQ = [
     ("Which sports do you coach?",
      "Triathlon across every distance, road and ultra running, and cycling from sportives to "
      "ultra-distance. If you have a target event, I can build for it."),
+    ("Can I message you between blocks?",
+     "Leave notes on your sessions in TrainingPeaks and I read every one at the end of the "
+     "block, as part of the review. There is no back and forth in between. If you want my time "
+     "day to day, that is Coached by Tom."),
+    ("Is TrainingPeaks Premium included?",
+     "No. Plan Only is delivered to your own TrainingPeaks account. A free TrainingPeaks "
+     "Premium account comes with Coached by Tom."),
     ("Can I upgrade later?",
      "Yes. If you want me directly, you can move to Coached by Tom when a place is open."),
 ]
@@ -1512,7 +1519,7 @@ def render_coached(cat) -> str:
         <ol class="step-list">
           <li><strong>It starts with you</strong>A proper intake: your target event, your history, your week, your numbers and the hours you actually have.</li>
           <li><strong>Your plan arrives block by block</strong>Built around your life and your event, three weeks at a time, so it stays current with how your training is actually going rather than a whole year written on day one.</li>
-          <li><strong>Feedback on every completed session</strong>I read the sessions you complete against what was asked, using your actual data, and tell you what it means and what happens next.</li>
+          <li><strong>Feedback at the end of every block</strong>I go through the whole block against what was asked, using your actual data and the notes you leave on your sessions, tell you what it means and build the next block from it.</li>
           <li><strong>A race plan before every start line</strong>Pacing, fuelling and strategy for your event, in your hands before you get there.</li>
         </ol>
       </div>
@@ -1531,7 +1538,7 @@ def render_coached(cat) -> str:
     <div>
       <div class="callout">
         <h2>Where it differs from full coaching</h2>
-        <p>There are no scheduled calls and I am not on call day to day. What you get is a programme I build around your life and your event, with real feedback on the sessions you actually do. If you want me in your corner for all of it, look at Coached by Tom.</p>
+        <p>There are no scheduled calls and I am not on call day to day. What you get is a programme I build around your life and your event, with real feedback at the end of every block on the sessions you actually did. If you want me in your corner for all of it, look at Coached by Tom.</p>
         <p style="margin-top:18px"><a class="btn on-dark ghost" href="{BASE_PATH}/coaching/">Coached by Tom</a></p>
       </div>
     </div>
@@ -1549,8 +1556,8 @@ def render_coached(cat) -> str:
 </section>
 {quote_block("coached")}
 </main>"""
-    desc = ("Coached by Tom Cooling, £120 a month. A plan I build for you block by block, "
-            "with real feedback on every session and a race plan for race day.")
+    desc = ("Plan Only with Tom Cooling, £120 a month. A plan I build for you block by block, "
+            "with real feedback every block and a race plan for race day.")
     faq_ld = {
         "@context": "https://schema.org", "@type": "FAQPage",
         "mainEntity": [
@@ -1560,7 +1567,7 @@ def render_coached(cat) -> str:
     svc = service_node(
         f"{TIER2_NAME} coaching",
         (f"{COACHED_INTRO} Built block by block around your life and target event, with real "
-         "feedback on every completed session and a race plan before every start line."),
+         "feedback at the end of every block and a race plan before every start line."),
         "/coached/", monthly_price="120.00")
     extra = ld_script([
         breadcrumb_node([("Home", "/"), (TIER2_NAME, None)]), svc, faq_ld])
@@ -2002,8 +2009,8 @@ def render_female(cat) -> str:
         <li><strong>Feedback reads your sessions in context.</strong> What your body actually did, alongside your reported symptoms, recovery and where you are in your cycle.</li>
         <li><strong>Strength for bone and tendon is built in.</strong> Not bolted on, because long-term durability is part of performance, not separate from it.</li>
       </ul>
-      <p style="margin-top:16px">I'm honest about the limits: coaching is personalised week to
-      week, and I'll never overclaim what it does. I coach with a particular emphasis on
+      <p style="margin-top:16px">I'm honest about the limits: coaching is personalised to you,
+      and I'll never overclaim what it does. I coach with a particular emphasis on
       female-specific performance development, built from years of working with female athletes
       from first finish lines to the front of the race.</p>
       <p style="margin-top:20px">
