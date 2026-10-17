@@ -120,16 +120,13 @@ def _canon(obj):
     return json.dumps(obj, sort_keys=True, ensure_ascii=False)
 
 
-def verify(site_dir, allow_missing=(), body_exempt=()):
+def verify(site_dir, allow_missing=()):
     """Verify a built tree against the committed snapshot.
 
     allow_missing names paths the caller has DELIBERATELY dropped, so the gate
     does not read the omission as an accidentally-lost URL. The preview build
     uses it for sitemap.xml, which must never ship on a non-indexable copy.
     Every other path stays frozen in both build modes.
-
-    body_exempt names pages whose visible body text the caller knows differs from
-    the snapshot for a declared reason (head metadata and the URL set stay frozen).
     """
     if not os.path.exists(SNAPSHOT):
         print("FREEZE GATE: no snapshot at %s (run 'snapshot' first)" % SNAPSHOT)
@@ -163,7 +160,7 @@ def verify(site_dir, allow_missing=(), body_exempt=()):
                     errors.append("HEAD metadata changed in %s [%s]:\n    was: %s\n    now: %s"
                                   % (path, key, _canon(b["head"].get(key))[:200],
                                      _canon(c["head"].get(key))[:200]))
-        if b["body"] != c["body"] and path not in body_exempt:
+        if b["body"] != c["body"]:
             # Show the first differing region.
             bt, ct = b["body"], c["body"]
             i = 0

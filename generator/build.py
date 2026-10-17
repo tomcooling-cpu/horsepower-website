@@ -82,11 +82,9 @@ THANKS_PATH = "/contact/thanks/"
 PRIVACY_PATH = "/privacy/"
 PRIVACY_UPDATED = "2026-10-17"  # the ship date; a constant, never date.today() (freeze gate)
 GA4_RETENTION = "14 months"     # must equal the GA4 event-data retention setting (section 7 step 3)
-LEGAL_NAME_PLACEHOLDER = "{{LEGAL_NAME}}"
-PRIVACY_EMAIL_PLACEHOLDER = "{{PRIVACY_CONTACT_EMAIL}}"
-# Gate 17h refuses the placeholders in the live build. Env overrides mirror HP_GA4_ID.
-LEGAL_NAME = os.environ.get("HP_LEGAL_NAME", LEGAL_NAME_PLACEHOLDER)
-PRIVACY_CONTACT_EMAIL = os.environ.get("HP_PRIVACY_EMAIL", PRIVACY_EMAIL_PLACEHOLDER)
+# Confirmed by Tom 2026-10-17: sole trader; happy to publish this address on /privacy/.
+LEGAL_NAME = "Tom Cooling, trading as Horsepower Coaching"
+PRIVACY_CONTACT_EMAIL = "tom@horsepowercoaching.co.uk"
 BASE_URL = "https://tomcooling-cpu.github.io/horsepower-website"
 EXISTING = "https://www.horsepowercoaching.co.uk"   # current live site (phase 2 links)
 # The Contact CTA now points at the real on-site /contact/ page (WS-SITE13),
@@ -3238,15 +3236,7 @@ def freeze_check():
     # the GitHub Pages copy is exactly what we are stopping). Everything else
     # stays frozen in both modes.
     allow_missing = ("sitemap.xml",) if IS_PREVIEW_BUILD else ()
-    # WS-SITE25: until LEGAL_NAME / PRIVACY_CONTACT_EMAIL are confirmed, the preview
-    # renders their placeholders while the snapshot holds the live build's values,
-    # so only that page's body text is exempt. The live build refuses placeholders
-    # (gate 17h), and once the constants are set this exemption is never taken.
-    body_exempt = ()
-    if LEGAL_NAME == LEGAL_NAME_PLACEHOLDER or PRIVACY_CONTACT_EMAIL == PRIVACY_EMAIL_PLACEHOLDER:
-        body_exempt = ("privacy/index.html",)
-        print("Freeze gate: privacy/index.html body exempt (identity placeholders unconfirmed)")
-    if freeze_gate.verify(SITE, allow_missing=allow_missing, body_exempt=body_exempt) != 0:
+    if freeze_gate.verify(SITE, allow_missing=allow_missing) != 0:
         raise SystemExit(1)
 
 
@@ -3862,24 +3852,14 @@ def run_gates(cat, written):
     if not priv:
         errors.append("17h: privacy/index.html missing")
     else:
-        priv_check = priv
-        if not GA4_ENABLED:
-            # Preview only: the two unconfirmed identity placeholders may render.
-            for ph in (LEGAL_NAME_PLACEHOLDER, PRIVACY_EMAIL_PLACEHOLDER):
-                priv_check = priv_check.replace(esc(ph), "")
         for tok in ("{{", "TODO", "G-XXXXXXXXXX"):
-            if tok in priv_check:
+            if tok in priv:
                 errors.append(f"17h: privacy page contains {tok!r}")
         m = re.search(r'<span class="ga-retention">(.*?)</span>', priv)
         if not m or html.unescape(m.group(1)) != GA4_RETENTION:
             errors.append("17h: privacy page retention does not equal GA4_RETENTION")
         if PRIVACY_NO_PII_LINE not in html.unescape(priv):
             errors.append("17h: privacy page missing the no-PII sentence")
-    if GA4_ENABLED:
-        if LEGAL_NAME == LEGAL_NAME_PLACEHOLDER:
-            errors.append("17h: LEGAL_NAME is still the placeholder (live build refused)")
-        if PRIVACY_CONTACT_EMAIL == PRIVACY_EMAIL_PLACEHOLDER:
-            errors.append("17h: PRIVACY_CONTACT_EMAIL is still the placeholder (live build refused)")
 
     # 17i is the freeze gate (freeze_check, after run_gates) against a snapshot
     # regenerated from the LIVE build.
