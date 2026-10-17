@@ -15,6 +15,9 @@ House rules enforced as build gates (build fails if any gate fails):
   - Gate 17 (WS-SITE25): GA4 ships in the LIVE build only, behind the consent
     banner; the preview build carries no Google code; tracking attributes,
     privacy page and the contact thanks page are all checked
+  - Gate 18 (WS-SITE26): the contact form option field, ?option= links, the
+    analytics whitelist, the Plan Only first CTA and nav order, the monthly
+    review copy on /coached/ and the privacy lines
 """
 from __future__ import annotations
 
@@ -150,8 +153,10 @@ HERO_BODY = ("Whether it's your first Ironman, a Haute Route podium or the perfe
 CTA_FIND = "Find your plan"
 # WS-SITE19: every CTA names the tier it leads to. This one points at /coaching/
 # (the Coached by Tom page), so it reads "Coach with Tom", not the old generic
-# "Get coached" (which no longer says which tier).
+# "Get coached" (which no longer says which tier). WS-SITE26: the home hero
+# primary is now Plan Only (CTA_START_PLAN); this is the second, ghost button.
 CTA_GET = "Coach with Tom"
+CTA_START_PLAN = "Start with Plan Only"
 CTA_FEMALE_FEATURE = "See how I train female athletes"
 
 # (Removed 2026-08-13: the "written by a professional coach / not a machine" home band was
@@ -222,10 +227,11 @@ WHICH_TOM = "Chasing something big and want a coach in your corner for all of it
 PLANS_INTRO = TIER_PLANS_BODY
 
 COACHED_INTRO = ("The same coaching my fully coached athletes get, written for you, block by "
-                 "block, for £120 a month. I build your programme myself and, at the end of "
-                 "every block, give you honest feedback and build the next one around it. The "
-                 "only difference is the contact: no calls, and I am not on call day to day. "
-                 "The coaching in the plan is exactly the same.")
+                 "block, for £120 a month. Each month runs the same way: three weeks of "
+                 "training, then a rest week in which I review the block you have just done, "
+                 "give you honest feedback and build the next one around it. The only "
+                 "difference is the contact: no calls, and I am not on call day to day. The "
+                 "coaching in the plan is exactly the same.")
 
 # ── Tier 1 display name (the £39.99 off-the-shelf plan library) ───────────────
 # Renamed "Plans" -> "Plan Store" (WS-SITE13, Tom's ask). The route stays /plans/;
@@ -249,6 +255,32 @@ SUPPORT_LEVELS = [
      "The complete relationship. One to one, weekly feedback, unlimited contact and a "
      "coach in your corner the whole way."),
 ]
+
+# ── Contact form option (WS-SITE26) ───────────────────────────────────────────
+# The one question the enquiry form asks beyond name, email, event and message:
+# which option the person is asking about. Values are fixed machine strings so a
+# Netlify submission, a ?option= link and the GA4 lead_option parameter all use
+# the same four words. analytics.js carries the SAME list (LEAD_OPTIONS) as its
+# whitelist; gate 18c asserts the two never drift. Display order is the ladder
+# minus the store, then the default, then the store question (spec 1.1).
+LEAD_OPTIONS = [
+    ("plan-only", f"{TIER2_NAME}, £120 a month"),
+    ("coached-by-tom", "Coached by Tom, £185 a month"),
+    ("not-sure", "Not sure yet"),
+    ("plan-store", f"A question about a {TIER1_NAME} plan"),
+]
+LEAD_OPTION_VALUES = [v for v, _l in LEAD_OPTIONS]
+LEAD_OPTION_DEFAULT = "not-sure"
+LEAD_OPTION_LABEL = "What are you interested in?"
+
+
+def contact_url(option=None) -> str:
+    """/contact/ with the option pre-selected. Only a known value may be linked."""
+    if option is None:
+        return CONTACT_URL
+    assert option in LEAD_OPTION_VALUES, option
+    return f"{CONTACT_URL}?option={option}"
+
 
 # ── Home tier cards (WS-SITE21 item 2: the money moment, distilled) ──────────
 # The HOME tier cards are distilled to a verdict + 3-4 sharp bullets so the three
@@ -274,9 +306,10 @@ HOME_TIER_CARDS = [
      "href": "/coached/", "cta": "How Plan Only works",
      "price_main": "&pound;120 a month", "price_qual": "",
      "verdict": "A plan I build for you, block by block, not pulled off a shelf.",
+     "flag": "If in doubt, start here",
      "bullets": [
          "Written by me, the same way I work with my coached athletes",
-         "Honest feedback at the end of every block",
+         "One written review a month, at the end of every block",
          "The next block built around where you actually are",
          "Everything but the day to day contact and calls",
      ]},
@@ -353,6 +386,19 @@ GA_BOOT = ("<!-- hp-ga-boot -->\n"
            "gtag('consent','default',{'ad_storage':'denied','ad_user_data':'denied',"
            "'ad_personalization':'denied','analytics_storage':'denied'});</script>\n")
 
+# WS-SITE26: pre-select the contact form option from ?option=<value>. Pure
+# functionality: no storage, no network, no analytics, so it runs whether or not
+# the visitor has accepted measurement cookies. The <option> list is the
+# whitelist; an unknown value is ignored and the default stands. Shipped ONLY on
+# /contact/ (gate 18c), so no other page reads the URL. With JS off the static
+# form is unchanged and still posts.
+CONTACT_PRESELECT_JS = (
+    "<script>(function(){var s=document.getElementById('c-option');"
+    "if(!s||!window.URLSearchParams)return;"
+    "var v=new URLSearchParams(location.search).get('option');if(!v)return;"
+    "for(var i=0;i<s.options.length;i++){if(s.options[i].value===v){s.value=v;return;}}"
+    "})();</script>")
+
 
 def head(title, description, canonical, og_image_name=None, og_type="website", extra="",
          preload_img=None, page_type="page", sport="", tier="") -> str:
@@ -422,10 +468,10 @@ def head(title, description, canonical, og_image_name=None, og_type="website", e
 
 NAV = [
     ("Home", BASE_PATH + "/", "home"),
+    # WS-SITE26: Plan Only first, Coached by Tom second (the premium step up), then the rest.
+    (TIER2_NAME, BASE_PATH + "/coached/", "coached"),
     ("Coached by Tom", BASE_PATH + "/coaching/", "coaching"),
     ("Female Performance", BASE_PATH + "/female-performance/", "female"),
-    # WS-SITE18: Plan Only before Plan Store in the nav.
-    (TIER2_NAME, BASE_PATH + "/coached/", "coached"),
     (TIER1_NAME, BASE_PATH + "/plans/", "plans"),
     ("About Us", BASE_PATH + "/about/", "about"),
     ("Blog", BASE_PATH + "/blog/", "blog"),
@@ -490,10 +536,10 @@ def footer() -> str:
       <div>
         <h4>Train with us</h4>
         <ul>
+          <li><a href="{BASE_PATH}/coached/">{esc(TIER2_NAME)}</a></li>
           <li><a href="{BASE_PATH}/coaching/">Coached by Tom</a></li>
           <li><a href="{BASE_PATH}/female-performance/">Female Performance</a></li>
           <li><a href="{BASE_PATH}/plans/">{esc(TIER1_NAME)}</a></li>
-          <li><a href="{BASE_PATH}/coached/">{esc(TIER2_NAME)}</a></li>
           <li><a href="{BASE_PATH}/about/">About Tom</a></li>
           <li><a href="{esc(CONTACT_URL)}">Contact</a></li>
         </ul>
@@ -1081,6 +1127,7 @@ def home_tier_cards() -> str:
         cards.append(
             f'<div class="tier-card {t["cls"]}">'
             f'<h3>{esc(t["name"])}</h3>'
+            + (f'<p class="tier-flag">{esc(t["flag"])}</p>' if t.get("flag") else "") +
             f'<div class="price">{t["price_main"]}{qual}</div>'
             f'<p class="support-line"><span class="support-tag {t["tag_cls"]}">'
             f'Support: {esc(t["support"])}</span></p>'
@@ -1125,8 +1172,8 @@ def render_home(cat) -> str:
     <h1>{esc(HERO_HEADLINE)}</h1>
     <p class="lede">{esc(HERO_BODY)}</p>
     <div class="cta-row">
-      <a class="btn" href="{BASE_PATH}/coaching/"{ga("cta", label=CTA_GET, location="hero")}>{esc(CTA_GET)}</a>
-      <a class="btn on-dark ghost" href="{BASE_PATH}/plans/"{ga("cta", label=CTA_FIND, location="hero")}>{esc(CTA_FIND)}</a>
+      <a class="btn" href="{BASE_PATH}/coached/"{ga("cta", label=CTA_START_PLAN, location="hero")}>{esc(CTA_START_PLAN)}</a>
+      <a class="btn on-dark ghost" href="{BASE_PATH}/coaching/"{ga("cta", label=CTA_GET, location="hero")}>{esc(CTA_GET)}</a>
     </div>
   </div>
 </section>
@@ -1137,7 +1184,8 @@ def render_home(cat) -> str:
     <h2>Pick the level of support that fits</h2>
     <p class="section-intro">The plan is only half of it. What really changes across the three tiers is
     how much of me you get, from a proven plan you run yourself, to feedback on every block, to the full
-    coaching relationship. No nonsense, no upselling, just the right level of support for where you are.</p>
+    coaching relationship. No nonsense, no upselling, just the right level of support for where you are.
+    If in doubt, start with Plan Only, and step up to Coached by Tom later if you want me in your corner day to day.</p>
     <div class="support-ladder" role="list" aria-label="Support increases across the three tiers">{ladder}</div>
     <div class="tier-grid tier-grid--distilled">{home_tier_cards()}</div>
   </div>
@@ -1564,6 +1612,10 @@ COACHED_FAQ = [
      "No. Plan Only is built around the work and the why, delivered in writing so you can go "
      "back to it. If you want calls, WhatsApp and race-day strategy built together, that is "
      "Coached by Tom."),
+    ("How often do you review my training?",
+     "Once a month. Each cycle is three weeks of training then a rest week, and the rest week "
+     "is when I review the block, write your feedback and build the next one. There is no "
+     "per-session feedback in between."),
     ("What if my numbers change or life gets in the way?",
      "The plan moves. When your data shifts or a week falls apart, the next block reflects it. "
      "That is the point of building it block by block instead of all at once."),
@@ -1571,9 +1623,9 @@ COACHED_FAQ = [
      "Triathlon across every distance, road and ultra running, and cycling from sportives to "
      "ultra-distance. If you have a target event, I can build for it."),
     ("Can I message you between blocks?",
-     "Leave notes on your sessions in TrainingPeaks and I read every one at the end of the "
-     "block, as part of the review. There is no back and forth in between. If you want my time "
-     "day to day, that is Coached by Tom."),
+     "Leave notes on your sessions in TrainingPeaks and I read every one in the rest week, as "
+     "part of the block review. There is no back and forth in between. If you want my time day "
+     "to day, that is Coached by Tom."),
     ("Is TrainingPeaks Premium included?",
      "No. Plan Only is delivered to your own TrainingPeaks account. A free TrainingPeaks "
      "Premium account comes with Coached by Tom."),
@@ -1593,7 +1645,7 @@ def render_coached(cat) -> str:
     <p class="eyebrow" style="color:var(--teal-soft)">{esc(TIER2_NAME)} &middot; &pound;120 a month</p>
     <h1>A plan I build for you, block by block</h1>
     <p class="lede">{esc(COACHED_INTRO)}</p>
-    <div class="cta-row"><a class="btn" href="{esc(CONTACT_URL)}"{ga("cta", label=CTA_APPLY_PLAN, location="hero")}>{esc(CTA_APPLY_PLAN)}</a></div>
+    <div class="cta-row"><a class="btn" href="{esc(contact_url('plan-only'))}"{ga("cta", label=CTA_APPLY_PLAN, location="hero")}>{esc(CTA_APPLY_PLAN)}</a></div>
   </div>
 </section>
 
@@ -1608,8 +1660,8 @@ def render_coached(cat) -> str:
         <p class="section-intro">{esc(TIER_COACHED_BODY_2)}</p>
         <ol class="step-list">
           <li><strong>It starts with you</strong>A proper intake: your target event, your history, your week, your numbers and the hours you actually have.</li>
-          <li><strong>Your plan arrives block by block</strong>Built around your life and your event, three weeks at a time, so it stays current with how your training is actually going rather than a whole year written on day one.</li>
-          <li><strong>Feedback at the end of every block</strong>I go through the whole block against what was asked, using your actual data and the notes you leave on your sessions, tell you what it means and build the next block from it.</li>
+          <li><strong>Your plan arrives block by block</strong>Three weeks of training built around your life and your event, delivered to your TrainingPeaks account, so the plan stays current with how your training is actually going rather than a whole year written on day one.</li>
+          <li><strong>A rest week, and one review a month</strong>The fourth week is a rest week. In it I go through the whole block against what was asked, using your actual data and the notes you leave on your sessions, tell you straight what I see, and build the next block from it. One review a month, in writing, so you can go back to it.</li>
           <li><strong>A race plan before every start line</strong>Pacing, fuelling and strategy for your event, in your hands before you get there.</li>
         </ol>
       </div>
@@ -1628,7 +1680,7 @@ def render_coached(cat) -> str:
     <div>
       <div class="callout">
         <h2>Where it differs from full coaching</h2>
-        <p>There are no scheduled calls and I am not on call day to day. What you get is a programme I build around your life and your event, with real feedback at the end of every block on the sessions you actually did. If you want me in your corner for all of it, look at Coached by Tom.</p>
+        <p>There are no scheduled calls and I am not on call day to day. What you get is a programme I build around your life and your event, with one proper review a month: at the end of every three week block, in the rest week, I go through the sessions you actually did and build the next block from them. If you want me in your corner for all of it, look at Coached by Tom.</p>
         <p style="margin-top:18px"><a class="btn on-dark ghost" href="{BASE_PATH}/coaching/"{ga("cta", label="Coached by Tom", location="faq_aside")}>Coached by Tom</a></p>
       </div>
     </div>
@@ -1641,13 +1693,15 @@ def render_coached(cat) -> str:
   <div class="wrap">
     <h2>Ready to start?</h2>
     <p class="section-intro">Tell me about your event and your season and I'll take it from there.</p>
-    <p style="margin-top:18px"><a class="btn" href="{esc(CONTACT_URL)}"{ga("cta", label=CTA_APPLY_PLAN, location="closing")}>{esc(CTA_APPLY_PLAN)}</a></p>
+    <p style="margin-top:18px"><a class="btn" href="{esc(contact_url('plan-only'))}"{ga("cta", label=CTA_APPLY_PLAN, location="closing")}>{esc(CTA_APPLY_PLAN)}</a></p>
   </div>
 </section>
 {quote_block("coached")}
 </main>"""
-    desc = ("Plan Only with Tom Cooling, £120 a month. A plan I build for you block by block, "
-            "with real feedback every block and a race plan for race day.")
+    desc = ("Plan Only with Tom Cooling, £120 a month. Three weeks of training, then a rest week "
+            "in which I review your block and build the next one. Race plan included.")
+    # Gate 18g: the description must fit the 158 character snippet budget.
+    assert len(esc(desc)) <= 158, len(esc(desc))
     faq_ld = {
         "@context": "https://schema.org", "@type": "FAQPage",
         "mainEntity": [
@@ -1656,8 +1710,7 @@ def render_coached(cat) -> str:
             for q, a in COACHED_FAQ]}
     svc = service_node(
         f"{TIER2_NAME} coaching",
-        (f"{COACHED_INTRO} Built block by block around your life and target event, with real "
-         "feedback at the end of every block and a race plan before every start line."),
+        f"{COACHED_INTRO} A race plan before every start line is included.",
         "/coached/", monthly_price="120.00")
     extra = ld_script([
         breadcrumb_node([("Home", "/"), (TIER2_NAME, None)]), svc, faq_ld])
@@ -1700,7 +1753,7 @@ def render_coaching(cat) -> str:
     <h1>A coach in your corner for all&nbsp;of&nbsp;it</h1>
     <p class="lede">{esc(TIER_TOM_BODY)}</p>
     <div class="cta-row">
-      <a class="btn" href="{esc(CONTACT_URL)}"{ga("cta", label=CTA_ASK_TOM, location="hero")}>{esc(CTA_ASK_TOM)}</a>
+      <a class="btn" href="{esc(contact_url('coached-by-tom'))}"{ga("cta", label=CTA_ASK_TOM, location="hero")}>{esc(CTA_ASK_TOM)}</a>
       <a class="btn on-dark ghost" href="#what-you-get"{ga("cta", label="See what you get", location="hero")}>See what you get</a>
     </div>
   </div>
@@ -1776,7 +1829,7 @@ def render_coaching(cat) -> str:
       this level of support, weekly feedback, unlimited contact and a coach reading every
       session, is not something I can give properly to more than a small cohort. When those 15
       are taken, it is full.</p>
-      <p style="margin-top:18px"><a class="btn btn--tom" href="{esc(CONTACT_URL)}"{ga("cta", label=CTA_ASK_TOM, location="limited_band")}>{esc(CTA_ASK_TOM)}</a></p>
+      <p style="margin-top:18px"><a class="btn btn--tom" href="{esc(contact_url('coached-by-tom'))}"{ga("cta", label=CTA_ASK_TOM, location="limited_band")}>{esc(CTA_ASK_TOM)}</a></p>
     </div>
   </div>
 </section>
@@ -1793,8 +1846,8 @@ def render_coaching(cat) -> str:
         <li>Three-month minimum</li>
         <li>Limited places, taken one at a time</li>
       </ul>
-      <p style="margin-top:6px"><a class="btn" href="{esc(CONTACT_URL)}"{ga("cta", label="Apply for Coached by Tom", location="pricing_card")}>Apply for Coached by Tom</a></p>
-      <p class="pricing-note">Not quite ready for this level? <a href="{BASE_PATH}/coached/"{ga("cta", label=f"{TIER2_NAME} is £120 a month", location="pricing_note")}>{esc(TIER2_NAME)} is &pound;120 a month</a>.</p>
+      <p style="margin-top:6px"><a class="btn" href="{esc(contact_url('coached-by-tom'))}"{ga("cta", label="Apply for Coached by Tom", location="pricing_card")}>Apply for Coached by Tom</a></p>
+      <p class="pricing-note">Want the same plan without the day to day contact? <a href="{BASE_PATH}/coached/"{ga("cta", label=f"{TIER2_NAME} is £120 a month", location="pricing_note")}>{esc(TIER2_NAME)} is &pound;120 a month</a>.</p>
     </div>
   </div>
 </section>
@@ -1922,8 +1975,8 @@ def render_about(cat) -> str:
     <p class="section-intro">Start your journey with a plan built for your race, get coached
     from £120 a month, or ask about a limited place with me directly.</p>
     <div class="cta-row" style="margin-top:20px">
-      <a class="btn" href="{BASE_PATH}/plans/"{ga("cta", label="Browse plans", location="closing")}>Browse plans</a>
-      <a class="btn ghost" href="{BASE_PATH}/coached/"{ga("cta", label=CTA_EXPLORE_PLAN, location="closing")}>{esc(CTA_EXPLORE_PLAN)}</a>
+      <a class="btn" href="{BASE_PATH}/coached/"{ga("cta", label=CTA_EXPLORE_PLAN, location="closing")}>{esc(CTA_EXPLORE_PLAN)}</a>
+      <a class="btn ghost" href="{BASE_PATH}/plans/"{ga("cta", label="Browse plans", location="closing")}>Browse plans</a>
     </div>
   </div>
 </section>
@@ -2307,6 +2360,9 @@ def render_options() -> str:
 # does not carry one. The form is a plain Netlify Forms form: a static POST with
 # a hidden form-name field and a honeypot, so it works on Netlify with no backend.
 def render_contact(cat) -> str:
+    option_tags = "".join(
+        f'<option value="{v}"{" selected" if v == LEAD_OPTION_DEFAULT else ""}>{esc(label)}</option>'
+        for v, label in LEAD_OPTIONS)
     body = f"""<main id="main">
 <section class="hero" style="padding:60px 0 52px">
   <div class="wrap">
@@ -2347,12 +2403,15 @@ def render_contact(cat) -> str:
           <input id="c-name" name="name" type="text" autocomplete="name" required></div>
         <div class="field"><label for="c-email">Your email</label>
           <input id="c-email" name="email" type="email" autocomplete="email" required></div>
+        <div class="field"><label for="c-option">{esc(LEAD_OPTION_LABEL)}</label>
+          <select id="c-option" name="option">{option_tags}</select></div>
         <div class="field"><label for="c-event">Your target event (optional)</label>
           <input id="c-event" name="event" type="text"></div>
         <div class="field"><label for="c-message">Your message</label>
           <textarea id="c-message" name="message" rows="6" required></textarea></div>
         <button class="btn" type="submit">Send message</button>
       </form>
+      {CONTACT_PRESELECT_JS}
     </div>
   </div>
 </section>
@@ -2375,6 +2434,9 @@ def render_contact(cat) -> str:
 # constants above (gate 17h checks both).
 PRIVACY_NO_PII_LINE = ("I never send your name, email address or the contents of your "
                        "message to Google Analytics.")
+PRIVACY_FORM_LINE = ("When you send the form on the contact page I receive your name, your "
+                     "email address, which option you are interested in, your target event if "
+                     "you give one, and your message.")
 
 
 def render_privacy(cat) -> str:
@@ -2396,10 +2458,10 @@ def render_privacy(cat) -> str:
     <p>This page covers horsepowercoaching.co.uk only. When you buy a plan you are taken to TrainingPeaks, and when you message me on WhatsApp, Instagram or Facebook you are using those services. Each of them has its own privacy policy, and I don't control what they collect.</p>
 
     <h2>The contact form</h2>
-    <p>When you send the form on the contact page I receive your name, your email address, your target event if you give one, and your message. I use them to reply to you and, if we go on to work together, to set up your coaching. The form is run by Netlify, which hosts this site, so your message is stored on Netlify's systems and emailed to me. I keep enquiries for as long as I need them to deal with your question, and I delete them when they are no longer needed. The legal basis is that you have asked me to get in touch, and my legitimate interest in answering enquiries about my coaching.</p>
+    <p>{esc(PRIVACY_FORM_LINE)} I use them to reply to you and, if we go on to work together, to set up your coaching. The form is run by Netlify, which hosts this site, so your message is stored on Netlify's systems and emailed to me. I keep enquiries for as long as I need them to deal with your question, and I delete them when they are no longer needed. The legal basis is that you have asked me to get in touch, and my legitimate interest in answering enquiries about my coaching.</p>
 
     <h2>Measurement with Google Analytics</h2>
-    <p>If you click Accept on the cookie banner, this site runs Google Analytics 4. It tells me which pages people read, which plans they look at, which buttons they click, how far down a page they get, whether they start and send the contact form, and whether a visit came from a Google ad. I use that to improve the site and to see whether the advertising I pay for is worth it.</p>
+    <p>If you click Accept on the cookie banner, this site runs Google Analytics 4. It tells me which pages people read, which plans they look at, which buttons they click, how far down a page they get, whether they start and send the contact form, which option they picked on it, and whether a visit came from a Google ad. I use that to improve the site and to see whether the advertising I pay for is worth it.</p>
     <p>Google Analytics sets cookies on your device and sends data about your visit to Google, including a shortened version of your IP address, your browser and device type and the pages you view. Google acts on my instructions for the analytics itself, and it also uses the data under its own terms. I have switched off Google's cross-device signals and personalised advertising features. Analytics data is kept in my Google Analytics account for <span class="ga-retention">{esc(GA4_RETENTION)}</span> and then deleted.</p>
     <p>Nothing is sent to Google unless you accept. If you reject, or make no choice, Google Analytics does not load and no analytics cookies are set. You can change your mind at any time using the Cookie settings link at the bottom of every page. The legal basis is your consent.</p>
     <p>{esc(PRIVACY_NO_PII_LINE)}</p>
@@ -2479,16 +2541,18 @@ def render_contact_thanks(cat) -> str:
 def _funnel_cards():
     tiers = [
         (TIER1_NAME, 'From &pound;39.99,<span class="price-qual"> one-off</span>', SUPPORT_LEVELS[0][1], "/plans/", "Browse the plans"),
-        (TIER2_NAME, "&pound;120 a month", SUPPORT_LEVELS[1][1], "/coached/", "How Plan Only works"),
+        (TIER2_NAME, "&pound;120 a month", SUPPORT_LEVELS[1][1], "/coached/", "How Plan Only works",
+         "If in doubt, start here"),
         ("Coached by Tom", "&pound;185 a month", SUPPORT_LEVELS[2][1], "/coaching/", "Coach with Tom"),
     ]
     # WS-SITE18 tier colour theme: store (white/bordered), plan (teal), tom (gold).
     tier_cls = ["tier-card--store", "feature tier-card--plan", "tier-card--tom"]
     btn_cls = ["btn--store", "btn--plan", "btn--tom"]
     cards = []
-    for i, (name, price, support, path, cta) in enumerate(tiers):
+    for i, (name, price, support, path, cta, *flag) in enumerate(tiers):
         cards.append(
             f'<div class="tier-card {tier_cls[i]}"><h3>{esc(name)}</h3>'
+            + (f'<p class="tier-flag">{esc(flag[0])}</p>' if flag else "") +
             f'<div class="price">{price}</div>'
             f'<p class="support-line"><span class="support-tag">Support: {esc(support)}</span></p>'
             f'<a class="btn {btn_cls[i]}" href="{BASE_PATH}{path}"'
@@ -2507,8 +2571,8 @@ def render_sport_landing(*, slug, h1, eyebrow, hero_img, og_name, title, desc,
     <h1>{esc(h1)}</h1>
     <p class="lede">{esc(lede)}</p>
     <div class="cta-row">
-      <a class="btn" href="{BASE_PATH}/plans/"{ga("cta", label=CTA_FIND, location="hero")}>{esc(CTA_FIND)}</a>
-      <a class="btn on-dark ghost" href="{BASE_PATH}/coached/"{ga("cta", label=CTA_EXPLORE_PLAN, location="hero")}>{esc(CTA_EXPLORE_PLAN)}</a>
+      <a class="btn" href="{BASE_PATH}/coached/"{ga("cta", label=CTA_EXPLORE_PLAN, location="hero")}>{esc(CTA_EXPLORE_PLAN)}</a>
+      <a class="btn on-dark ghost" href="{BASE_PATH}/plans/"{ga("cta", label=CTA_FIND, location="hero")}>{esc(CTA_FIND)}</a>
     </div>
   </div>
 </section>
@@ -3009,8 +3073,9 @@ def render_llms_txt(cat) -> str:
         f"- {names[0]}: training plans from {store_amt}, one-off. {total} plans, each written "
         "for a specific target race and goal and delivered through TrainingPeaks.")
     lines.append(
-        f"- {names[1]}: {plan_amt} a month. A bespoke plan built for you block by block, with "
-        "block-by-block feedback. No calls.")
+        f"- {names[1]}: {plan_amt} a month. A bespoke plan built for you block by block: three "
+        "weeks of training, then a rest week in which Tom reviews the block, writes feedback and "
+        "builds the next one. One review a month, no calls.")
     lines.append(
         f"- {names[2]}: {tom_amt} a month. Full one to one coaching with weekly feedback. "
         "15 places only.")
@@ -3861,6 +3926,137 @@ def run_gates(cat, written):
         if PRIVACY_NO_PII_LINE not in html.unescape(priv):
             errors.append("17h: privacy page missing the no-PII sentence")
 
+    # ── Gate 18 (WS-SITE26): Plan Only first, the enquiry option field ──────────
+    # 18a: the option select sits in the contact form, in order, default selected.
+    selects = re.findall(r'<select id="c-option" name="option">(.*?)</select>', contact_html, re.S)
+    if len(selects) != 1:
+        errors.append(f"18a: contact page carries {len(selects)} option selects, want 1")
+    else:
+        i_form = contact_html.find('class="contact-form"')
+        i_sel = contact_html.find('<select id="c-option"')
+        i_end = contact_html.find("</form>", i_form)
+        if not (0 <= i_form < i_sel < i_end):
+            errors.append("18a: option select is not inside the contact form")
+        if not (contact_html.find('id="c-email"') < i_sel < contact_html.find('id="c-event"')):
+            errors.append("18a: option select is not between email and event")
+        vals = re.findall(r'<option value="([^"]*)"', selects[0])
+        if vals != LEAD_OPTION_VALUES:
+            errors.append(f"18a: option values {vals} != {LEAD_OPTION_VALUES}")
+        sel = re.findall(r'<option value="([^"]*)" selected>', selects[0])
+        if sel != [LEAD_OPTION_DEFAULT]:
+            errors.append(f"18a: selected options {sel}, want [{LEAD_OPTION_DEFAULT!r}]")
+        m = re.search(r'<label for="c-option">(.*?)</label>', contact_html)
+        if not m or html.unescape(m.group(1)) != LEAD_OPTION_LABEL:
+            errors.append("18a: option label text does not equal LEAD_OPTION_LABEL")
+
+    # 18b: ?option= links carry known values, on the right tier pages only.
+    bare_contact = f'href="{BASE_PATH}/contact/"'
+    for path, content in html_pages.items():
+        for v in re.findall(rf'href="{re.escape(BASE_PATH)}/contact/\?option=([^"]*)"', content):
+            if v not in LEAD_OPTION_VALUES:
+                errors.append(f"18b: unknown ?option={v!r} in {path}")
+        if content.count(bare_contact) != 2:
+            errors.append(f"18b: {path} has {content.count(bare_contact)} bare contact links, want 2")
+    coached_html = written.get("coached/index.html", "")
+    coaching_html = written.get("coaching/index.html", "")
+    if coached_html.count(f'href="{BASE_PATH}/contact/?option=plan-only"') != 2:
+        errors.append("18b: coached/index.html must link ?option=plan-only exactly twice")
+    if "?option=coached-by-tom" in coached_html:
+        errors.append("18b: coached/index.html links ?option=coached-by-tom")
+    if coaching_html.count(f'href="{BASE_PATH}/contact/?option=coached-by-tom"') != 3:
+        errors.append("18b: coaching/index.html must link ?option=coached-by-tom exactly 3 times")
+    if "?option=plan-only" in coaching_html:
+        errors.append("18b: coaching/index.html links ?option=plan-only")
+
+    # 18c: analytics.js whitelist matches the build, and the preselect script
+    # ships on /contact/ only.
+    m = re.search(r"var LEAD_OPTIONS = \[([^\]]*)\]", asrc)
+    js_vals = re.findall(r'"([^"]*)"', m.group(1)) if m else []
+    if js_vals != LEAD_OPTION_VALUES:
+        errors.append(f"18c: analytics.js LEAD_OPTIONS {js_vals} != {LEAD_OPTION_VALUES}")
+    if asrc.count("lead_option") < 2:
+        errors.append("18c: analytics.js must send lead_option on submit and on the lead")
+    if "JSON.stringify({ ts:" not in asrc:
+        errors.append("18c: analytics.js must store the lead flag as JSON {ts, option}")
+    if contact_html.count(CONTACT_PRESELECT_JS) != 1:
+        errors.append("18c: contact page must carry the preselect script exactly once")
+    for path, content in written.items():
+        if path == "contact/index.html":
+            continue
+        if CONTACT_PRESELECT_JS in content or "URLSearchParams" in content:
+            errors.append(f"18c: preselect script or URLSearchParams found in {path}")
+
+    # 18d: the monthly review rhythm on /coached/ and in llms.txt.
+    def _body_text(doc):
+        doc = re.sub(r"<head\b.*?</head>", " ", doc, flags=re.S)
+        doc = re.sub(r"<script\b.*?</script>", " ", doc, flags=re.S)
+        return html.unescape(re.sub(r"<[^>]+>", " ", doc))
+    ctext = _body_text(coached_html)
+    if ctext.lower().count("rest week") < 4:
+        errors.append(f"18d: coached page says 'rest week' {ctext.lower().count('rest week')} times, want >= 4")
+    if ctext.lower().count("three weeks of training") < 2:
+        errors.append("18d: coached page must say 'three weeks of training' at least twice")
+    if "one review a month" not in ctext.lower():
+        errors.append("18d: coached page missing 'one review a month'")
+    m = re.search(r'<meta name="description" content="([^"]*)"', coached_html)
+    coached_desc = html.unescape(m.group(1)) if m else ""
+    if "rest week" not in coached_desc:
+        errors.append("18d: coached meta description missing 'rest week'")
+    svc_desc = ""
+    for raw in re.findall(r'<script type="application/ld\+json">(.*?)</script>', coached_html, re.S):
+        data = json.loads(raw)
+        nodes = data if isinstance(data, list) else data.get("@graph", [data])
+        for n in nodes:
+            if isinstance(n, dict) and n.get("@type") == "Service":
+                svc_desc = n.get("description", "")
+    if "rest week" not in svc_desc:
+        errors.append("18d: coached Service JSON-LD description missing 'rest week'")
+    if "rest week" not in written.get("llms.txt", ""):
+        errors.append("18d: llms.txt missing 'rest week'")
+    for tok in ("Feedback at the end of every block", "at the end of the block, as part of the review"):
+        if tok in coached_html:
+            errors.append(f"18d: coached page still carries {tok!r}")
+
+    # 18e: Plan Only leads the CTAs and the nav.
+    home_html = written.get("index.html", "")
+    i_hero = home_html.find('<section class="hero')
+    hero = home_html[i_hero:home_html.find("</section>", i_hero)] if i_hero >= 0 else ""
+    hero_hrefs = re.findall(r'<a class="btn[" ][^>]*?href="([^"]*)"', hero)
+    if hero_hrefs[:2] != [f"{BASE_PATH}/coached/", f"{BASE_PATH}/coaching/"]:
+        errors.append(f"18e: home hero buttons point at {hero_hrefs[:2]}, want /coached/ then /coaching/")
+    for path, content in html_pages.items():
+        m = re.search(r'<nav class="site-nav".*?</nav>', content, re.S)
+        if not m:
+            errors.append(f"18e: {path} has no header nav")
+            continue
+        i_po = m.group(0).find(f'href="{BASE_PATH}/coached/"')
+        i_tom = m.group(0).find(f'href="{BASE_PATH}/coaching/"')
+        if not (0 <= i_po < i_tom):
+            errors.append(f"18e: {path} nav does not put Plan Only before Coached by Tom")
+    if "Not quite ready" in coaching_html:
+        errors.append("18e: coaching page still says 'Not quite ready'")
+    for path in ("index.html", "triathlon-coaching/index.html", "cycling-coaching/index.html"):
+        n = written.get(path, "").count('class="tier-flag"')
+        if n != 1:
+            errors.append(f"18e: {path} carries {n} tier flags, want 1")
+    for path in ("about/index.html", "triathlon-coaching/index.html", "cycling-coaching/index.html"):
+        m = re.search(r'<div class="cta-row"[^>]*>\s*<a [^>]*?href="([^"]*)"', written.get(path, ""))
+        if not m or m.group(1) != f"{BASE_PATH}/coached/":
+            errors.append(f"18e: {path} first cta-row anchor does not point at /coached/")
+
+    # 18f: the privacy page names the option field in both places.
+    priv_text = html.unescape(priv)
+    if PRIVACY_FORM_LINE not in priv_text:
+        errors.append("18f: privacy page missing PRIVACY_FORM_LINE")
+    if "which option they picked on it" not in priv_text:
+        errors.append("18f: privacy page missing 'which option they picked on it'")
+    if PRIVACY_NO_PII_LINE not in priv_text:
+        errors.append("18f: privacy page missing the no-PII sentence")
+
+    # 18g: the /coached/ description fits the snippet budget.
+    if len(coached_desc) > 158:
+        errors.append(f"18g: coached meta description is {len(coached_desc)} characters, want <= 158")
+
     # 17i is the freeze gate (freeze_check, after run_gates) against a snapshot
     # regenerated from the LIVE build.
 
@@ -3881,6 +4077,9 @@ def run_gates(cat, written):
     print(f"  - Gate 17 (GA4/consent): 17a stub {'once per page, live' if GA4_ENABLED else 'absent, preview'}; "
           f"17b boot order; 17c no PII; 17d {len(tracked)} tracked elements; 17e banner; "
           f"17f en-dash; 17g thanks page; 17h privacy page")
+    print("  - Gate 18 (Plan Only first): 18a option field; 18b ?option= links; 18c analytics "
+          "whitelist + preselect on /contact/ only; 18d monthly review copy; 18e CTA order; "
+          "18f privacy; 18g description length")
     print(f"  - zero client surnames across all generated output (first name + initial policy)")
     ld_total = sum(len(re.findall(r'application/ld\+json', v)) for v in html_pages.values())
     print(f"  - SEO/AEO: 1 h1 + canonical(prod host) + OG/Twitter + parsing JSON-LD per page "

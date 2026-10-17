@@ -40,7 +40,11 @@ checks the page). `assets/consent.js` runs the cookie banner
 and loads gtag.js only after the visitor clicks Accept (basic Consent Mode v2);
 `assets/analytics.js` sends the events, driven by the `data-ga*` attributes the
 generator emits. The privacy page is `/privacy/`; the contact form posts to the
-noindex `/contact/thanks/` page, where `generate_lead` fires.
+noindex `/contact/thanks/` page, where `generate_lead` fires. The form's `option`
+field, pre-selected from `?option=` on the link that led to `/contact/`, is carried
+as `lead_option` on `contact_submit` and `generate_lead` (WS-SITE26, gate 18). Its
+four values are `plan-only`, `coached-by-tom`, `not-sure` (the default) and
+`plan-store`.
 
 ## Refreshing the catalogue
 
