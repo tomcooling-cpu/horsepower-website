@@ -2,7 +2,8 @@
    filter events from catalogue.js, and the page's own structure. It never reads a
    contact form field. Events queue in memory until consent.js signals hp:ga-ready
    and are sent through gtag; without consent the queue is simply dropped with the
-   page, nothing is stored. */
+   page, nothing is stored. The one form control it reads is the option select,
+   whitelisted to four fixed values. */
 (function () {
   "use strict";
   var root = document.documentElement;
@@ -11,6 +12,10 @@
   var LIST_NAMES = { plan_list: "Plan Store", female_performance: "Female Performance" };
   var LEAD_KEY = "hp_lead_pending";
   var LEAD_MAX_AGE = 15 * 60 * 1000;
+  // WS-SITE26: the contact form's option select. Only one of these fixed values
+  // is ever sent; anything else is reported as "not-sure". Never user-typed text.
+  var LEAD_OPTIONS = ["plan-only", "coached-by-tom", "not-sure", "plan-store"];
+  function leadOption(v) { return LEAD_OPTIONS.indexOf(v) >= 0 ? v : "not-sure"; }
   var queue = [];
 
   function ready() { return window.__hpGaReady === true && typeof window.gtag === "function"; }
@@ -122,9 +127,13 @@
     form.addEventListener("focusin", onStart);
     form.addEventListener("input", onStart);
     form.addEventListener("submit", function () {
-      send("contact_submit", { form_name: "contact" });
+      var sel = form.querySelector('select[name="option"]');
+      var opt = leadOption(sel ? String(sel.value) : "");
+      send("contact_submit", { form_name: "contact", lead_option: opt });
       if (ready()) {
-        try { window.sessionStorage.setItem(LEAD_KEY, String(Date.now())); } catch (err) { /* blocked */ }
+        try {
+          window.sessionStorage.setItem(LEAD_KEY, JSON.stringify({ ts: Date.now(), option: opt }));
+        } catch (err) { /* blocked */ }
       }
     });
   }
@@ -149,16 +158,17 @@
     send("view_item_list", { item_list_name: LIST_NAMES[PAGE_TYPE],
       item_count: document.querySelectorAll("[data-ga-item]").length });
   } else if (PAGE_TYPE === "contact_thanks") {
-    var ts = null;
+    var rec = null;
     try {
-      ts = window.sessionStorage.getItem(LEAD_KEY);
+      rec = JSON.parse(window.sessionStorage.getItem(LEAD_KEY) || "null");
       window.sessionStorage.removeItem(LEAD_KEY);
-    } catch (err) { ts = null; }
-    var age = ts ? Date.now() - parseInt(ts, 10) : NaN;
+    } catch (err) { rec = null; }
+    var age = (rec && typeof rec.ts === "number") ? Date.now() - rec.ts : NaN;
     if (age >= 0 && age < LEAD_MAX_AGE) {
       send("generate_lead", { currency: "GBP",
         value: parseFloat(main && main.getAttribute("data-lead-value")) || 0,
-        lead_source: "contact_form" });
+        lead_source: "contact_form",
+        lead_option: leadOption(rec.option) });
     }
   }
 })();
