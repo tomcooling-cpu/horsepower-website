@@ -1141,3 +1141,37 @@ html.js .blog-card:not(.in) .blog-card-media img { transform: scale(1.045); }
 .carousel.is-single .review-slide::before { right: 50%; transform: translateX(50%); top: -14px; }
 @media (max-width: 640px) { .review-slide { padding: 30px 24px 26px; }
   .carousel.is-single .review-slide { padding: 32px 24px 28px; } }
+
+/* ============================================================================
+   WS-SITE25: consent banner, footer legal links, privacy table
+   ========================================================================== */
+.consent {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
+  background: var(--black); color: var(--white);
+  border-top: 3px solid var(--teal);
+  padding: 14px 0 calc(14px + env(safe-area-inset-bottom));
+}
+.consent[hidden] { display: none; }
+.consent-inner { display: grid; gap: 14px; align-items: center; grid-template-columns: 1fr; }
+@media (min-width: 640px) { .consent-inner { grid-template-columns: 1fr auto; gap: 24px; } }
+.consent-title { color: var(--white); font-size: 1.05rem; margin: 0 0 6px; }
+.consent-copy p { margin: 0; font-size: 0.95rem; color: var(--grey-light); }
+.consent-copy a { color: var(--teal-soft); }
+.consent-actions { display: flex; gap: 12px; min-width: 260px; }
+.consent-actions .btn { flex: 1 1 0; min-height: 44px; padding: 11px 22px; font-size: 1rem; }
+.consent-accept { background: var(--teal); color: var(--white); }
+.consent-accept:hover { background: var(--teal-dark); color: var(--white); }
+.consent-reject { background: var(--grey-dark); color: var(--white); }
+.consent-reject:hover { background: var(--black); color: var(--white); box-shadow: inset 0 0 0 2px var(--grey-mid); }
+.consent :focus-visible { outline-color: var(--teal-soft); }
+.consent-title:focus { outline: none; }
+.consent-title:focus-visible { outline: 3px solid var(--teal-soft); }
+
+.footer-legal { margin-top: 8px; }
+.footer-legal a { color: #B8B8B8; margin-right: 16px; }
+html:not(.js) .consent-open { display: none; }
+
+.consent-table { width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 0.95rem; }
+.consent-table th, .consent-table td { border: 1px solid var(--rule); padding: 10px 12px; text-align: left; vertical-align: top; }
+.consent-table th { font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 600; }
+@media (max-width: 560px) { .consent-table { display: block; overflow-x: auto; } }

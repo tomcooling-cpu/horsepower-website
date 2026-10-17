@@ -25,7 +25,7 @@
     return "high";
   }
 
-  function apply() {
+  function apply(e) {
     var s = fSport.value, c = fCat.value, t = fTier.value,
         w = fWeeks.value, h = fHours.value,
         q = (fSearch.value || "").trim().toLowerCase();
@@ -43,6 +43,11 @@
     });
     if (count) count.textContent = String(shown);
     if (empty) empty.style.display = shown ? "none" : "block";
+    var src = e && e.target;
+    if (src && src.id) {
+      document.dispatchEvent(new CustomEvent("hp:filter", { detail: {
+        filter: src.id.replace(/^f-/, ""), value: src.value, shown: shown } }));
+    }
   }
 
   [fSport, fCat, fTier, fWeeks, fHours].forEach(function (el) {
