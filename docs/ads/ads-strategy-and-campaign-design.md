@@ -28,8 +28,8 @@ New-user acquisition for the relaunched site, across three tiers that form a lad
 | Tier | Price | Landing page | Conversion type |
 |---|---|---|---|
 | Plan Store | from £39.99 one-off | /plans/ plus 153 race pages | Purchase |
-| Plan Only | £120/month | /coaching/ (Plan Only page) | Lead (apply / contact) |
-| Coached by Tom | £185/month | /coached/ | Lead (apply / contact) |
+| Plan Only | £120/month | /coached/ (Plan Only page) | Lead (apply / contact) |
+| Coached by Tom | £185/month | /coaching/ | Lead (apply / contact) |
 
 The ladder matters for ads: a £39.99 plan buyer is worth more than £39.99 because some buyers step up to Plan Only or Coached later. We do not have measured step-up rates yet, so treat that as upside, not as something to bake into bids on day one.
 
@@ -643,8 +643,8 @@ All created at account level unless stated. Exact text below, ready to paste.
 | Sitelink text | Description line 1 | Description line 2 | Final URL |
 |---|---|---|---|
 | Training Plans | 153 race-specific plans | From £39.99, one-off | /plans/ |
-| Coached by Tom | Full 1:1 coaching, £185/mo | 15 places, weekly feedback | /coached/ |
-| Plan Only | Bespoke plan, £120 a month | Block-by-block feedback | /coaching/ |
+| Coached by Tom | Full 1:1 coaching, £185/mo | 15 places, weekly feedback | /coaching/ |
+| Plan Only | Bespoke plan, £120 a month | Block-by-block feedback | /coached/ |
 | Female Performance | Female first coaching | Not female adapted | /female-performance/ |
 | About Tom | Coach and racer | Based in the South West | /about/ |
 | Training Blog | Real coaching articles | Written by the coach | /blog/ (confirm the live blog URL before entering) |
@@ -673,8 +673,8 @@ Type: Services. Currency GBP.
 | Item header | Description | Price | Final URL |
 |---|---|---|---|
 | Training Plans | Race-specific, one-off | From £39.99 | /plans/ |
-| Plan Only | Bespoke plan, self directed | £120 per month | /coaching/ |
-| Coached by Tom | Full 1:1 coaching | £185 per month | /coached/ |
+| Plan Only | Bespoke plan, self directed | £120 per month | /coached/ |
+| Coached by Tom | Full 1:1 coaching | £185 per month | /coaching/ |
 
 Price asset headers are limited to 25 characters and descriptions to 25 characters; the above fit.
 

@@ -17,7 +17,8 @@ House rules enforced as build gates (build fails if any gate fails):
     privacy page and the contact thanks page are all checked
   - Gate 18 (WS-SITE26): the contact form option field, ?option= links, the
     analytics whitelist, the Plan Only first CTA and nav order, the monthly
-    review copy on /coached/ and the privacy lines
+    review copy on /coached/ and the privacy lines, the minimum-term FAQ and
+    the blog Plan Only links
 """
 from __future__ import annotations
 
@@ -1607,6 +1608,12 @@ def render_plan_detail(cat, p) -> str:
 
 CTA_APPLY_PLAN = "Apply for Plan Only"
 
+# WS-SITE27: the minimum term. The agreement is the source: an initial commitment
+# of three months, then at least one month's notice in writing, email included.
+# Coached by Tom carries the same term on its pricing card (/coaching/); gate 18h
+# asserts both pages say it.
+MIN_TERM_Q = "Is there a minimum term?"
+
 COACHED_FAQ = [
     ("Is there a call every week?",
      "No. Plan Only is built around the work and the why, delivered in writing so you can go "
@@ -1629,6 +1636,12 @@ COACHED_FAQ = [
     ("Is TrainingPeaks Premium included?",
      "No. Plan Only is delivered to your own TrainingPeaks account. A free TrainingPeaks "
      "Premium account comes with Coached by Tom."),
+    (MIN_TERM_Q,
+     "Yes. Plan Only has a three-month minimum, the same as Coached by Tom. After those first "
+     "three months it runs month to month, and either of us can end it by giving at least one "
+     "month's notice in writing. An email is fine. Three months is three full cycles of "
+     "training, review and the next block built from what you actually did, which is enough "
+     "time for the plan to show you what it does."),
     ("Can I upgrade later?",
      "Yes. If you want me directly, you can move to Coached by Tom when a place is open."),
 ]
@@ -4057,6 +4070,56 @@ def run_gates(cat, written):
     if len(coached_desc) > 158:
         errors.append(f"18g: coached meta description is {len(coached_desc)} characters, want <= 158")
 
+    # 18h (WS-SITE27): the minimum term on /coached/ (FAQ + FAQPage JSON-LD) and /coaching/.
+    faq_qs = [q for q, _a in COACHED_FAQ]
+    if faq_qs.count(MIN_TERM_Q) != 1:
+        errors.append(f"18h: COACHED_FAQ carries MIN_TERM_Q {faq_qs.count(MIN_TERM_Q)} times, want 1")
+    elif faq_qs.index(MIN_TERM_Q) != len(COACHED_FAQ) - 2:
+        errors.append("18h: MIN_TERM_Q must sit directly before the last FAQ ('Can I upgrade later?')")
+    if "three-month minimum" not in ctext.lower():
+        errors.append("18h: coached page missing 'three-month minimum'")
+    if "one month's notice in writing" not in ctext.lower():
+        errors.append("18h: coached page missing \"one month's notice in writing\"")
+    faq_nodes = []
+    for block in re.findall(r'<script type="application/ld\+json">(.*?)</script>', coached_html, re.S):
+        data = json.loads(block)
+        if isinstance(data, dict) and "@graph" in data:
+            data = data["@graph"]
+        for node in (data if isinstance(data, list) else [data]):
+            if isinstance(node, dict) and node.get("@type") == "FAQPage":
+                faq_nodes.append(node)
+    if len(faq_nodes) != 1:
+        errors.append(f"18h: coached page carries {len(faq_nodes)} FAQPage nodes, want 1")
+    else:
+        main_entity = faq_nodes[0].get("mainEntity", [])
+        if len(main_entity) != len(COACHED_FAQ):
+            errors.append(f"18h: FAQPage has {len(main_entity)} questions, want {len(COACHED_FAQ)}")
+        mt = [q for q in main_entity if q.get("name") == MIN_TERM_Q]
+        if len(mt) != 1:
+            errors.append(f"18h: FAQPage carries MIN_TERM_Q {len(mt)} times, want 1")
+        elif "three-month minimum" not in mt[0].get("acceptedAnswer", {}).get("text", ""):
+            errors.append("18h: FAQPage minimum-term answer missing 'three-month minimum'")
+    if coaching_html.count("<li>Three-month minimum</li>") != 1:
+        errors.append(f"18h: coaching page carries '<li>Three-month minimum</li>' "
+                      f"{coaching_html.count('<li>Three-month minimum</li>')} times, want 1")
+
+    # 18i (WS-SITE27): the two Ironman Wales posts link Plan Only before Coached by Tom.
+    for slug in ("ironman-wales-2027-what-i-saw-in-tenby", "ironman-wales-how-to-beat-the-dragon"):
+        path = f"blog/f/{slug}/index.html"
+        m = re.search(r"<article\b.*?</article>", written.get(path, ""), re.S)
+        if not m:
+            errors.append(f"18i: {path} missing or has no <article>")
+            continue
+        own = m.group(0).split('<hr class="blog-rule">')[0]
+        c_href = f'href="{BASE_PATH}/coached/"'
+        t_href = f'href="{BASE_PATH}/coaching/"'
+        if c_href not in own:
+            errors.append(f"18i: {path} body has no link to /coached/")
+        if t_href not in own:
+            errors.append(f"18i: {path} body has no link to /coaching/")
+        if c_href in own and t_href in own and own.find(c_href) > own.find(t_href):
+            errors.append(f"18i: {path} links /coaching/ before /coached/")
+
     # 17i is the freeze gate (freeze_check, after run_gates) against a snapshot
     # regenerated from the LIVE build.
 
@@ -4079,7 +4142,8 @@ def run_gates(cat, written):
           f"17f en-dash; 17g thanks page; 17h privacy page")
     print("  - Gate 18 (Plan Only first): 18a option field; 18b ?option= links; 18c analytics "
           "whitelist + preselect on /contact/ only; 18d monthly review copy; 18e CTA order; "
-          "18f privacy; 18g description length")
+          "18f privacy; 18g description length; 18h minimum term on /coached/ and /coaching/; "
+          "18i Wales posts link Plan Only first")
     print(f"  - zero client surnames across all generated output (first name + initial policy)")
     ld_total = sum(len(re.findall(r'application/ld\+json', v)) for v in html_pages.values())
     print(f"  - SEO/AEO: 1 h1 + canonical(prod host) + OG/Twitter + parsing JSON-LD per page "
