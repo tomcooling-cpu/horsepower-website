@@ -6,3 +6,4 @@
 User-agent: *
 Allow: /
 Disallow: /options/
+Disallow: /contact/thanks/

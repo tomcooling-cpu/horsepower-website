@@ -29,6 +29,19 @@ The build fails if any quality gate fails: zero em-dashes, approved copy present
 byte-exact, every internal link resolves, viewport + unique title + meta
 description + image alt text on every page, and card count == live SKU count.
 
+## Analytics and consent (WS-SITE25)
+
+Google Analytics 4 ships in the LIVE build only (`HP_BASE_PATH=''`, Netlify); the
+GitHub Pages preview build emits no Google code at all. The measurement ID is the
+one constant `GA4_MEASUREMENT_ID` in `generator/build.py` (env `HP_GA4_ID` for a
+one-off check), and the live build refuses to run without a valid ID or with the
+`LEGAL_NAME` / `PRIVACY_CONTACT_EMAIL` placeholders still set (gate 17h; env
+`HP_LEGAL_NAME` / `HP_PRIVACY_EMAIL`). `assets/consent.js` runs the cookie banner
+and loads gtag.js only after the visitor clicks Accept (basic Consent Mode v2);
+`assets/analytics.js` sends the events, driven by the `data-ga*` attributes the
+generator emits. The privacy page is `/privacy/`; the contact form posts to the
+noindex `/contact/thanks/` page, where `generate_lead` fires.
+
 ## Refreshing the catalogue
 
 The catalogue is exported from the coaching engine repo so the storefront and the

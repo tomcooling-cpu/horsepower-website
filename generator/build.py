@@ -12,6 +12,9 @@ House rules enforced as build gates (build fails if any gate fails):
   - every <img> has alt text; every page has a viewport meta + a unique
     title and meta description
   - the number of plan cards equals the live SKU count in catalogue.json
+  - Gate 17 (WS-SITE25): GA4 ships in the LIVE build only, behind the consent
+    banner; the preview build carries no Google code; tracking attributes,
+    privacy page and the contact thanks page are all checked
 """
 from __future__ import annotations
 
@@ -61,6 +64,29 @@ BASE_PATH = os.environ.get("HP_BASE_PATH", "/horsepower-website").rstrip("/")
 # pages, overriding our canonical (Search Console, 2026-08-24). Everything gated
 # on IS_PREVIEW_BUILD below exists to keep that copy out of the index.
 IS_PREVIEW_BUILD = bool(BASE_PATH)
+
+# ── GA4 (WS-SITE25) ──────────────────────────────────────────────────────────
+# ONE measurement ID for the whole site. Emitted ONLY in the live build (Netlify,
+# HP_BASE_PATH=""); the GitHub Pages preview copy carries no Google code so test
+# traffic can never reach the property. Env override HP_GA4_ID exists for a
+# one-off local check; the committed constant is the source of truth.
+GA4_MEASUREMENT_ID = os.environ.get("HP_GA4_ID", "G-HEZHVQCJ5P")
+GA4_ID_RE = re.compile(r"^G-[A-Z0-9]{10}$")
+GA4_ENABLED = not IS_PREVIEW_BUILD
+if GA4_ENABLED and (GA4_MEASUREMENT_ID == "G-XXXXXXXXXX" or not GA4_ID_RE.match(GA4_MEASUREMENT_ID)):
+    raise SystemExit("LIVE build refused: GA4_MEASUREMENT_ID missing or malformed "
+                     f"({GA4_MEASUREMENT_ID!r}); set the constant in generator/build.py")
+LEAD_VALUE_GBP = 40            # placeholder lead value, docs/ads s8.1 C2; not a measured figure
+CONSENT_TTL_DAYS = 183         # ICO: re-ask after a reasonable time, six months suggested
+THANKS_PATH = "/contact/thanks/"
+PRIVACY_PATH = "/privacy/"
+PRIVACY_UPDATED = "2026-10-17"  # the ship date; a constant, never date.today() (freeze gate)
+GA4_RETENTION = "14 months"     # must equal the GA4 event-data retention setting (section 7 step 3)
+LEGAL_NAME_PLACEHOLDER = "{{LEGAL_NAME}}"
+PRIVACY_EMAIL_PLACEHOLDER = "{{PRIVACY_CONTACT_EMAIL}}"
+# Gate 17h refuses the placeholders in the live build. Env overrides mirror HP_GA4_ID.
+LEGAL_NAME = os.environ.get("HP_LEGAL_NAME", LEGAL_NAME_PLACEHOLDER)
+PRIVACY_CONTACT_EMAIL = os.environ.get("HP_PRIVACY_EMAIL", PRIVACY_EMAIL_PLACEHOLDER)
 BASE_URL = "https://tomcooling-cpu.github.io/horsepower-website"
 EXISTING = "https://www.horsepowercoaching.co.uk"   # current live site (phase 2 links)
 # The Contact CTA now points at the real on-site /contact/ page (WS-SITE13),
@@ -128,6 +154,7 @@ CTA_FIND = "Find your plan"
 # (the Coached by Tom page), so it reads "Coach with Tom", not the old generic
 # "Get coached" (which no longer says which tier).
 CTA_GET = "Coach with Tom"
+CTA_FEMALE_FEATURE = "See how I train female athletes"
 
 # (Removed 2026-08-13: the "written by a professional coach / not a machine" home band was
 # dropped. Protesting that the coaching is not AI is itself an AI tell; the site sells the
@@ -288,6 +315,23 @@ def esc(s) -> str:
     return html.escape(str(s), quote=True)
 
 
+def ga(kind, **params) -> str:
+    """Tracking attributes for analytics.js: data-ga="<kind>" plus data-ga-<key>="<value>"
+    for each param. Values are esc()'d. Never pass user-entered text."""
+    out = [f' data-ga="{esc(kind)}"']
+    for k, v in params.items():
+        out.append(f' data-ga-{k.replace("_", "-")}="{esc(v)}"')
+    return "".join(out)
+
+
+def ga_item(p) -> str:
+    return esc(json.dumps({
+        "item_id": f"tp-{p['live_plan_id']}", "item_name": p["title"],
+        "item_brand": "Horsepower Coaching", "item_category": p["sport"],
+        "item_category2": p["category"], "item_variant": p["tier"],
+        "price": round(float(p["price"]), 2), "quantity": 1}, separators=(",", ":")))
+
+
 # WS-SITE23: SERP titles truncate near 60 characters, so assemble each page
 # <title> as `core` plus the LONGEST brand suffix that still fits within `cap`.
 # Where the full " | Horsepower Coaching" would push a long race name over, it
@@ -306,8 +350,14 @@ def fit_title(core, cap=60):
     return core
 
 
+GA_BOOT = ("<!-- hp-ga-boot -->\n"
+           "<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}\n"
+           "gtag('consent','default',{'ad_storage':'denied','ad_user_data':'denied',"
+           "'ad_personalization':'denied','analytics_storage':'denied'});</script>\n")
+
+
 def head(title, description, canonical, og_image_name=None, og_type="website", extra="",
-         preload_img=None) -> str:
+         preload_img=None, page_type="page", sport="", tier="") -> str:
     name = og_image_name or DEFAULT_OG_IMAGE
     og_img = og_image_url(name)
     og_alt = IMG_ALT.get(name, SITE_NAME)
@@ -329,8 +379,16 @@ def head(title, description, canonical, og_image_name=None, og_type="website", e
     noindex = ('\n<meta name="robots" content="noindex, nofollow">'
                '\n<meta name="googlebot" content="noindex, nofollow">'
                if IS_PREVIEW_BUILD else "")
+    html_attrs = f' data-page-type="{esc(page_type)}"'
+    if sport:
+        html_attrs += f' data-sport="{esc(sport)}"'
+    if tier:
+        html_attrs += f' data-tier="{esc(tier)}"'
+    if GA4_ENABLED:
+        html_attrs += f' data-ga4="{esc(GA4_MEASUREMENT_ID)}"'
+    ga_boot = GA_BOOT if GA4_ENABLED else ""
     return f"""<!doctype html>
-<html lang="en">
+<html lang="en"{html_attrs}>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">{noindex}
@@ -354,7 +412,7 @@ def head(title, description, canonical, og_image_name=None, og_type="website", e
 <meta name="twitter:image" content="{esc(og_img)}">
 <meta name="twitter:image:alt" content="{esc(og_alt)}">
 <meta name="theme-color" content="#0F0F0F">
-<script>document.documentElement.classList.add('js');</script>
+{ga_boot}<script>document.documentElement.classList.add('js');</script>
 <link rel="preload" as="font" type="font/woff2" href="{BASE_PATH}/assets/fonts/oswald-600.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="{BASE_PATH}/assets/fonts/sourcesans3-400.woff2" crossorigin>
 {hero_preload}<link rel="stylesheet" href="{BASE_PATH}/assets/style.css">
@@ -380,10 +438,10 @@ def header(active) -> str:
     items = []
     for label, href, key in NAV:
         cur = ' aria-current="page"' if key == active else ""
-        items.append(f'<li><a href="{esc(href)}"{cur}>{esc(label)}</a></li>')
+        items.append(f'<li><a href="{esc(href)}"{cur}{ga("nav", label=label)}>{esc(label)}</a></li>')
     # The single Contact CTA (teal button). Plan discovery lives on the "Plans"
     # nav link, so the button points at Contact instead of duplicating Plans.
-    items.append(f'<li><a class="cta" href="{esc(CONTACT_URL)}">Contact</a></li>')
+    items.append(f'<li><a class="cta" href="{esc(CONTACT_URL)}"{ga("cta", label="Contact", location="header")}>Contact</a></li>')
     return f"""<div class="teal-bar"></div>
 <header class="site-header">
   <div class="header-inner">
@@ -403,6 +461,23 @@ if(b&&n){{b.addEventListener('click',function(){{var o=n.classList.toggle('open'
 b.setAttribute('aria-expanded',o?'true':'false');}});}}}})();
 </script>
 """
+
+
+def consent_banner() -> str:
+    """WS-SITE25 cookie banner. Server-rendered hidden on every page; consent.js
+    un-hides it when there is no valid stored choice or "Cookie settings" is used."""
+    return f"""<section id="cookie-banner" class="consent" hidden aria-labelledby="consent-title" role="region" data-consent-ttl="{CONSENT_TTL_DAYS}">
+  <div class="wrap consent-inner">
+    <div class="consent-copy">
+      <h2 id="consent-title" class="consent-title" tabindex="-1">Cookies for measurement</h2>
+      <p>I use Google Analytics to see which pages, plans and buttons people use, and to tell whether an enquiry came from a Google ad. It only runs if you say yes. Google receives the data. <a href="{BASE_PATH}{PRIVACY_PATH}">How I use data and cookies</a>.</p>
+    </div>
+    <div class="consent-actions">
+      <button type="button" class="btn consent-accept" data-consent="accept">Accept</button>
+      <button type="button" class="btn consent-reject" data-consent="reject">Reject</button>
+    </div>
+  </div>
+</section>"""
 
 
 def footer() -> str:
@@ -428,34 +503,39 @@ def footer() -> str:
       <div>
         <h4>Talk to us</h4>
         <ul>
-          <li><a href="{WHATSAPP_URL}" rel="noopener" target="_blank">WhatsApp +44 7780 008724</a></li>
-          <li><a href="{INSTAGRAM_URL}" rel="noopener" target="_blank">Instagram @horsepower.coaching</a></li>
-          <li><a href="{esc(GOOGLE_REVIEW_URL)}" rel="noopener" target="_blank">Reviews on Google</a></li>
+          <li><a href="{WHATSAPP_URL}" rel="noopener" target="_blank"{ga("contact", channel="whatsapp")}>WhatsApp +44 7780 008724</a></li>
+          <li><a href="{INSTAGRAM_URL}" rel="noopener" target="_blank"{ga("contact", channel="instagram")}>Instagram @horsepower.coaching</a></li>
+          <li><a href="{esc(GOOGLE_REVIEW_URL)}" rel="noopener" target="_blank"{ga("contact", channel="google_reviews")}>Reviews on Google</a></li>
         </ul>
         <h4 style="margin-top:22px">More from Horsepower</h4>
         <ul>
-          <li><a href="{EXISTING}/breathwork">Breathwork</a></li>
-          <li><a href="{EXISTING}/wheelbuilding">Wheelbuilding</a></li>
-          <li><a href="{EXISTING}/alps-camp">Alps Camp</a></li>
+          <li><a href="{EXISTING}/breathwork"{ga("outbound")}>Breathwork</a></li>
+          <li><a href="{EXISTING}/wheelbuilding"{ga("outbound")}>Wheelbuilding</a></li>
+          <li><a href="{EXISTING}/alps-camp"{ga("outbound")}>Alps Camp</a></li>
           <li><a href="{BASE_PATH}/blog/">Blog</a></li>
         </ul>
       </div>
     </div>
     <div class="footer-bottom">
       <p>&copy; {date.today().year} Horsepower Coaching. Plans are delivered through TrainingPeaks.</p>
+      <p class="footer-legal"><a href="{BASE_PATH}{PRIVACY_PATH}">Privacy and cookies</a> <a href="#cookie-settings" class="consent-open">Cookie settings</a></p>
     </div>
   </div>
 </footer>
+{consent_banner()}
 <script src="{BASE_PATH}/assets/carousel.js" defer></script>
 <script src="{BASE_PATH}/assets/reveal.js" defer></script>
+<script src="{BASE_PATH}/assets/consent.js" defer></script>
+<script src="{BASE_PATH}/assets/analytics.js" defer></script>
 </body>
 </html>"""
 
 
 def page(active, title, description, canonical, body,
-         og_image_name=None, og_type="website", extra="", preload_img=None) -> str:
+         og_image_name=None, og_type="website", extra="", preload_img=None,
+         page_type="page", sport="", tier="") -> str:
     return (head(title, description, canonical, og_image_name, og_type, extra,
-                 preload_img=preload_img)
+                 preload_img=preload_img, page_type=page_type, sport=sport, tier=tier)
             + header(active) + body + footer())
 
 
@@ -737,9 +817,9 @@ SVG_FB = ('<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" a
 
 
 def social_links(cls):
-    return (f'<a class="{cls}" href="{INSTAGRAM_URL}" rel="noopener" target="_blank" aria-label="Horsepower Coaching on Instagram">{SVG_IG}</a>'
-            f'<a class="{cls}" href="{WHATSAPP_URL}" rel="noopener" target="_blank" aria-label="Message Horsepower Coaching on WhatsApp">{SVG_WA}</a>'
-            f'<a class="{cls}" href="{FACEBOOK_URL}" rel="noopener" target="_blank" aria-label="Horsepower Coaching on Facebook">{SVG_FB}</a>')
+    return (f'<a class="{cls}" href="{INSTAGRAM_URL}" rel="noopener" target="_blank" aria-label="Horsepower Coaching on Instagram"{ga("contact", channel="instagram")}>{SVG_IG}</a>'
+            f'<a class="{cls}" href="{WHATSAPP_URL}" rel="noopener" target="_blank" aria-label="Message Horsepower Coaching on WhatsApp"{ga("contact", channel="whatsapp")}>{SVG_WA}</a>'
+            f'<a class="{cls}" href="{FACEBOOK_URL}" rel="noopener" target="_blank" aria-label="Horsepower Coaching on Facebook"{ga("contact", channel="facebook")}>{SVG_FB}</a>')
 
 
 IMG_DIMS = {
@@ -890,7 +970,8 @@ MADDISON_SLIDE = {"kind": "result"}
 
 
 def _review_cta(cls="btn on-dark ghost"):
-    return (f'<a class="{cls}" href="{esc(GOOGLE_REVIEW_URL)}" rel="noopener" target="_blank">'
+    return (f'<a class="{cls}" href="{esc(GOOGLE_REVIEW_URL)}" rel="noopener" target="_blank"'
+            f'{ga("contact", channel="google_reviews")}>'
             f'Read all {REVIEW_COUNT} reviews on Google</a>')
 
 
@@ -1007,13 +1088,19 @@ def home_tier_cards() -> str:
             f'Support: {esc(t["support"])}</span></p>'
             f'<p class="tier-verdict">{esc(t["verdict"])}</p>'
             f'<ul class="tier-benefits">{bullets}</ul>'
-            f'<a class="btn {t["btn_cls"]}" href="{BASE_PATH}{t["href"]}">'
+            f'<a class="btn {t["btn_cls"]}" href="{BASE_PATH}{t["href"]}"'
+            f'{ga("cta", label=t["cta"], location="tier_card")}>'
             f'{esc(t["cta"])}</a>'
             f'</div>')
     return "".join(cards)
 
 
 # The four live Female-First plan SKUs, cross-linked to the female performance page.
+CTA_FEMALE_CROSSLINK = "Part of our female performance approach"
+LIST_STORE = "Plan Store"
+LIST_DETAIL = "Plan detail"
+LIST_FEMALE = "Female Performance"
+
 FEMALE_FIRST_SLUGS = {
     "female-first-70-3-training-plan",
     "female-first-marathon-training-plan",
@@ -1040,8 +1127,8 @@ def render_home(cat) -> str:
     <h1>{esc(HERO_HEADLINE)}</h1>
     <p class="lede">{esc(HERO_BODY)}</p>
     <div class="cta-row">
-      <a class="btn" href="{BASE_PATH}/coaching/">{esc(CTA_GET)}</a>
-      <a class="btn on-dark ghost" href="{BASE_PATH}/plans/">{esc(CTA_FIND)}</a>
+      <a class="btn" href="{BASE_PATH}/coaching/"{ga("cta", label=CTA_GET, location="hero")}>{esc(CTA_GET)}</a>
+      <a class="btn on-dark ghost" href="{BASE_PATH}/plans/"{ga("cta", label=CTA_FIND, location="hero")}>{esc(CTA_FIND)}</a>
     </div>
   </div>
 </section>
@@ -1065,7 +1152,7 @@ def render_home(cat) -> str:
       <p class="eyebrow">Female performance</p>
       <h2>Female first, not female adapted.</h2>
       <p class="section-intro">{esc(FEMALE_FIRST_BODY)}</p>
-      <p style="margin-top:20px"><a class="btn" href="{BASE_PATH}/female-performance/">See how I train female athletes</a></p>
+      <p style="margin-top:20px"><a class="btn" href="{BASE_PATH}/female-performance/"{ga("cta", label=CTA_FEMALE_FEATURE, location="feature_female")}>{esc(CTA_FEMALE_FEATURE)}</a></p>
     </div>
   </div>
 </section>
@@ -1099,7 +1186,7 @@ def render_home(cat) -> str:
       <h2>Over {total} plans, every one built for its event</h2>
       <p class="section-intro">First marathon to Ironman, hill climbs to 100 mile TTs, every plan in
       the library is written for one specific race and one specific goal. Find yours and get to work.</p>
-      <p style="margin-top:22px"><a class="btn" href="{BASE_PATH}/plans/">{esc(CTA_FIND)}</a></p>
+      <p style="margin-top:22px"><a class="btn" href="{BASE_PATH}/plans/"{ga("cta", label=CTA_FIND, location="plans_stat")}>{esc(CTA_FIND)}</a></p>
     </div>
   </div>
 </section>
@@ -1109,7 +1196,7 @@ def render_home(cat) -> str:
     extra = ld_script([org_node(with_rating=True), website_node()])
     return page("home", "Horsepower Coaching | Training Plans for Your Race",
                 desc, prod_url("/"), body, og_image_name="hero-alpine-mist", extra=extra,
-                preload_img="hero-alpine-mist")
+                preload_img="hero-alpine-mist", page_type="home")
 
 
 def _filter_options(plans, key):
@@ -1124,18 +1211,20 @@ def render_plans_index(cat) -> str:
     for p in plans:
         tier_tag = "" if p["tier"] == "Standard" else f'<span class="tag tier">{esc(p["tier"])}</span>'
         detail = f'{BASE_PATH}/plans/{p["slug"]}/'
-        female_link = (f'<p class="female-crosslink"><a href="{BASE_PATH}/female-performance/">Part of our female performance approach</a></p>'
+        female_link = (f'<p class="female-crosslink"><a href="{BASE_PATH}/female-performance/"'
+                       f'{ga("cta", label=CTA_FEMALE_CROSSLINK, location="plan_card")}>'
+                       f'{esc(CTA_FEMALE_CROSSLINK)}</a></p>'
                        if p["slug"] in FEMALE_FIRST_SLUGS else "")
         cards.append(f"""<article class="plan-card"
   data-sport="{esc(p['sport'])}" data-category="{esc(p['category'])}"
   data-tier="{esc(p['tier'])}" data-weeks="{p['weeks']}" data-hours="{p['hours_per_week']}"
-  data-title="{esc(p['title'].lower())}">
+  data-title="{esc(p['title'].lower())}" data-ga-item="{ga_item(p)}">
   <div class="tags">
     <span class="tag">{esc(p['sport'])}</span>
     <span class="tag">{esc(p['category'])}</span>
     {tier_tag}
   </div>
-  <h3><a href="{detail}">{esc(p['title'])}</a></h3>
+  <h3><a href="{detail}"{ga("select", list=LIST_STORE)}>{esc(p['title'])}</a></h3>
   <p class="blurb">{esc(p['blurb'])}</p>
   {female_link}
   <div class="meta">
@@ -1143,8 +1232,8 @@ def render_plans_index(cat) -> str:
     <span class="weeks">{p['weeks']} wk &middot; ~{p['hours_per_week']:g} h/wk</span>
   </div>
   <div class="actions">
-    <a class="btn" href="{esc(p['buy_url'])}" rel="noopener" target="_blank">Buy on TrainingPeaks</a>
-    <a class="link-plain" href="{detail}">Details</a>
+    <a class="btn" href="{esc(p['buy_url'])}" rel="noopener" target="_blank"{ga("buy", list=LIST_STORE)}>Buy on TrainingPeaks</a>
+    <a class="link-plain" href="{detail}"{ga("select", list=LIST_STORE)}>Details</a>
   </div>
 </article>""")
 
@@ -1204,7 +1293,7 @@ def render_plans_index(cat) -> str:
     return page("plans", f"Training Plan Library | {total} Plans | Horsepower Coaching",
                 desc, prod_url("/plans/"), body,
                 og_image_name="plans-izoard-trio", extra=extra,
-                preload_img="plans-izoard-trio")
+                preload_img="plans-izoard-trio", page_type="plan_list", tier="plan_store")
 
 
 # ── Plan-page de-templating (WS-SITE23, punch-list b + 6) ────────────────────
@@ -1432,7 +1521,7 @@ def render_plan_detail(cat, p) -> str:
       female athlete from the start, with recovery-respecting structure and strength work
       for long-term bone and tendon health. <a class="link-plain on-dark" href="{BASE_PATH}/female-performance/">See how we train female athletes</a>.</p>
     </div>"""
-    body = f"""<main id="main">
+    body = f"""<main id="main" data-ga-item="{ga_item(p)}">
 <section class="plan-hero">
   <div class="wrap">
     <p class="crumbs"><a href="{BASE_PATH}/plans/">Plan library</a> / {esc(p['sport'])} / {esc(p['category'])}</p>
@@ -1445,7 +1534,7 @@ def render_plan_detail(cat, p) -> str:
     </div>
     <div class="buy-row">
       <span class="price">&pound;{p['price']:.2f}</span>
-      <a class="btn" href="{esc(p['buy_url'])}" rel="noopener" target="_blank">Buy on TrainingPeaks</a>
+      <a class="btn" href="{esc(p['buy_url'])}" rel="noopener" target="_blank"{ga("buy", list=LIST_DETAIL)}>Buy on TrainingPeaks</a>
       <span style="color:var(--grey-mid);font-size:0.9rem">One-off. Delivered to your TrainingPeaks account.</span>
     </div>
   </div>
@@ -1454,20 +1543,23 @@ def render_plan_detail(cat, p) -> str:
   <div class="wrap prose">
     <h2>About this plan</h2>
     {paras}
-    <p><a class="btn" href="{esc(p['buy_url'])}" rel="noopener" target="_blank">Get {esc(p['title'])}</a>
+    <p><a class="btn" href="{esc(p['buy_url'])}" rel="noopener" target="_blank"{ga("buy", list=LIST_DETAIL)}>Get {esc(p['title'])}</a>
     &nbsp; <a class="link-plain" href="{BASE_PATH}/plans/">Back to the library</a></p>
     <h2>Common questions</h2>
     {faq_html}
     <p style="margin-top:26px;color:var(--grey-mid)">Want it built around your life instead of off the shelf?
-    <a href="{BASE_PATH}/coached/">See {esc(TIER2_NAME)}</a>.</p>
+    <a href="{BASE_PATH}/coached/"{ga("cta", label=f"See {TIER2_NAME}", location="plan_body")}>See {esc(TIER2_NAME)}</a>.</p>
     {female_note}
   </div>
 </section>
 </main>"""
     desc = (p["blurb"][:150]).rsplit(" ", 1)[0]
     return page("plans", fit_title(p['title']), desc, canonical, body,
-                og_image_name=plan_img, og_type="product", extra=extra)
+                og_image_name=plan_img, og_type="product", extra=extra,
+                page_type="plan_detail", sport=p["sport"], tier="plan_store")
 
+
+CTA_APPLY_PLAN = "Apply for Plan Only"
 
 COACHED_FAQ = [
     ("Is there a call every week?",
@@ -1503,7 +1595,7 @@ def render_coached(cat) -> str:
     <p class="eyebrow" style="color:var(--teal-soft)">{esc(TIER2_NAME)} &middot; &pound;120 a month</p>
     <h1>A plan I build for you, block by block</h1>
     <p class="lede">{esc(COACHED_INTRO)}</p>
-    <div class="cta-row"><a class="btn" href="{esc(CONTACT_URL)}">Apply for Plan Only</a></div>
+    <div class="cta-row"><a class="btn" href="{esc(CONTACT_URL)}"{ga("cta", label=CTA_APPLY_PLAN, location="hero")}>{esc(CTA_APPLY_PLAN)}</a></div>
   </div>
 </section>
 
@@ -1539,7 +1631,7 @@ def render_coached(cat) -> str:
       <div class="callout">
         <h2>Where it differs from full coaching</h2>
         <p>There are no scheduled calls and I am not on call day to day. What you get is a programme I build around your life and your event, with real feedback at the end of every block on the sessions you actually did. If you want me in your corner for all of it, look at Coached by Tom.</p>
-        <p style="margin-top:18px"><a class="btn on-dark ghost" href="{BASE_PATH}/coaching/">Coached by Tom</a></p>
+        <p style="margin-top:18px"><a class="btn on-dark ghost" href="{BASE_PATH}/coaching/"{ga("cta", label="Coached by Tom", location="faq_aside")}>Coached by Tom</a></p>
       </div>
     </div>
   </div>
@@ -1551,7 +1643,7 @@ def render_coached(cat) -> str:
   <div class="wrap">
     <h2>Ready to start?</h2>
     <p class="section-intro">Tell me about your event and your season and I'll take it from there.</p>
-    <p style="margin-top:18px"><a class="btn" href="{esc(CONTACT_URL)}">Apply for Plan Only</a></p>
+    <p style="margin-top:18px"><a class="btn" href="{esc(CONTACT_URL)}"{ga("cta", label=CTA_APPLY_PLAN, location="closing")}>{esc(CTA_APPLY_PLAN)}</a></p>
   </div>
 </section>
 {quote_block("coached")}
@@ -1572,8 +1664,11 @@ def render_coached(cat) -> str:
     extra = ld_script([
         breadcrumb_node([("Home", "/"), (TIER2_NAME, None)]), svc, faq_ld])
     return page("coached", f"{TIER2_NAME} | £120 a month | Horsepower Coaching", desc,
-                prod_url("/coached/"), body, og_image_name="hero-torridon-ridge", extra=extra)
+                prod_url("/coached/"), body, og_image_name="hero-torridon-ridge", extra=extra,
+                page_type="tier_plan_only", tier="plan_only")
 
+
+CTA_ASK_TOM = "Ask about a Coached by Tom place"
 
 COACHED_BY_TOM_GET = [
     ("A completely bespoke programme",
@@ -1607,8 +1702,8 @@ def render_coaching(cat) -> str:
     <h1>A coach in your corner for all&nbsp;of&nbsp;it</h1>
     <p class="lede">{esc(TIER_TOM_BODY)}</p>
     <div class="cta-row">
-      <a class="btn" href="{esc(CONTACT_URL)}">Ask about a Coached by Tom place</a>
-      <a class="btn on-dark ghost" href="#what-you-get">See what you get</a>
+      <a class="btn" href="{esc(CONTACT_URL)}"{ga("cta", label=CTA_ASK_TOM, location="hero")}>{esc(CTA_ASK_TOM)}</a>
+      <a class="btn on-dark ghost" href="#what-you-get"{ga("cta", label="See what you get", location="hero")}>See what you get</a>
     </div>
   </div>
 </section>
@@ -1683,7 +1778,7 @@ def render_coaching(cat) -> str:
       this level of support, weekly feedback, unlimited contact and a coach reading every
       session, is not something I can give properly to more than a small cohort. When those 15
       are taken, it is full.</p>
-      <p style="margin-top:18px"><a class="btn btn--tom" href="{esc(CONTACT_URL)}">Ask about a Coached by Tom place</a></p>
+      <p style="margin-top:18px"><a class="btn btn--tom" href="{esc(CONTACT_URL)}"{ga("cta", label=CTA_ASK_TOM, location="limited_band")}>{esc(CTA_ASK_TOM)}</a></p>
     </div>
   </div>
 </section>
@@ -1700,8 +1795,8 @@ def render_coaching(cat) -> str:
         <li>Three-month minimum</li>
         <li>Limited places, taken one at a time</li>
       </ul>
-      <p style="margin-top:6px"><a class="btn" href="{esc(CONTACT_URL)}">Apply for Coached by Tom</a></p>
-      <p class="pricing-note">Not quite ready for this level? <a href="{BASE_PATH}/coached/">{esc(TIER2_NAME)} is &pound;120 a month</a>.</p>
+      <p style="margin-top:6px"><a class="btn" href="{esc(CONTACT_URL)}"{ga("cta", label="Apply for Coached by Tom", location="pricing_card")}>Apply for Coached by Tom</a></p>
+      <p class="pricing-note">Not quite ready for this level? <a href="{BASE_PATH}/coached/"{ga("cta", label=f"{TIER2_NAME} is £120 a month", location="pricing_note")}>{esc(TIER2_NAME)} is &pound;120 a month</a>.</p>
     </div>
   </div>
 </section>
@@ -1730,7 +1825,11 @@ def render_coaching(cat) -> str:
         breadcrumb_node([("Home", "/"), ("Coached by Tom", None)]), svc])
     return page("coaching", "Coached by Tom | £185 a month | Horsepower Coaching", desc,
                 prod_url("/coaching/"), body, og_image_name="coached-tom-dolomites-arch", extra=extra,
-                preload_img="coached-tom-dolomites-arch")
+                preload_img="coached-tom-dolomites-arch", page_type="tier_coached_by_tom",
+                tier="coached_by_tom")
+
+
+CTA_EXPLORE_PLAN = "Explore Plan Only"
 
 
 def render_about(cat) -> str:
@@ -1825,8 +1924,8 @@ def render_about(cat) -> str:
     <p class="section-intro">Start your journey with a plan built for your race, get coached
     from £120 a month, or ask about a limited place with me directly.</p>
     <div class="cta-row" style="margin-top:20px">
-      <a class="btn" href="{BASE_PATH}/plans/">Browse plans</a>
-      <a class="btn ghost" href="{BASE_PATH}/coached/">Explore Plan Only</a>
+      <a class="btn" href="{BASE_PATH}/plans/"{ga("cta", label="Browse plans", location="closing")}>Browse plans</a>
+      <a class="btn ghost" href="{BASE_PATH}/coached/"{ga("cta", label=CTA_EXPLORE_PLAN, location="closing")}>{esc(CTA_EXPLORE_PLAN)}</a>
     </div>
   </div>
 </section>
@@ -1839,7 +1938,7 @@ def render_about(cat) -> str:
         person_node(), org_node(with_rating=False)])
     return page("about", fit_title("About Tom Cooling | Founder and Head Coach"),
                 desc, prod_url("/about/"), body,
-                og_image_name="about-brecon-titan", extra=extra)
+                og_image_name="about-brecon-titan", extra=extra, page_type="about")
 
 
 FEMALE_LEAD = "Female first, not female adapted."
@@ -1937,13 +2036,13 @@ def _honour_tile(h):
 def render_female(cat) -> str:
     fem = [p for p in cat["plans"] if p["slug"] in FEMALE_FIRST_SLUGS]
     fem.sort(key=lambda p: p["title"])
-    plan_cards = "".join(f"""<article class="plan-card">
+    plan_cards = "".join(f"""<article class="plan-card" data-ga-item="{ga_item(p)}">
     <div class="tags"><span class="tag">{esc(p['sport'])}</span><span class="tag tier">Female-First</span></div>
     <h3><a href="{BASE_PATH}/plans/{p['slug']}/">{esc(p['title'])}</a></h3>
     <p class="blurb">{esc(p['blurb'])}</p>
     <div class="actions">
-      <a class="btn" href="{esc(p['buy_url'])}" rel="noopener" target="_blank">Buy on TrainingPeaks</a>
-      <a class="link-plain" href="{BASE_PATH}/plans/{p['slug']}/">Details</a>
+      <a class="btn" href="{esc(p['buy_url'])}" rel="noopener" target="_blank"{ga("buy", list=LIST_FEMALE)}>Buy on TrainingPeaks</a>
+      <a class="link-plain" href="{BASE_PATH}/plans/{p['slug']}/"{ga("select", list=LIST_FEMALE)}>Details</a>
     </div>
   </article>""" for p in fem)
 
@@ -1968,8 +2067,8 @@ def render_female(cat) -> str:
     <h1>{esc(FEMALE_LEAD)}</h1>
     <p class="lede">{esc(FEMALE_FIRST_BODY)}</p>
     <div class="cta-row">
-      <a class="btn" href="{BASE_PATH}/coached/">Explore Plan Only</a>
-      <a class="btn on-dark ghost" href="#female-plans">See the plans</a>
+      <a class="btn" href="{BASE_PATH}/coached/"{ga("cta", label=CTA_EXPLORE_PLAN, location="hero")}>{esc(CTA_EXPLORE_PLAN)}</a>
+      <a class="btn on-dark ghost" href="#female-plans"{ga("cta", label="See the plans", location="hero")}>See the plans</a>
     </div>
   </div>
 </section>
@@ -2014,8 +2113,8 @@ def render_female(cat) -> str:
       female-specific performance development, built from years of working with female athletes
       from first finish lines to the front of the race.</p>
       <p style="margin-top:20px">
-        <a class="btn btn--plan" href="{BASE_PATH}/coached/">Explore Plan Only</a>
-        <a class="btn btn--tom" href="{BASE_PATH}/coaching/" style="margin-left:10px">Coach with Tom</a>
+        <a class="btn btn--plan" href="{BASE_PATH}/coached/"{ga("cta", label=CTA_EXPLORE_PLAN, location="feature_coaching")}>{esc(CTA_EXPLORE_PLAN)}</a>
+        <a class="btn btn--tom" href="{BASE_PATH}/coaching/" style="margin-left:10px"{ga("cta", label=CTA_GET, location="feature_coaching")}>{esc(CTA_GET)}</a>
       </p>
     </div>
   </div>
@@ -2056,9 +2155,9 @@ def render_female(cat) -> str:
       training block by block, or go all in with a coach in your corner for all of it. Whichever
       path you choose, the training bends around your physiology, your event and your life.</p>
       <div class="tier-cta-row">
-        <a class="btn btn--store" href="{BASE_PATH}/plans/">Plan Store</a>
-        <a class="btn btn--plan" href="{BASE_PATH}/coached/">Plan Only</a>
-        <a class="btn btn--tom" href="{BASE_PATH}/coaching/">Coached by Tom</a>
+        <a class="btn btn--store" href="{BASE_PATH}/plans/"{ga("cta", label="Plan Store", location="callout")}>Plan Store</a>
+        <a class="btn btn--plan" href="{BASE_PATH}/coached/"{ga("cta", label="Plan Only", location="callout")}>Plan Only</a>
+        <a class="btn btn--tom" href="{BASE_PATH}/coaching/"{ga("cta", label="Coached by Tom", location="callout")}>Coached by Tom</a>
       </div>
     </div>
   </div>
@@ -2070,7 +2169,7 @@ def render_female(cat) -> str:
                 "Female Performance Coaching | Female-Specific Triathlon, Cycling and Running Training | Horsepower Coaching",
                 desc, prod_url("/female-performance/"), body,
                 og_image_name="female-hero", extra=extra,
-                preload_img="female-hero")
+                preload_img="female-hero", page_type="female_performance")
 
 
 # ── Banner option previews (hidden /options/ page) ───────────────────────────
@@ -2200,7 +2299,8 @@ def render_options() -> str:
     extra = '<meta name="robots" content="noindex, nofollow">\n' + ld_script(webpage_ld)
     return page("", "Banner options (private preview) | Horsepower Coaching",
                 "Private banner preview page. Not indexed.",
-                prod_url("/options/"), body, og_image_name="hero-alpine-mist", extra=extra)
+                prod_url("/options/"), body, og_image_name="hero-alpine-mist", extra=extra,
+                page_type="options")
 
 
 # ── Contact (WS-SITE13) ──────────────────────────────────────────────────────
@@ -2227,13 +2327,13 @@ def render_contact(cat) -> str:
         <figcaption>Tom Cooling, founder and head coach of Horsepower Coaching</figcaption></figure>
       <h2>Talk to me directly</h2>
       <ul class="contact-channels">
-        <li><a href="{WHATSAPP_URL}" rel="noopener" target="_blank">
+        <li><a href="{WHATSAPP_URL}" rel="noopener" target="_blank"{ga("contact", channel="whatsapp")}>
           <span class="ch-icon">{SVG_WA}</span>
           <span class="ch-body"><strong>WhatsApp</strong><span>+44 7780 008724</span></span></a></li>
-        <li><a href="{INSTAGRAM_URL}" rel="noopener" target="_blank">
+        <li><a href="{INSTAGRAM_URL}" rel="noopener" target="_blank"{ga("contact", channel="instagram")}>
           <span class="ch-icon">{SVG_IG}</span>
           <span class="ch-body"><strong>Instagram</strong><span>@horsepower.coaching</span></span></a></li>
-        <li><a href="{esc(GOOGLE_REVIEW_URL)}" rel="noopener" target="_blank">
+        <li><a href="{esc(GOOGLE_REVIEW_URL)}" rel="noopener" target="_blank"{ga("contact", channel="google_reviews")}>
           <span class="ch-icon">{SVG_FB}</span>
           <span class="ch-body"><strong>Reviews</strong><span>Read {REVIEW_COUNT} reviews on Google</span></span></a></li>
       </ul>
@@ -2242,7 +2342,7 @@ def render_contact(cat) -> str:
     </div>
     <div class="contact-panel">
       <h2>Send me a message</h2>
-      <form name="contact" method="POST" data-netlify="true" netlify-honeypot="bot-field" class="contact-form" action="{BASE_PATH}/contact/">
+      <form name="contact" method="POST" data-netlify="true" netlify-honeypot="bot-field" class="contact-form" action="{BASE_PATH}{THANKS_PATH}">
         <input type="hidden" name="form-name" value="contact">
         <p class="hp-field"><label>Leave this field empty if you're human <input name="bot-field"></label></p>
         <div class="field"><label for="c-name">Your name</label>
@@ -2268,7 +2368,109 @@ def render_contact(cat) -> str:
                        contact_ld, org_node(with_rating=False)])
     return page("contact", "Contact | Horsepower Coaching", desc,
                 prod_url("/contact/"), body,
-                og_image_name="coached-tom-dolomites-arch", extra=extra)
+                og_image_name="coached-tom-dolomites-arch", extra=extra, page_type="contact")
+
+
+# ── Privacy and cookies (WS-SITE25) ──────────────────────────────────────────
+# The second consent layer, linked from the banner and every footer. Copy is the
+# spec's verbatim text; the retention figure and the legal identity come from the
+# constants above (gate 17h checks both).
+PRIVACY_NO_PII_LINE = ("I never send your name, email address or the contents of your "
+                       "message to Google Analytics.")
+
+
+def render_privacy(cat) -> str:
+    email = (f'<a href="mailto:{esc(PRIVACY_CONTACT_EMAIL)}">{esc(PRIVACY_CONTACT_EMAIL)}</a>'
+             if "@" in PRIVACY_CONTACT_EMAIL else esc(PRIVACY_CONTACT_EMAIL))
+    body = f"""<main id="main">
+<section class="plan-hero">
+  <div class="wrap">
+    <h1>Privacy and cookies</h1>
+    <p class="blog-meta">Last updated <time datetime="{PRIVACY_UPDATED}">{esc(human_date(PRIVACY_UPDATED))}</time></p>
+  </div>
+</section>
+<section>
+  <div class="wrap prose">
+    <h2>Who I am</h2>
+    <p>I'm Tom Cooling and I run Horsepower Coaching from Truro, Cornwall. For data protection purposes the business is {esc(LEGAL_NAME)}. If anything on this page is unclear, email me at {email} and I'll answer it myself.</p>
+
+    <h2>What this page covers</h2>
+    <p>This page covers horsepowercoaching.co.uk only. When you buy a plan you are taken to TrainingPeaks, and when you message me on WhatsApp, Instagram or Facebook you are using those services. Each of them has its own privacy policy, and I don't control what they collect.</p>
+
+    <h2>The contact form</h2>
+    <p>When you send the form on the contact page I receive your name, your email address, your target event if you give one, and your message. I use them to reply to you and, if we go on to work together, to set up your coaching. The form is run by Netlify, which hosts this site, so your message is stored on Netlify's systems and emailed to me. I keep enquiries for as long as I need them to deal with your question, and I delete them when they are no longer needed. The legal basis is that you have asked me to get in touch, and my legitimate interest in answering enquiries about my coaching.</p>
+
+    <h2>Measurement with Google Analytics</h2>
+    <p>If you click Accept on the cookie banner, this site runs Google Analytics 4. It tells me which pages people read, which plans they look at, which buttons they click, how far down a page they get, whether they start and send the contact form, and whether a visit came from a Google ad. I use that to improve the site and to see whether the advertising I pay for is worth it.</p>
+    <p>Google Analytics sets cookies on your device and sends data about your visit to Google, including a shortened version of your IP address, your browser and device type and the pages you view. Google acts on my instructions for the analytics itself, and it also uses the data under its own terms. I have switched off Google's cross-device signals and personalised advertising features. Analytics data is kept in my Google Analytics account for <span class="ga-retention">{esc(GA4_RETENTION)}</span> and then deleted.</p>
+    <p>Nothing is sent to Google unless you accept. If you reject, or make no choice, Google Analytics does not load and no analytics cookies are set. You can change your mind at any time using the Cookie settings link at the bottom of every page. The legal basis is your consent.</p>
+    <p>{esc(PRIVACY_NO_PII_LINE)}</p>
+
+    <h2>Cookies and similar storage</h2>
+    <table class="consent-table">
+      <thead><tr><th scope="col">Name</th><th scope="col">Set by</th><th scope="col">Purpose</th><th scope="col">Lasts</th></tr></thead>
+      <tbody>
+        <tr><td>hp_consent</td><td>This site</td><td>Remembers whether you accepted or rejected measurement cookies</td><td>Six months</td></tr>
+        <tr><td>_ga</td><td>Google Analytics</td><td>Tells one visitor's browser apart from another</td><td>Up to two years</td></tr>
+        <tr><td>_ga_ followed by a code</td><td>Google Analytics</td><td>Keeps the state of your current visit</td><td>Up to two years</td></tr>
+      </tbody>
+    </table>
+    <p>The hp_consent entry is strictly necessary to honour your choice and is set whichever button you press. The Google cookies are only set if you accept.</p>
+
+    <h2>Buying a plan</h2>
+    <p>Plans are sold through TrainingPeaks. When you click Buy on TrainingPeaks you leave this site, and TrainingPeaks handles your payment and your account under its own privacy policy.</p>
+
+    <h2>Your rights</h2>
+    <p>Under UK data protection law you can ask me what personal data I hold about you, ask me to correct it or delete it, object to how I use it, and withdraw consent at any time. Email {email} and I'll respond. If you are unhappy with how I've handled your data you can complain to the Information Commissioner's Office at ico.org.uk.</p>
+
+    <h2>Changes</h2>
+    <p>If I change how this site uses data I'll update this page and the date at the top.</p>
+  </div>
+</section>
+</main>"""
+    desc = ("How Horsepower Coaching handles your data: the contact form, Google Analytics "
+            "with your consent, cookies, and your rights.")
+    webpage_ld = {"@context": "https://schema.org", "@type": "WebPage",
+                  "name": "Privacy and cookies", "url": prod_url(PRIVACY_PATH),
+                  "about": _org_provider()}
+    extra = ld_script([breadcrumb_node([("Home", "/"), ("Privacy and cookies", None)]),
+                       webpage_ld])
+    return page("", "Privacy and cookies | Horsepower Coaching", desc,
+                prod_url(PRIVACY_PATH), body, og_image_name="tom-portrait", extra=extra,
+                page_type="privacy")
+
+
+# ── Contact form success page (WS-SITE25) ────────────────────────────────────
+# The Netlify form action. Not indexed, not in the sitemap, Disallowed in robots.
+# analytics.js fires generate_lead here only when the same-session submit flag
+# written on /contact/ exists, so a reload or a direct visit never counts a lead.
+def render_contact_thanks(cat) -> str:
+    body = f"""<main id="main" data-lead-value="{LEAD_VALUE_GBP}">
+<section class="hero" style="padding:60px 0 52px">
+  <div class="wrap">
+    <p class="eyebrow" style="color:var(--teal-soft)">Contact</p>
+    <h1>Message sent</h1>
+    <p class="lede">Thanks. Your message is on its way to me and I read every one myself. I'll come back to you as soon as I can. If it's quicker, you can also reach me on WhatsApp.</p>
+  </div>
+</section>
+<section>
+  <div class="wrap">
+    <div class="cta-row">
+      <a class="btn" href="{BASE_PATH}/"{ga("cta", label="Back to the home page", location="thanks")}>Back to the home page</a>
+      <a class="btn ghost" href="{BASE_PATH}/blog/"{ga("cta", label="Read the blog", location="thanks")}>Read the blog</a>
+    </div>
+    <p style="margin-top:22px"><a class="link-plain" href="{WHATSAPP_URL}" rel="noopener" target="_blank"{ga("contact", channel="whatsapp")}>Message me on WhatsApp, +44 7780 008724</a></p>
+  </div>
+</section>
+</main>"""
+    webpage_ld = {"@context": "https://schema.org", "@type": "WebPage",
+                  "name": "Message sent", "url": prod_url(THANKS_PATH)}
+    extra = ('<meta name="robots" content="noindex, nofollow">\n'
+             + ld_script([breadcrumb_node([("Home", "/"), ("Contact", "/contact/"),
+                                           ("Message sent", None)]), webpage_ld]))
+    return page("contact", "Message sent | Horsepower Coaching",
+                "Your message to Horsepower Coaching has been sent.",
+                prod_url(THANKS_PATH), body, extra=extra, page_type="contact_thanks")
 
 
 # ── Sport coaching landing pages (WS-SITE13, SEO retention) ──────────────────
@@ -2291,12 +2493,14 @@ def _funnel_cards():
             f'<div class="tier-card {tier_cls[i]}"><h3>{esc(name)}</h3>'
             f'<div class="price">{price}</div>'
             f'<p class="support-line"><span class="support-tag">Support: {esc(support)}</span></p>'
-            f'<a class="btn {btn_cls[i]}" href="{BASE_PATH}{path}">{esc(cta)}</a></div>')
+            f'<a class="btn {btn_cls[i]}" href="{BASE_PATH}{path}"'
+            f'{ga("cta", label=cta, location="funnel_card")}>{esc(cta)}</a></div>')
     return "".join(cards)
 
 
 def render_sport_landing(*, slug, h1, eyebrow, hero_img, og_name, title, desc,
-                         lede, intro_html, funnel_heading, service_name, service_desc) -> str:
+                         lede, intro_html, funnel_heading, service_name, service_desc,
+                         sport) -> str:
     body = f"""<main id="main">
 <section class="hero hero--image">
   {img(hero_img, cls="hero-bg", lazy=False)}
@@ -2305,8 +2509,8 @@ def render_sport_landing(*, slug, h1, eyebrow, hero_img, og_name, title, desc,
     <h1>{esc(h1)}</h1>
     <p class="lede">{esc(lede)}</p>
     <div class="cta-row">
-      <a class="btn" href="{BASE_PATH}/plans/">Find your plan</a>
-      <a class="btn on-dark ghost" href="{BASE_PATH}/coached/">Explore Plan Only</a>
+      <a class="btn" href="{BASE_PATH}/plans/"{ga("cta", label=CTA_FIND, location="hero")}>{esc(CTA_FIND)}</a>
+      <a class="btn on-dark ghost" href="{BASE_PATH}/coached/"{ga("cta", label=CTA_EXPLORE_PLAN, location="hero")}>{esc(CTA_EXPLORE_PLAN)}</a>
     </div>
   </div>
 </section>
@@ -2331,7 +2535,8 @@ def render_sport_landing(*, slug, h1, eyebrow, hero_img, og_name, title, desc,
     extra = ld_script([
         breadcrumb_node([("Home", "/"), (h1, None)]), svc, org_node(with_rating=False)])
     return page("", title, desc, prod_url(f"/{slug}/"), body,
-                og_image_name=og_name, extra=extra, preload_img=hero_img)
+                og_image_name=og_name, extra=extra, preload_img=hero_img,
+                page_type="sport_landing", sport=sport)
 
 
 def render_triathlon_coaching(cat) -> str:
@@ -2360,7 +2565,7 @@ def render_triathlon_coaching(cat) -> str:
         "are in the UK or further afield, the coaching is delivered online from the South West, so "
         "the only thing that changes is your postcode, never the standard.</p>")
     return render_sport_landing(
-        slug="triathlon-coaching",
+        slug="triathlon-coaching", sport="Triathlon",
         h1="Triathlon Coaching",
         eyebrow="Triathlon coaching, South West UK and online",
         hero_img="hero-tenby-swim", og_name="hero-tenby-swim",
@@ -2404,7 +2609,7 @@ def render_cycling_coaching(cat) -> str:
         "all delivered online from the South West of the UK, so wherever you ride, the coaching "
         "comes with you.</p>")
     return render_sport_landing(
-        slug="cycling-coaching",
+        slug="cycling-coaching", sport="Cycling",
         h1="Cycling Coaching",
         eyebrow="Cycling coaching, South West UK and online",
         hero_img="alpine-ridge", og_name="alpine-ridge",
@@ -2700,7 +2905,7 @@ def render_blog_index(posts):
     }
     extra = ld_script([breadcrumb_node([("Home", "/"), ("Blog", None)]), blog_ld])
     return page("blog", "Blog | Horsepower Coaching", desc, prod_url("/blog/"), body,
-                og_image_name="hero-welsh-climb", extra=extra)
+                og_image_name="hero-welsh-climb", extra=extra, page_type="blog_index")
 
 
 def render_blog_post(p):
@@ -2723,8 +2928,8 @@ def render_blog_post(p):
     <div class="callout" style="margin-top:30px">
       <p class="eyebrow" style="color:var(--teal-soft)">Train with Horsepower</p>
       <p>If that is how you like your coaching, straight and built for your race, take a look at the
-      <a class="link-plain on-dark" href="{BASE_PATH}/plans/">training plans</a> or see
-      <a class="link-plain on-dark" href="{BASE_PATH}/coached/">how coaching works</a>.</p>
+      <a class="link-plain on-dark" href="{BASE_PATH}/plans/"{ga("cta", label="training plans", location="post_callout")}>training plans</a> or see
+      <a class="link-plain on-dark" href="{BASE_PATH}/coached/"{ga("cta", label="how coaching works", location="post_callout")}>how coaching works</a>.</p>
     </div>
   </article>
 </section>
@@ -2756,7 +2961,8 @@ def render_blog_post(p):
     crumbs = breadcrumb_node([("Home", "/"), ("Blog", "/blog/"), (p["title"], None)])
     extra = ld_script([ld, crumbs])
     return page("blog", fit_title(p["title"]), desc, canonical, body,
-                og_image_name=DEFAULT_OG_IMAGE, og_type="article", extra=extra)
+                og_image_name=DEFAULT_OG_IMAGE, og_type="article", extra=extra,
+                page_type="blog_post")
 
 
 # ── llms.txt (WS-SITE22, AI-crawl pass) ──────────────────────────────────────
@@ -2875,6 +3081,8 @@ def build():
     write("coaching/index.html", render_coaching(cat), written)
     write("about/index.html", render_about(cat), written)
     write("contact/index.html", render_contact(cat), written)
+    write("contact/thanks/index.html", render_contact_thanks(cat), written)
+    write("privacy/index.html", render_privacy(cat), written)
     write("triathlon-coaching/index.html", render_triathlon_coaching(cat), written)
     write("cycling-coaching/index.html", render_cycling_coaching(cat), written)
     # Hidden banner-preview page: noindex, deliberately absent from nav + sitemap.
@@ -2902,7 +3110,8 @@ def build():
                   ("/coached/", "monthly", "0.8"),
                   ("/coaching/", "monthly", "0.8"), ("/about/", "monthly", "0.6"),
                   ("/blog/", "weekly", "0.7"),
-                  ("/contact/", "monthly", "0.5")]
+                  ("/contact/", "monthly", "0.5"),
+                  (PRIVACY_PATH, "yearly", "0.3")]
     sm = ['<?xml version="1.0" encoding="UTF-8"?>',
           '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
     for path, cf, pr in main_pages:
@@ -2929,9 +3138,11 @@ def build():
           "User-agent: *",
           "Allow: /",
           "Disallow: /options/",
+          f"Disallow: {THANKS_PATH}",
           ""]
     for bot in ai_bots:
-        rb += [f"User-agent: {bot}", "Allow: /", "Disallow: /options/", ""]
+        rb += [f"User-agent: {bot}", "Allow: /", "Disallow: /options/",
+               f"Disallow: {THANKS_PATH}", ""]
     rb += [f"Sitemap: {prod_url('/sitemap.xml')}", ""]
     if IS_PREVIEW_BUILD:
         # Preview build (GitHub Pages). Crawling is deliberately still allowed so
@@ -2946,6 +3157,7 @@ def build():
               "User-agent: *",
               "Allow: /",
               "Disallow: /options/",
+              f"Disallow: {THANKS_PATH}",
               ""]
     write("robots.txt", "\n".join(rb), written)
 
@@ -3026,8 +3238,58 @@ def freeze_check():
     # the GitHub Pages copy is exactly what we are stopping). Everything else
     # stays frozen in both modes.
     allow_missing = ("sitemap.xml",) if IS_PREVIEW_BUILD else ()
-    if freeze_gate.verify(SITE, allow_missing=allow_missing) != 0:
+    # WS-SITE25: until LEGAL_NAME / PRIVACY_CONTACT_EMAIL are confirmed, the preview
+    # renders their placeholders while the snapshot holds the live build's values,
+    # so only that page's body text is exempt. The live build refuses placeholders
+    # (gate 17h), and once the constants are set this exemption is never taken.
+    body_exempt = ()
+    if LEGAL_NAME == LEGAL_NAME_PLACEHOLDER or PRIVACY_CONTACT_EMAIL == PRIVACY_EMAIL_PLACEHOLDER:
+        body_exempt = ("privacy/index.html",)
+        print("Freeze gate: privacy/index.html body exempt (identity placeholders unconfirmed)")
+    if freeze_gate.verify(SITE, allow_missing=allow_missing, body_exempt=body_exempt) != 0:
         raise SystemExit(1)
+
+
+GA_JS_ASSETS = ("consent.js", "analytics.js")
+GA_REQUIRED = {"nav": ("label",), "cta": ("label", "location"), "buy": ("list",),
+               "select": ("list",), "contact": ("channel",), "outbound": ()}
+
+
+def _ga_scan(html_pages):
+    """[(path, attrs, enclosing data-ga-item values)] for every element carrying
+    data-ga, from a real HTML parse so ancestry is structural, not regex."""
+    from html.parser import HTMLParser
+    void = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link",
+            "meta", "source", "track", "wbr", "path", "rect", "circle"}
+    found = []
+
+    class _P(HTMLParser):
+        def __init__(self, path):
+            super().__init__(convert_charrefs=True)
+            self.path, self.stack = path, []
+
+        def handle_starttag(self, tag, attrs):
+            a = dict(attrs)
+            items = [x for _t, x in self.stack if x is not None]
+            if "data-ga" in a:
+                found.append((self.path, a, items + ([a["data-ga-item"]] if "data-ga-item" in a else [])))
+            if tag not in void:
+                self.stack.append((tag, a.get("data-ga-item")))
+
+        def handle_startendtag(self, tag, attrs):
+            a = dict(attrs)
+            if "data-ga" in a:
+                found.append((self.path, a, [x for _t, x in self.stack if x is not None]))
+
+        def handle_endtag(self, tag):
+            for i in range(len(self.stack) - 1, -1, -1):
+                if self.stack[i][0] == tag:
+                    del self.stack[i:]
+                    break
+
+    for path, content in html_pages.items():
+        _P(path).feed(content)
+    return found
 
 
 def run_gates(cat, written):
@@ -3351,7 +3613,8 @@ def run_gates(cat, written):
         # already Disallowed in robots.txt and absent from the sitemap.
         indexed_off = [path for path, body in written.items()
                        if path.endswith(".html") and 'content="noindex' in body
-                       and not path.startswith("options/")]
+                       and not path.startswith("options/")
+                       and not path.startswith("contact/thanks/")]
         if indexed_off:
             errors.append(
                 f"LIVE build carries noindex on {len(indexed_off)} page(s), "
@@ -3448,6 +3711,179 @@ def run_gates(cat, written):
     if blog_bytes > blog_budget:
         errors.append(f"blog image weight {blog_bytes/1024:.0f}KB exceeds 6MB budget")
 
+    # ── Gate 17 (WS-SITE25): GA4 tagging, consent banner, privacy, thanks page ──
+    js_src = {}
+    for name in GA_JS_ASSETS:
+        with open(os.path.join(HERE, "assets", name), encoding="utf-8") as fh:
+            js_src[name] = fh.read()
+    for name, src in js_src.items():
+        if EM_DASH in src:
+            errors.append(f"em-dash (U+2014) found in assets/{name}")
+        if "domestiq" in src.lower():
+            errors.append(f'"domestiq" found in assets/{name} (must be zero site-wide)')
+
+    # 17a: the head stub ships exactly once per page in the live build and Google
+    # is never referenced from HTML; the preview build carries no Google code.
+    ga_id_re = re.compile(r"G-[A-Za-z0-9]{10}")
+    if GA4_ENABLED:
+        for path, content in html_pages.items():
+            if content.count("<!-- hp-ga-boot -->") != 1:
+                errors.append(f"17a: {path} must carry the hp-ga-boot stub exactly once")
+            if content.count("gtag('consent','default'") != 1:
+                errors.append(f"17a: {path} must set the consent default exactly once")
+            m = re.search(r"<html\b[^>]*>", content)
+            if not m or content.count(f'data-ga4="{GA4_MEASUREMENT_ID}"') != 1 \
+                    or f'data-ga4="{GA4_MEASUREMENT_ID}"' not in m.group(0):
+                errors.append(f"17a: {path} must carry data-ga4 exactly once, on <html>")
+            if "googletagmanager.com" in content or "gtag('config'" in content:
+                errors.append(f"17a: {path} references googletagmanager.com or gtag('config' in HTML")
+    else:
+        for path, content in written.items():
+            for tok in ("hp-ga-boot", "gtag", "googletagmanager", "data-ga4"):
+                if tok in content:
+                    errors.append(f"17a: preview build carries {tok!r} in {path}")
+            if ga_id_re.search(content):
+                errors.append(f"17a: preview build carries a GA4 measurement ID in {path}")
+
+    # 17b: consent.js boot order and ad_personalization stays denied.
+    csrc = js_src["consent.js"]
+    i_upd = csrc.find("'consent','update'")
+    i_cfg = csrc.find("'config'")
+    i_tag = csrc.find("googletagmanager.com/gtag/js")
+    if not (0 <= i_upd < i_cfg < i_tag):
+        errors.append(f"17b: consent.js boot order wrong (update {i_upd}, config {i_cfg}, "
+                      f"gtag.js {i_tag})")
+    if "'ad_personalization':'denied'" not in csrc or "'ad_personalization':'granted'" in csrc:
+        errors.append("17b: consent.js must keep ad_personalization denied and never grant it")
+
+    # 17c: no PII reaches analytics.
+    asrc = js_src["analytics.js"]
+    for tok in ("c-name", "c-email", "c-event", "c-message", "bot-field",
+                "location.search", "FormData"):
+        if tok in asrc:
+            errors.append(f"17c: analytics.js references {tok!r}")
+    for path, content in html_pages.items():
+        for val in re.findall(r'\sdata-ga-[a-z0-9-]+="([^"]*)"', content):
+            if "@" in html.unescape(val):
+                errors.append(f"17c: data-ga-* value with '@' in {path}")
+    thanks = written.get("contact/thanks/index.html", "")
+    chrome_scripts = None
+    for path, content in html_pages.items():
+        tags = {t for t in re.findall(r"<script\b[^>]*>.*?</script>", content, re.S)
+                if 'type="application/ld+json"' not in t}
+        chrome_scripts = tags if chrome_scripts is None else chrome_scripts & tags
+    asset_includes = {f'<script src="{BASE_PATH}/assets/{n}" defer></script>' for n in GA_JS_ASSETS}
+    if not asset_includes <= (chrome_scripts or set()):
+        errors.append("17c: consent.js / analytics.js are not included on every page")
+    for t in re.findall(r"<script\b[^>]*>.*?</script>", thanks, re.S):
+        if 'type="application/ld+json"' in t:
+            continue
+        if t not in (chrome_scripts or set()):
+            errors.append(f"17c: thanks page carries a page-specific script: {t[:80]}")
+
+    # 17d: tracking attributes carry their required params; buy/select sit inside
+    # a parseable plan item whose id matches the TrainingPeaks store id.
+    tracked = _ga_scan(html_pages)
+    tp_by_title = {p["title"]: re.search(r"tp-(\d+)", p["buy_url"]).group(0)
+                   for p in cat["plans"]}
+    for path, attrs, items in tracked:
+        kind = attrs.get("data-ga")
+        need = GA_REQUIRED.get(kind)
+        if need is None:
+            errors.append(f"17d: unknown data-ga kind {kind!r} in {path}")
+            continue
+        for k in need:
+            if not (attrs.get(f"data-ga-{k}") or "").strip():
+                errors.append(f"17d: data-ga=\"{kind}\" missing data-ga-{k} in {path}")
+        if kind in ("buy", "select"):
+            if not items:
+                errors.append(f"17d: {kind} link without a data-ga-item ancestor in {path}")
+                continue
+            try:
+                it = json.loads(items[-1])
+            except Exception:
+                errors.append(f"17d: data-ga-item JSON does not parse in {path}")
+                continue
+            if not (re.match(r"^tp-\d+$", str(it.get("item_id", ""))) and it.get("item_name")
+                    and float(it.get("price", 0)) > 0):
+                errors.append(f"17d: data-ga-item incomplete in {path}: {it}")
+            if kind == "buy":
+                m = re.search(r"tp-\d+", attrs.get("href", ""))
+                if not m or m.group(0) != it.get("item_id"):
+                    errors.append(f"17d: buy link tp id != item_id in {path}")
+    for path, content in html_pages.items():
+        for raw in re.findall(r'data-ga-item="([^"]*)"', content):
+            it = json.loads(html.unescape(raw))
+            if tp_by_title.get(it.get("item_name")) != it.get("item_id"):
+                errors.append(f"17d: data-ga-item {it.get('item_id')} does not match the "
+                              f"buy_url of {it.get('item_name')!r} in {path}")
+
+    # 17e: banner, both buttons in order, footer links, TTL.
+    for path, content in html_pages.items():
+        if content.count('id="cookie-banner"') != 1:
+            errors.append(f"17e: {path} must carry exactly one #cookie-banner")
+        btns = re.findall(r'data-consent="(accept|reject)"', content)
+        if btns != ["accept", "reject"]:
+            errors.append(f"17e: {path} consent buttons are {btns}, want accept then reject")
+        if f'href="{BASE_PATH}{PRIVACY_PATH}"' not in content:
+            errors.append(f"17e: {path} has no link to {PRIVACY_PATH}")
+        if 'class="consent-open"' not in content:
+            errors.append(f"17e: {path} has no Cookie settings link")
+        if f'data-consent-ttl="{CONSENT_TTL_DAYS}"' not in content:
+            errors.append(f"17e: {path} banner TTL is not {CONSENT_TTL_DAYS}")
+
+    # 17f: en-dash gate, with the one frozen legacy page allowlisted.
+    EN_DASH = "\u2013"
+    EN_DASH_ALLOW = {"blog/f/our-origins---a-little-bit-of-history/index.html"}
+    for path, content in written.items():
+        if EN_DASH in content and path not in EN_DASH_ALLOW:
+            errors.append(f"17f: en-dash (U+2013) found in {path}")
+    for name in GA_JS_ASSETS + ("catalogue.js",):
+        with open(os.path.join(HERE, "assets", name), encoding="utf-8") as fh:
+            if EN_DASH in fh.read():
+                errors.append(f"17f: en-dash (U+2013) found in assets/{name}")
+
+    # 17g: thanks page is noindex, unlisted, Disallowed, and is the form action.
+    if 'content="noindex' not in thanks:
+        errors.append("17g: thanks page is not noindex")
+    if prod_url(THANKS_PATH) in written.get("sitemap.xml", ""):
+        errors.append("17g: thanks page listed in sitemap.xml")
+    groups = robots.split("User-agent:")[1:]
+    if not groups or any(f"Disallow: {THANKS_PATH}" not in g for g in groups):
+        errors.append(f"17g: robots.txt group(s) missing 'Disallow: {THANKS_PATH}'")
+    contact_html = written.get("contact/index.html", "")
+    for tok in (f'action="{BASE_PATH}{THANKS_PATH}"', 'data-netlify="true"',
+                'netlify-honeypot="bot-field"', 'name="form-name" value="contact"'):
+        if tok not in contact_html:
+            errors.append(f"17g: contact form missing {tok}")
+
+    # 17h: privacy page is complete and true to the constants.
+    priv = written.get("privacy/index.html", "")
+    if not priv:
+        errors.append("17h: privacy/index.html missing")
+    else:
+        priv_check = priv
+        if not GA4_ENABLED:
+            # Preview only: the two unconfirmed identity placeholders may render.
+            for ph in (LEGAL_NAME_PLACEHOLDER, PRIVACY_EMAIL_PLACEHOLDER):
+                priv_check = priv_check.replace(esc(ph), "")
+        for tok in ("{{", "TODO", "G-XXXXXXXXXX"):
+            if tok in priv_check:
+                errors.append(f"17h: privacy page contains {tok!r}")
+        m = re.search(r'<span class="ga-retention">(.*?)</span>', priv)
+        if not m or html.unescape(m.group(1)) != GA4_RETENTION:
+            errors.append("17h: privacy page retention does not equal GA4_RETENTION")
+        if PRIVACY_NO_PII_LINE not in html.unescape(priv):
+            errors.append("17h: privacy page missing the no-PII sentence")
+    if GA4_ENABLED:
+        if LEGAL_NAME == LEGAL_NAME_PLACEHOLDER:
+            errors.append("17h: LEGAL_NAME is still the placeholder (live build refused)")
+        if PRIVACY_CONTACT_EMAIL == PRIVACY_EMAIL_PLACEHOLDER:
+            errors.append("17h: PRIVACY_CONTACT_EMAIL is still the placeholder (live build refused)")
+
+    # 17i is the freeze gate (freeze_check, after run_gates) against a snapshot
+    # regenerated from the LIVE build.
+
     if errors:
         print("BUILD GATES FAILED:")
         for e in errors:
@@ -3461,7 +3897,10 @@ def run_gates(cat, written):
     print(f"  - female performance page: lead line + FAQPage schema + 4 plan links")
     print(f"  - {img_count} images shipped, {img_bytes/1024:.0f}KB total (budget 3584KB); no fabricated ratings")
     print(f"  - {blog_count} original blog photos, {blog_bytes/1024:.0f}KB total (separate budget 6144KB)")
-    print(f"  - zero 'domestiq' occurrences across all generated output")
+    print(f"  - zero 'domestiq' occurrences across all generated output and JS assets")
+    print(f"  - Gate 17 (GA4/consent): 17a stub {'once per page, live' if GA4_ENABLED else 'absent, preview'}; "
+          f"17b boot order; 17c no PII; 17d {len(tracked)} tracked elements; 17e banner; "
+          f"17f en-dash; 17g thanks page; 17h privacy page")
     print(f"  - zero client surnames across all generated output (first name + initial policy)")
     ld_total = sum(len(re.findall(r'application/ld\+json', v)) for v in html_pages.values())
     print(f"  - SEO/AEO: 1 h1 + canonical(prod host) + OG/Twitter + parsing JSON-LD per page "
