@@ -157,7 +157,7 @@ CTA_FIND = "Find your plan"
 # "Get coached" (which no longer says which tier). WS-SITE26: the home hero
 # primary is now Plan Only (CTA_START_PLAN); this is the second, ghost button.
 CTA_GET = "Coach with Tom"
-CTA_START_PLAN = "Start with Plan Only"
+CTA_START_PLAN = "Start with Block Coaching"
 CTA_FEMALE_FEATURE = "See how I train female athletes"
 
 # (Removed 2026-08-13: the "written by a professional coach / not a machine" home band was
@@ -181,7 +181,7 @@ FEMALE_FIRST_BODY = ("Most plans are built around male physiology and handed to 
 # variable. A handful of Tom's byte-exact approved body-copy strings (the WHICH_*
 # lines and the TIER_* bodies, which are locked by the verbatim gate) still spell
 # the word literally; on rename those need Tom's re-approval, by design.
-TIER2_NAME = "Plan Only"
+TIER2_NAME = "Block Coaching"   # WS-SITE28: renamed from Plan Only (Tom 2026-10-20); internal ids stay plan-only
 
 # Plans tier (copy B). One block, reused on the home tier card and the /plans/ intro.
 TIER_PLANS_BODY = ("A proper plan for your race, ready to start today. Take your pick from "
@@ -221,7 +221,7 @@ RESULTS_LINE = ("Ironman wins, 70.3 and XTRI podiums, Haute Route podiums and ul
                 "of.")
 
 WHICH_PLANS = "Know what you're doing and want a proven route? Plan Store."
-WHICH_COACHED = "Want the plan built around your life, and someone reading your sessions? Plan Only."
+WHICH_COACHED = "Want the plan built around your life, and someone reading your sessions? Block Coaching."
 WHICH_TOM = "Chasing something big and want a coach in your corner for all of it? Coached by Tom."
 
 # The /plans/ intro is copy B, reused verbatim from the home tier card.
@@ -248,7 +248,7 @@ SUPPORT_LEVELS = [
     ("Plan Store", "No support",
      "Buy a proven plan off the shelf and follow it yourself. No feedback and no "
      "check-ins, just a well-built plan ready to start today."),
-    ("Plan Only", "Feedback each block",
+    (TIER2_NAME, "Feedback each block",
      "Self-directed, but not on your own. I write your bespoke plan and give you a "
      "full round of feedback each block. You drive the day to day, there are no calls "
      "and I am not on call."),
@@ -304,7 +304,7 @@ HOME_TIER_CARDS = [
      ]},
     {"name": TIER2_NAME, "cls": "feature tier-card--plan", "tag_cls": "support-tag--mid",
      "support": SUPPORT_LEVELS[1][1], "btn_cls": "btn--plan",
-     "href": "/coached/", "cta": "How Plan Only works",
+     "href": "/coached/", "cta": "How Block Coaching works",
      "price_main": "&pound;120 a month", "price_qual": "",
      "verdict": "A plan I build for you, block by block, not pulled off a shelf.",
      "flag": "If in doubt, start here",
@@ -1186,7 +1186,7 @@ def render_home(cat) -> str:
     <p class="section-intro">The plan is only half of it. What really changes across the three tiers is
     how much of me you get, from a proven plan you run yourself, to feedback on every block, to the full
     coaching relationship. No nonsense, no upselling, just the right level of support for where you are.
-    If in doubt, start with Plan Only, and step up to Coached by Tom later if you want me in your corner day to day.</p>
+    If in doubt, start with Block Coaching, and step up to Coached by Tom later if you want me in your corner day to day.</p>
     <div class="support-ladder" role="list" aria-label="Support increases across the three tiers">{ladder}</div>
     <div class="tier-grid tier-grid--distilled">{home_tier_cards()}</div>
   </div>
@@ -1606,7 +1606,7 @@ def render_plan_detail(cat, p) -> str:
                 page_type="plan_detail", sport=p["sport"], tier="plan_store")
 
 
-CTA_APPLY_PLAN = "Apply for Plan Only"
+CTA_APPLY_PLAN = "Apply for Block Coaching"
 
 # WS-SITE27: the minimum term. The agreement is the source: an initial commitment
 # of three months, then at least one month's notice in writing, email included.
@@ -1616,7 +1616,7 @@ MIN_TERM_Q = "Is there a minimum term?"
 
 COACHED_FAQ = [
     ("Is there a call every week?",
-     "No. Plan Only is built around the work and the why, delivered in writing so you can go "
+     "No. Block Coaching is built around the work and the why, delivered in writing so you can go "
      "back to it. If you want calls, WhatsApp and race-day strategy built together, that is "
      "Coached by Tom."),
     ("How often do you review my training?",
@@ -1634,10 +1634,10 @@ COACHED_FAQ = [
      "part of the block review. There is no back and forth in between. If you want my time day "
      "to day, that is Coached by Tom."),
     ("Is TrainingPeaks Premium included?",
-     "No. Plan Only is delivered to your own TrainingPeaks account. A free TrainingPeaks "
+     "No. Block Coaching is delivered to your own TrainingPeaks account. A free TrainingPeaks "
      "Premium account comes with Coached by Tom."),
     (MIN_TERM_Q,
-     "Yes. Plan Only has a three-month minimum, the same as Coached by Tom. After those first "
+     "Yes. Block Coaching has a three-month minimum, the same as Coached by Tom. After those first "
      "three months it runs month to month, and either of us can end it by giving at least one "
      "month's notice in writing. An email is fine. Three months is three full cycles of "
      "training, review and the next block built from what you actually did, which is enough "
@@ -1711,8 +1711,8 @@ def render_coached(cat) -> str:
 </section>
 {quote_block("coached")}
 </main>"""
-    desc = ("Plan Only with Tom Cooling, £120 a month. Three weeks of training, then a rest week "
-            "in which I review your block and build the next one. Race plan included.")
+    desc = ("Block Coaching with Tom Cooling, £120 a month. Three weeks of training, then a rest week "
+            "where I review your block and build the next one. Race plan included.")
     # Gate 18g: the description must fit the 158 character snippet budget.
     assert len(esc(desc)) <= 158, len(esc(desc))
     faq_ld = {
@@ -1722,7 +1722,7 @@ def render_coached(cat) -> str:
              "acceptedAnswer": {"@type": "Answer", "text": a}}
             for q, a in COACHED_FAQ]}
     svc = service_node(
-        f"{TIER2_NAME} coaching",
+        TIER2_NAME,
         f"{COACHED_INTRO} A race plan before every start line is included.",
         "/coached/", monthly_price="120.00")
     extra = ld_script([
@@ -1893,7 +1893,7 @@ def render_coaching(cat) -> str:
                 tier="coached_by_tom")
 
 
-CTA_EXPLORE_PLAN = "Explore Plan Only"
+CTA_EXPLORE_PLAN = "Explore Block Coaching"
 
 
 def render_about(cat) -> str:
@@ -2163,7 +2163,7 @@ def render_female(cat) -> str:
   <div class="wrap feature-grid">
     <div class="feature-media">{img("female-trail")}</div>
     <div class="feature-copy">
-      <p class="eyebrow">Plan Only and Coached by Tom</p>
+      <p class="eyebrow">{esc(TIER2_NAME)} and Coached by Tom</p>
       <h2>Genuinely cycle-aware coaching</h2>
       <p class="section-intro">This is where female-specific training stops being a label and
       gets personal. When I coach you, three things happen that a downloadable plan can't.</p>
@@ -2220,7 +2220,7 @@ def render_female(cat) -> str:
       path you choose, the training bends around your physiology, your event and your life.</p>
       <div class="tier-cta-row">
         <a class="btn btn--store" href="{BASE_PATH}/plans/"{ga("cta", label="Plan Store", location="callout")}>Plan Store</a>
-        <a class="btn btn--plan" href="{BASE_PATH}/coached/"{ga("cta", label="Plan Only", location="callout")}>Plan Only</a>
+        <a class="btn btn--plan" href="{BASE_PATH}/coached/"{ga("cta", label=TIER2_NAME, location="callout")}>{esc(TIER2_NAME)}</a>
         <a class="btn btn--tom" href="{BASE_PATH}/coaching/"{ga("cta", label="Coached by Tom", location="callout")}>Coached by Tom</a>
       </div>
     </div>
@@ -2260,7 +2260,7 @@ BANNER_SLOTS = [
               "coached-tom-dolomites-arch; the alternates below are here for you to override.",
      "eyebrow": "Coached by Tom · £185 a month · Limited places",
      "headline": "A coach in your corner for all of it",
-     "lede": ("Everything in Plan Only, plus me. Calls when you need them, WhatsApp when it is "
+     "lede": ("Everything in Block Coaching, plus me. Calls when you need them, WhatsApp when it is "
               "urgent, and a coach who knows your story, not just your data."),
      "candidates": ["coached-tom-dolomites-arch",
                     ("tom-alps-finish", "Alternate: Tom riding into the Haute Route Alps stage finish"),
@@ -2286,8 +2286,8 @@ BANNER_SLOTS = [
                     ("plans-pyrenees-switchback", "Alternate: lone rider on a Pyrenean switchback"),
                     ("hero-alps", "Alternate: cyclist climbing high above an alpine valley"),
                     "plans-pyrenees-dawn", "hero-welsh-climb", "alpine-ridge", "coached-band"]},
-    {"id": "coached-top", "kind": "band", "name": "Plan Only (£120), top banner",
-     "where": "The full-width band under the hero on the Plan Only page. Ships live as "
+    {"id": "coached-top", "kind": "band", "name": "Block Coaching (£120), top banner",
+     "where": "The full-width band under the hero on the Block Coaching page. Ships live as "
               "hero-torridon-ridge; the alternates below are here for you to override.",
      "candidates": ["hero-torridon-ridge", "alpine-ridge", "plans-pyrenees-switchback",
                     "coached-band"]},
@@ -2554,7 +2554,7 @@ def render_contact_thanks(cat) -> str:
 def _funnel_cards():
     tiers = [
         (TIER1_NAME, 'From &pound;39.99,<span class="price-qual"> one-off</span>', SUPPORT_LEVELS[0][1], "/plans/", "Browse the plans"),
-        (TIER2_NAME, "&pound;120 a month", SUPPORT_LEVELS[1][1], "/coached/", "How Plan Only works",
+        (TIER2_NAME, "&pound;120 a month", SUPPORT_LEVELS[1][1], "/coached/", "How Block Coaching works",
          "If in doubt, start here"),
         ("Coached by Tom", "&pound;185 a month", SUPPORT_LEVELS[2][1], "/coaching/", "Coach with Tom"),
     ]
@@ -4045,7 +4045,7 @@ def run_gates(cat, written):
         i_po = m.group(0).find(f'href="{BASE_PATH}/coached/"')
         i_tom = m.group(0).find(f'href="{BASE_PATH}/coaching/"')
         if not (0 <= i_po < i_tom):
-            errors.append(f"18e: {path} nav does not put Plan Only before Coached by Tom")
+            errors.append(f"18e: {path} nav does not put Block Coaching before Coached by Tom")
     if "Not quite ready" in coaching_html:
         errors.append("18e: coaching page still says 'Not quite ready'")
     for path in ("index.html", "triathlon-coaching/index.html", "cycling-coaching/index.html"):
@@ -4140,10 +4140,10 @@ def run_gates(cat, written):
     print(f"  - Gate 17 (GA4/consent): 17a stub {'once per page, live' if GA4_ENABLED else 'absent, preview'}; "
           f"17b boot order; 17c no PII; 17d {len(tracked)} tracked elements; 17e banner; "
           f"17f en-dash; 17g thanks page; 17h privacy page")
-    print("  - Gate 18 (Plan Only first): 18a option field; 18b ?option= links; 18c analytics "
+    print("  - Gate 18 (Block Coaching first): 18a option field; 18b ?option= links; 18c analytics "
           "whitelist + preselect on /contact/ only; 18d monthly review copy; 18e CTA order; "
           "18f privacy; 18g description length; 18h minimum term on /coached/ and /coaching/; "
-          "18i Wales posts link Plan Only first")
+          "18i Wales posts link Block Coaching first")
     print(f"  - zero client surnames across all generated output (first name + initial policy)")
     ld_total = sum(len(re.findall(r'application/ld\+json', v)) for v in html_pages.values())
     print(f"  - SEO/AEO: 1 h1 + canonical(prod host) + OG/Twitter + parsing JSON-LD per page "

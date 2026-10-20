@@ -29,7 +29,7 @@
   --teal-soft: #CCFBF1;
   --maxw: 1120px;
   /* WS-SITE18 tier colour theme: Plan Store = white/cream + ink + subtle border,
-     Plan Only = teal, Coached by Tom = gold. Applied site-wide to every tier
+     Block Coaching = teal, Coached by Tom = gold. Applied site-wide to every tier
      card, ladder rung and tier CTA/button set. */
   --gold: #B8841A;
   --gold-dark: #9C6F15;
@@ -161,7 +161,7 @@ a { color: var(--teal-dark); }
 .btn.on-dark.ghost { color: var(--white); border-color: var(--white); }
 .btn.on-dark.ghost:hover { background: var(--white); color: var(--black); }
 
-/* WS-SITE18 tier-themed buttons (Plan Store white/bordered, Plan Only teal, Coached by Tom gold) */
+/* WS-SITE18 tier-themed buttons (Plan Store white/bordered, Block Coaching teal, Coached by Tom gold) */
 .btn--plan { background: var(--teal); color: var(--white); }
 .btn--plan:hover { background: var(--teal-dark); color: var(--white); }
 .btn--tom { background: var(--gold); color: var(--white); }
@@ -662,7 +662,7 @@ section { padding: 64px 0; }
 .side-fig-grid .photo-fig--port { max-width: 420px; }
 @media (max-width: 899px) { .side-fig-grid .photo-fig--port { margin: 0 auto; } }
 /* WS-SITE18: balanced two-column feel so the support photo fills the right side
-   instead of looking like it has fallen off the edge (Plan Only "what you get"). */
+   instead of looking like it has fallen off the edge (Block Coaching "what you get"). */
 @media (min-width: 900px) {
   .side-fig-grid--balanced { grid-template-columns: 1.1fr 0.9fr; }
   .side-fig-grid--balanced .photo-fig--port { max-width: 100%; margin-left: auto; }
@@ -710,7 +710,7 @@ section { padding: 64px 0; }
 .support-ladder .rung { flex: 1 1 200px; border: 1px solid var(--rule); border-radius: 10px;
   background: var(--white); padding: 14px 16px; display: flex; flex-direction: column; gap: 3px;
   border-left: 4px solid var(--grey-light); }
-.support-ladder .rung:nth-child(3) { border-left-color: var(--teal); }   /* Plan Only */
+.support-ladder .rung:nth-child(3) { border-left-color: var(--teal); }   /* Block Coaching */
 /* WS-SITE18: Coached by Tom rung is gold (replacing the old black fill) */
 .support-ladder .rung--full { border-left-color: var(--gold-dark);
   background: var(--gold); }
