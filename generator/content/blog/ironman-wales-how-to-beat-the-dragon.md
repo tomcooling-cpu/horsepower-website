@@ -208,4 +208,4 @@ Ironman Wales is not won by the strongest athlete. **It is won by the most compo
 - **Let the crowd lift you late, not early.**
 - Then take the red carpet, having done it properly.
 
-If you want this race planned around you, your fitness and your season rather than a generic template, that is exactly what I do. Have a look at [Plan Only](/coached/), where I build your plan block by block with a race plan for Tenby included, or at [Coached by Tom](/coaching/) if you want me in your corner the whole way. Or read [Enter The Dragon](/blog/f/ironman-wales---enter-the-dragon/) for what this course looked like from the inside when I was the one racing it.
+If you want this race planned around you, your fitness and your season rather than a generic template, that is exactly what I do. Have a look at [Block Coaching](/coached/), where I build your plan block by block with a race plan for Tenby included, or at [Coached by Tom](/coaching/) if you want me in your corner the whole way. Or read [Enter The Dragon](/blog/f/ironman-wales---enter-the-dragon/) for what this course looked like from the inside when I was the one racing it.

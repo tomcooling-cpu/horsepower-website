@@ -79,7 +79,7 @@ None of this is a secret, and none of it is glamorous. The athletes who have a g
 
 Insulate yourself against failure for 2027. Get the gear range right. Get a proper race plan. Rehearse the fuelling until it is boring. And respect the recovery. Do those four things and you give yourself the best possible chance of enjoying the hardest, most rewarding day on the Ironman calendar.
 
-If any of that felt like it was aimed at you, and you want a coach who genuinely understands the difference between fast tech and the right tech, start with [Plan Only](/coached/), where I build your plan block by block, or come and say hello over on [Coached by Tom](/coaching/) if you want me in your corner for all of it. Either way, look after yourselves, ride smart, and I will see you in Tenby.
+If any of that felt like it was aimed at you, and you want a coach who genuinely understands the difference between fast tech and the right tech, start with [Block Coaching](/coached/), where I build your plan block by block, or come and say hello over on [Coached by Tom](/coaching/) if you want me in your corner for all of it. Either way, look after yourselves, ride smart, and I will see you in Tenby.
 
 ## References
 
