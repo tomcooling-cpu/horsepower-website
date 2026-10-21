@@ -810,15 +810,15 @@
   "webp_quality": 53
  },
  "run-form-the-first-thing-to-fix__1": {
-  "source_url": "https://upload.wikimedia.org/wikipedia/commons/e/ef/Sobo_1909_305.png",
+  "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/f1/Posterior_compartment_of_leg_-_tibialis_posterior.png",
   "role": "inline",
-  "longedge": 1200,
-  "webp_quality": 70
+  "longedge": 900,
+  "webp_quality": 72
  },
  "run-form-the-first-thing-to-fix__2": {
-  "source_url": "https://upload.wikimedia.org/wikipedia/commons/6/68/Sobo_1909_304.png",
+  "source_url": "https://upload.wikimedia.org/wikipedia/commons/6/62/Soleus_muscle_-_posterior_view.png",
   "role": "inline",
-  "longedge": 1200,
-  "webp_quality": 70
+  "longedge": 900,
+  "webp_quality": 72
  }
 }

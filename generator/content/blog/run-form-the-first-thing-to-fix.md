@@ -44,9 +44,7 @@ When fatigue arrives, cadence drifts down. In 179 runners filmed at 8 km and aga
 
 Here is the pattern I see, and this is my observation rather than a published finding. The lower your cadence is to begin with, the steeper that late-race decline tends to be. If you start a marathon at 155 to 160 and fade to 140, you are effectively sitting down in your run form. The hips drop, the foot reaches out, every landing is a brake, and your body is fighting forward movement with every step. If you start at 180 and fade to 175, you are still running well. Same fatigue, different outcome.
 
-{{fig:into-the-unknown__8}}
-
-**Me at Ironman Nice 2016, one lap into the marathon.**
+{{fig:into-the-unknown__8|Me at Ironman Nice, one lap into the marathon. I felt like death, but run form kept me moving well.}}
 
 The best ultra runners do something different, and I think it proves the same point from the other direction. Elite runners in a 100 km World Championship averaged 182 steps per minute and, once you allowed for speed, their cadence did not drop with fatigue at all (Burns, Zendler and Zernicke, 2019), and over a 24 hour treadmill run experienced ultra runners actually quickened their step by around 5 per cent and landed with lower peak forces (Morin, Samozino and Millet, 2011). The people who can run for a day keep the step short and quick when everything else is failing. The rest of us have to train it in.
 
@@ -56,7 +54,7 @@ The number comes from Jack Daniels (not the whiskey maker), who counted the step
 
 So I treat 180 as a target, not a law. What I ask my athletes to do is lock in 180 steps per minute at mid to high zone 2, the easy aerobic running that makes up most of their week. Do that, and you will likely see 185 to 195 at tempo and in efforts without trying, because cadence rises with speed, by roughly 5 to 6 steps per minute for every metre per second of pace in the 100 km data (Burns, Zendler and Zernicke, 2019). With a quick step as your base, going faster means applying more force, pushing off harder, or both. Without it, going faster means reaching the leg out and lengthening the stride, which turns running into a strength activity: overstriding, heel striking, a jolt through the foot, and a brake on every step.
 
-{{img:honours-hannah-wales|Hannah S breaking the tape to win Ironman Wales 2022.}}
+{{img:honours-hannah-wales|Hannah S breaking the tape to win Ironman Wales 2022. Run form has been one of her biggest levers.}}
 
 ## Why not just buy a more supportive shoe?
 
@@ -64,9 +62,7 @@ Because if you focus on strength, you do not need the motion control shoe. The f
 
 A motion control shoe exists to stop the arch collapsing inwards under load. But you already own something built for exactly that. Tibialis posterior, the muscle that runs down the inside of the shin and under the arch, is the primary dynamic stabiliser of the medial arch in gait (Semple et al., 2009). Underneath it sits the foot core, the small intrinsic muscles that control the arch the way the deep trunk muscles control the spine, and the people who proposed that model pointed out that treatment for foot problems usually goes straight to supporting the foot from the outside rather than training those muscles (McKeon et al., 2015). Above both sits the calf, taking the landing and driving the push off. Strong and working together, that system controls pronation from the inside. A shoe does it from the outside, and a foot that has its job done for it never gets any stronger.
 
-{{fig:run-form-the-first-thing-to-fix__1}}
-
-**The deep muscles at the back of the lower leg. Tibialis posterior runs down the middle, and its tendon passes behind the inside ankle bone into the arch of the foot. Illustration: Sobotta's Atlas and Text-book of Human Anatomy (1909), public domain, via Wikimedia Commons.**
+{{fig:run-form-the-first-thing-to-fix__1|Tibialis posterior, in red, seen from behind. It runs down the back of the shin and its tendon passes behind the inside ankle bone into the arch of the foot. Image: BodyParts3D / Anatomography, © The Database Center for Life Science, CC BY-SA 2.1 JP, via Wikimedia Commons.}}
 
 Train the system and it changes, measurably. Four weeks of the short foot exercise, which is simply learning to draw the arch up without curling the toes, reduced navicular drop, how far the arch collapses under weight, by around 2 mm and improved single leg balance (Mulligan and Cook, 2013). That is the foot doing the shoe's job. In a year long randomised trial, recreational runners who followed an eight week foot and ankle strengthening programme and kept it going had a 2.4 fold lower rate of running injuries than the controls (Taddei et al., 2020). For tibialis posterior itself, progressive resistance work improved pain and function in early tendon problems beyond what orthoses alone managed (Kulig et al., 2009).
 
@@ -74,7 +70,7 @@ Now the honest part. The research does say that motion control shoes can help a 
 
 So my position is a coaching choice, and I will own it as one. The shoe can help in the short term, but it does nothing to make you stronger. I would rather build the foot that does not need it, and in my experience, once an athlete has done a few months of the strength work, they stop asking which shoe will fix them. One warning: do not run in minimal shoes overnight. When experienced runners switched to barefoot style shoes over ten weeks, more than half showed new bone stress in the feet on MRI (Ridge et al., 2013).
 
-{{img:female-trail|A trail runner on an alpine path.}}
+{{img:female-trail|Hannah S preparing for XTRI Norseman 2023, taking her cadence run work to the French Alps.}}
 
 ## How do I build cadence?
 
@@ -82,8 +78,8 @@ Patiently. Tendons and calves need weeks, not days.
 
 - **Measure first.** Most watches show it. Note your natural number on a few easy runs.
 - **Go up in steps of 5 to 10 per cent, never more.** That is what the lab used (Heiderscheit et al., 2011). From 160, aim for 168 to 172, hold it for two to three weeks until it feels normal, then go again. The goal is 180 at mid to high zone 2.
-- **Use a cue.** A metronome app, a playlist at the right tempo, or a cadence alert on the watch. The knee pain study used exactly that (Bramah et al., 2019).
-- **Think short and quick, not fast.** Shorter stride, feet landing underneath you (beneath your centre of mass), light and quiet. Your easy pace should not change; if it does, you have sped up rather than quickened.
+- **Use the metronome on your watch.** Most run watches have one built in, Garmin certainly does, and it is the tool the knee pain study used (Bramah et al., 2019). Do not set it to 180. Set it to beep once every other footfall, 90 beeps a minute, because that is far easier to follow than something chirping 180 times a minute. Pick a foot, right or left, land that foot on the beep, and stay in sync with it.
+- **Think short and quick, not fast.** Shorter stride, feet landing underneath you (beneath your centre of mass), light and quiet. The cue I give is to imagine the knee leading the stride rather than the foot; the foot then lands where it should without you thinking about it. Your easy pace should not change; if it does, you have sped up rather than quickened.
 - **At tempo and in efforts, let it rise.** 185 to 195 is normal once 180 is your easy day baseline. If your hard running sits at 175, that is overstriding.
 - **Hills are the test.** Keep the step quick going up, shorten it going down. Uphill is where cadence goes first, downhill is where braking bites.
 
@@ -96,9 +92,7 @@ Cadence protects you from load, but you still need a lower leg that can take wha
 - **Foot core.** The short foot exercise: standing, draw the ball of the big toe back towards the heel to lift the arch without curling the toes, hold five seconds, repeat (McKeon et al., 2015; Mulligan and Cook, 2013). Add single leg balance barefoot.
 - **Walk in less shoe.** Walking in minimal shoes, step count built up week by week, grew foot muscle size and strength as much as a formal exercise programme (Ridge et al., 2019). Walking, not running, until the foot has earned it.
 
-{{fig:run-form-the-first-thing-to-fix__2}}
-
-**The soleus, seen with the gastrocnemius cut away. It sits underneath the calf muscle you can see and runs down into the Achilles tendon. Illustration: Sobotta's Atlas and Text-book of Human Anatomy (1909), public domain, via Wikimedia Commons.**
+{{fig:run-form-the-first-thing-to-fix__2|The soleus, in red, seen from behind. It sits underneath the gastrocnemius, the calf muscle you can see, and runs down into the Achilles tendon. Image: BodyParts3D / Anatomography, © The Database Center for Life Science, CC BY-SA 2.1 JP, via Wikimedia Commons.}}
 
 A word on the soleus, because most runners have never heard of it. It is the flat muscle under the gastrocnemius, and in my experience it develops once you start landing properly on the midfoot. The mechanics support that: land on the forefoot or midfoot instead of the heel and the work shifts from the knee to the ankle, with higher plantarflexor moments and more force through the Achilles (Kulmala et al., 2013; Stearne et al., 2014). That load is the training stimulus, and the reason to change your landing gradually.
 

@@ -2763,11 +2763,14 @@ def site_figure(name, caption=""):
     return f'<figure class="blog-figure">{img(name, lazy=True)}{cap}</figure>'
 
 
-def blog_figure(name):
+def blog_figure(name, caption=""):
     """An inline blog photo rendered as a lazy-loaded <figure> (dimensions set so
-    the reflow-free space is reserved). Captions, where the original had one, are
-    the author's own bold lines already in the post body, so none is added here."""
-    return f'<figure class="blog-figure">{blog_img_tag(name, lazy=True)}</figure>'
+    the reflow-free space is reserved). For the migrated posts the captions, where
+    the original had one, are the author's own bold lines already in the post body,
+    so none is added. Newer posts may pass one after a pipe ({{fig:name|caption}}),
+    rendered as the same small <figcaption> that site_figure gives {{img:}}."""
+    cap = f"<figcaption>{esc(caption)}</figcaption>" if caption else ""
+    return f'<figure class="blog-figure">{blog_img_tag(name, lazy=True)}{cap}</figure>'
 
 
 def _md_inline(text):
@@ -2824,7 +2827,9 @@ def _md_to_html(body):
             # Inline original blog photo (WS-SITE24): a whole-line directive that
             # renders a <figure> in place. Not text, so it leaves the frozen body
             # text unchanged; a bad name fails the build loudly (KeyError).
-            flush(); out.append(blog_figure(s[6:-2].strip())); i += 1; continue
+            flush()
+            nm, _, cap = s[6:-2].strip().partition("|")
+            out.append(blog_figure(nm.strip(), cap.strip())); i += 1; continue
         if s.startswith("### "):
             flush(); out.append("<h3>" + _md_inline(s[4:].strip()) + "</h3>"); i += 1; continue
         if s.startswith("## "):
