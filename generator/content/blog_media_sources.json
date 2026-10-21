@@ -808,5 +808,17 @@
   "role": "inline",
   "longedge": 880,
   "webp_quality": 53
+ },
+ "run-form-the-first-thing-to-fix__1": {
+  "source_url": "https://upload.wikimedia.org/wikipedia/commons/e/ef/Sobo_1909_305.png",
+  "role": "inline",
+  "longedge": 1200,
+  "webp_quality": 70
+ },
+ "run-form-the-first-thing-to-fix__2": {
+  "source_url": "https://upload.wikimedia.org/wikipedia/commons/6/68/Sobo_1909_304.png",
+  "role": "inline",
+  "longedge": 1200,
+  "webp_quality": 70
  }
 }
