@@ -2897,6 +2897,7 @@ BLOG_HERO = {
     "make-the-plan-then-hold-it": "coached-band",             # a hard TT / pacing effort
     "train-easier-than-you-think": "plans-pyrenees-switchback",  # steady endurance on an alpine road
     "dont-get-fancy-before-youre-fancy": "hero-welsh-climb",  # honest fundamentals, climbing
+    "run-cadence-the-first-thing-i-fix": "hero-torridon-ridge",  # two runners on a ridge
     # Migrated posts
     "2017-season-wrapup---calm-after-the-storm": "plans-pyrenees-dawn",
     "everesting---climbing-the-mountain": "hero-alps",
