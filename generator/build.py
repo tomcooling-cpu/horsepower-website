@@ -1020,11 +1020,17 @@ def _review_cta(cls="btn on-dark ghost"):
             f'Read all {REVIEW_COUNT} reviews on Google</a>')
 
 
-def _rating_html():
+def _rating_html(link=False):
+    """The Google rating line. link=True (WS-SITE29) wraps the same line in the
+    Google reviews link, for the rating shown beside a Block Coaching CTA."""
     if REVIEW_RATING and REVIEW_COUNT:
         stars = "★" * int(round(REVIEW_RATING))
-        return (f'<p class="rating"><span class="stars" aria-hidden="true">{stars}</span> '
-                f'<strong>{REVIEW_RATING:g}</strong> from {REVIEW_COUNT} Google reviews</p>')
+        inner = (f'<span class="stars" aria-hidden="true">{stars}</span> '
+                 f'<strong>{REVIEW_RATING:g}</strong> from {REVIEW_COUNT} Google reviews')
+        if link:
+            inner = (f'<a href="{esc(GOOGLE_REVIEW_URL)}" rel="noopener" target="_blank"'
+                     f'{ga("contact", channel="google_reviews")}>{inner}</a>')
+        return f'<p class="rating">{inner}</p>'
     return ""
 
 
@@ -1658,7 +1664,8 @@ def render_coached(cat) -> str:
     <p class="eyebrow" style="color:var(--teal-soft)">{esc(TIER2_NAME)} &middot; &pound;120 a month</p>
     <h1>A plan I build for you, block by block</h1>
     <p class="lede">{esc(COACHED_INTRO)}</p>
-    <div class="cta-row"><a class="btn" href="{esc(contact_url('plan-only'))}"{ga("cta", label=CTA_APPLY_PLAN, location="hero")}>{esc(CTA_APPLY_PLAN)}</a></div>
+    <div class="cta-row"><a class="btn" href="{esc(contact_url('plan-only'))}"{ga("cta", label=CTA_APPLY_PLAN, location="hero")}>{esc(CTA_APPLY_PLAN)}</a>
+      {_rating_html(link=True)}</div>
   </div>
 </section>
 
@@ -2131,11 +2138,11 @@ def render_female(cat) -> str:
     <h1>{esc(FEMALE_LEAD)}</h1>
     <p class="lede">{esc(FEMALE_FIRST_BODY)}</p>
     <div class="cta-row">
-      <a class="btn" href="{BASE_PATH}/coached/"{ga("cta", label=CTA_EXPLORE_PLAN, location="hero")}>{esc(CTA_EXPLORE_PLAN)}</a>
-      <a class="btn on-dark ghost" href="#female-plans"{ga("cta", label="See the plans", location="hero")}>See the plans</a>
+      {_sport_hero_ctas()}
     </div>
   </div>
 </section>
+{_plan_panel()}
 
 <section>
   <div class="wrap">
@@ -2381,32 +2388,12 @@ def render_contact(cat) -> str:
   <div class="wrap">
     <p class="eyebrow" style="color:var(--teal-soft)">Contact</p>
     <h1>Get in touch</h1>
-    <p class="lede">Tell me about your event and your season and I'll come back to you. The
-    quickest way to reach me is WhatsApp or Instagram. If you'd rather write it all down,
-    use the form and I'll pick it up from there.</p>
+    <p class="lede">Tell me about your event and your season and I'll come back to you.</p>
   </div>
 </section>
 
 <section>
   <div class="wrap contact-grid">
-    <div class="contact-intro">
-      <figure class="photo-fig photo-fig--land contact-portrait">{img("tom-portrait")}
-        <figcaption>Tom Cooling, founder and head coach of Horsepower Coaching</figcaption></figure>
-      <h2>Talk to me directly</h2>
-      <ul class="contact-channels">
-        <li><a href="{WHATSAPP_URL}" rel="noopener" target="_blank"{ga("contact", channel="whatsapp")}>
-          <span class="ch-icon">{SVG_WA}</span>
-          <span class="ch-body"><strong>WhatsApp</strong><span>+44 7780 008724</span></span></a></li>
-        <li><a href="{INSTAGRAM_URL}" rel="noopener" target="_blank"{ga("contact", channel="instagram")}>
-          <span class="ch-icon">{SVG_IG}</span>
-          <span class="ch-body"><strong>Instagram</strong><span>@horsepower.coaching</span></span></a></li>
-        <li><a href="{esc(GOOGLE_REVIEW_URL)}" rel="noopener" target="_blank"{ga("contact", channel="google_reviews")}>
-          <span class="ch-icon">{SVG_FB}</span>
-          <span class="ch-body"><strong>Reviews</strong><span>Read {REVIEW_COUNT} reviews on Google</span></span></a></li>
-      </ul>
-      <p style="color:var(--grey-mid);margin-top:22px">Based in Truro, Cornwall, coaching athletes
-      across the UK and online worldwide.</p>
-    </div>
     <div class="contact-panel">
       <h2>Send me a message</h2>
       <form name="contact" method="POST" data-netlify="true" netlify-honeypot="bot-field" class="contact-form" action="{BASE_PATH}{THANKS_PATH}">
@@ -2425,6 +2412,24 @@ def render_contact(cat) -> str:
         <button class="btn" type="submit">Send message</button>
       </form>
       {CONTACT_PRESELECT_JS}
+    </div>
+    <div class="contact-intro">
+      <figure class="photo-fig photo-fig--land contact-portrait">{img("tom-portrait")}
+        <figcaption>Tom Cooling, founder and head coach of Horsepower Coaching</figcaption></figure>
+      <h2>Talk to me directly</h2>
+      <ul class="contact-channels">
+        <li><a href="{WHATSAPP_URL}" rel="noopener" target="_blank"{ga("contact", channel="whatsapp")}>
+          <span class="ch-icon">{SVG_WA}</span>
+          <span class="ch-body"><strong>WhatsApp</strong><span>+44 7780 008724</span></span></a></li>
+        <li><a href="{INSTAGRAM_URL}" rel="noopener" target="_blank"{ga("contact", channel="instagram")}>
+          <span class="ch-icon">{SVG_IG}</span>
+          <span class="ch-body"><strong>Instagram</strong><span>@horsepower.coaching</span></span></a></li>
+        <li><a href="{esc(GOOGLE_REVIEW_URL)}" rel="noopener" target="_blank"{ga("contact", channel="google_reviews")}>
+          <span class="ch-icon">{SVG_FB}</span>
+          <span class="ch-body"><strong>Reviews</strong><span>Read {REVIEW_COUNT} reviews on Google</span></span></a></li>
+      </ul>
+      <p style="color:var(--grey-mid);margin-top:22px">Based in Truro, Cornwall, coaching athletes
+      across the UK and online worldwide.</p>
     </div>
   </div>
 </section>
@@ -2551,6 +2556,39 @@ def render_contact_thanks(cat) -> str:
 # and /cycling-coaching URLs (the _redirects map sends the old no-slash URLs
 # here). Each targets its head term + Clevedon/UK, then funnels to the three
 # tiers. Not a duplicate of the tiers page; a focused door in.
+# WS-SITE29 (Tom 2026-10-26, Ads review): sport landing pages send the hero
+# straight to the Block Coaching enquiry and show the offer under the hero. Each
+# panel line is lifted verbatim from /coached/ (TIER_COACHED_BODY and the step
+# list), so no new claim is made.
+CTA_WHATS_INCLUDED = "What's included"
+PLAN_PANEL_PRICE = "£120 a month"
+PLAN_PANEL_LINES = [
+    "I write your programme myself, block by block, exactly the way I do for my "
+    "fully coached athletes.",
+    "One review a month, in writing, so you can go back to it.",
+    "A race plan before every start line.",
+]
+
+
+def _sport_hero_ctas():
+    return (f'<a class="btn" href="{esc(contact_url("plan-only"))}"'
+            f'{ga("cta", label=CTA_APPLY_PLAN, location="hero")}>{esc(CTA_APPLY_PLAN)}</a>\n'
+            f'      <a class="btn on-dark ghost" href="{BASE_PATH}/coached/"'
+            f'{ga("cta", label=CTA_WHATS_INCLUDED, location="hero")}>{esc(CTA_WHATS_INCLUDED)}</a>')
+
+
+def _plan_panel():
+    lines = "".join(f"<li>{esc(s)}</li>" for s in PLAN_PANEL_LINES)
+    return f"""<section class="plan-panel">
+  <div class="wrap">
+    <p class="eyebrow">{esc(TIER2_NAME)}</p>
+    <p class="plan-panel-price">{esc(PLAN_PANEL_PRICE)}</p>
+    <ul class="plan-panel-list">{lines}</ul>
+    {_rating_html(link=True)}
+  </div>
+</section>"""
+
+
 def _funnel_cards():
     tiers = [
         (TIER1_NAME, 'From &pound;39.99,<span class="price-qual"> one-off</span>', SUPPORT_LEVELS[0][1], "/plans/", "Browse the plans"),
@@ -2584,11 +2622,11 @@ def render_sport_landing(*, slug, h1, eyebrow, hero_img, og_name, title, desc,
     <h1>{esc(h1)}</h1>
     <p class="lede">{esc(lede)}</p>
     <div class="cta-row">
-      <a class="btn" href="{BASE_PATH}/coached/"{ga("cta", label=CTA_EXPLORE_PLAN, location="hero")}>{esc(CTA_EXPLORE_PLAN)}</a>
-      <a class="btn on-dark ghost" href="{BASE_PATH}/plans/"{ga("cta", label=CTA_FIND, location="hero")}>{esc(CTA_FIND)}</a>
+      {_sport_hero_ctas()}
     </div>
   </div>
 </section>
+{_plan_panel()}
 
 <section>
   <div class="wrap prose">
@@ -4058,10 +4096,13 @@ def run_gates(cat, written):
         n = written.get(path, "").count('class="tier-flag"')
         if n != 1:
             errors.append(f"18e: {path} carries {n} tier flags, want 1")
-    for path in ("about/index.html", "triathlon-coaching/index.html", "cycling-coaching/index.html"):
+    # WS-SITE29: the sport pages' first CTA is now the Block Coaching enquiry itself.
+    for path, want in (("about/index.html", f"{BASE_PATH}/coached/"),
+                       ("triathlon-coaching/index.html", contact_url("plan-only")),
+                       ("cycling-coaching/index.html", contact_url("plan-only"))):
         m = re.search(r'<div class="cta-row"[^>]*>\s*<a [^>]*?href="([^"]*)"', written.get(path, ""))
-        if not m or m.group(1) != f"{BASE_PATH}/coached/":
-            errors.append(f"18e: {path} first cta-row anchor does not point at /coached/")
+        if not m or html.unescape(m.group(1)) != want:
+            errors.append(f"18e: {path} first cta-row anchor does not point at {want}")
 
     # 18f: the privacy page names the option field in both places.
     priv_text = html.unescape(priv)
@@ -4126,6 +4167,83 @@ def run_gates(cat, written):
         if c_href in own and t_href in own and own.find(c_href) > own.find(t_href):
             errors.append(f"18i: {path} links /coaching/ before /coached/")
 
+    # 19a (WS-SITE29): every sport landing page (and /female-performance/) leads its
+    # hero with Apply for Block Coaching to the plan-only contact URL, then "What's
+    # included" to /coached/, and carries the offer panel (price, the three lines,
+    # the linked Google rating) directly under the hero, before any other section.
+    plan_href = f'href="{esc(contact_url("plan-only"))}"'
+    rating_line = _rating_html(link=True)
+    sport_pages = sorted(k for k, v in html_pages.items()
+                         if 'data-page-type="sport_landing"' in v)
+    if len(sport_pages) < 2:
+        errors.append(f"19a: expected the sport landing pages, found {sport_pages}")
+    for path in sport_pages + ["female-performance/index.html"]:
+        content = html_pages.get(path, "")
+        m = re.search(r'<section class="hero[^"]*">(.*?)</section>\s*(<section[^>]*>.*?</section>)',
+                      content, re.S)
+        if not m:
+            errors.append(f"19a: {path} has no hero followed by a section")
+            continue
+        hero, after = m.group(1), m.group(2)
+        btns = re.findall(r'<a class="btn[^"]*" href="([^"]*)"[^>]*>([^<]*)</a>', hero)
+        want = [(html.unescape(esc(contact_url("plan-only"))), CTA_APPLY_PLAN),
+                (f"{BASE_PATH}/coached/", CTA_WHATS_INCLUDED)]
+        got = [(html.unescape(h), html.unescape(t)) for h, t in btns]
+        if got != want:
+            errors.append(f"19a: {path} hero buttons are {got}, want {want}")
+        if not after.startswith('<section class="plan-panel">'):
+            errors.append(f"19a: {path} section after the hero is not the plan panel")
+        for s in [PLAN_PANEL_PRICE] + PLAN_PANEL_LINES:
+            if esc(s) not in after:
+                errors.append(f"19a: {path} plan panel missing {s[:40]!r}")
+        if rating_line not in after or f"from {REVIEW_COUNT} Google reviews" not in after:
+            errors.append(f"19a: {path} plan panel missing the Google rating line")
+        if "Plan Only" in content:
+            errors.append(f"19a: {path} says 'Plan Only'")
+        main = re.search(r'<main id="main">.*?</main>', content, re.S)
+        if not main or f'href="{BASE_PATH}/coaching/"' not in main.group(0) \
+                or main.group(0).find('class="plan-panel"') > main.group(0).find(f'href="{BASE_PATH}/coaching/"'):
+            errors.append(f"19a: {path} must keep its Coached by Tom CTA below the plan panel")
+        if path in sport_pages and "&pound;185 a month" not in content:
+            errors.append(f"19a: {path} lost the Coached by Tom price card")
+    home_hero = re.search(r'<section class="hero[^"]*">(.*?)</section>',
+                          written.get("index.html", ""), re.S)
+    if not home_hero or CTA_WHATS_INCLUDED in html.unescape(home_hero.group(1)):
+        errors.append("19a: home hero changed (it must not carry the sport page CTAs)")
+
+    # 19b: /contact/ puts the form before the photo and the WhatsApp/Instagram
+    # block in source order, and the intro no longer calls them the quickest way.
+    i_form = contact_html.find('<form name="contact"')
+    i_photo = contact_html.find('class="photo-fig photo-fig--land contact-portrait"')
+    i_wa = contact_html.find(f'href="{WHATSAPP_URL}" rel="noopener" target="_blank" data-ga="contact"'
+                             f' data-ga-channel="whatsapp">\n          <span class="ch-icon">')
+    i_ig = contact_html.find('<strong>Instagram</strong>')
+    if not (0 <= i_form < i_photo and 0 <= i_form < i_wa and 0 <= i_form < i_ig):
+        errors.append(f"19b: contact form must precede the photo and WhatsApp/Instagram "
+                      f"(form {i_form}, photo {i_photo}, whatsapp {i_wa}, instagram {i_ig})")
+    if "quickest way" in contact_html:
+        errors.append("19b: contact page still calls WhatsApp/Instagram the quickest way")
+
+    # 19c: /coached/ shows the linked Google rating beside its first Apply button.
+    m = re.search(r'<div class="cta-row">(.*?)</div>', coached_html, re.S)
+    if not m or CTA_APPLY_PLAN not in m.group(1) or rating_line not in m.group(1):
+        errors.append("19c: coached hero cta-row must carry Apply plus the Google rating line")
+
+    # 19d: chat_click fires for every WhatsApp/Instagram link with channel and
+    # page_type, through the same consent-gated send() as every other event.
+    if 'send("chat_click", { channel: chat, page_type: PAGE_TYPE })' not in asrc:
+        errors.append("19d: analytics.js does not send chat_click {channel, page_type}")
+    for host, ch in (('"wa.me"', '"whatsapp"'), ('"www.instagram.com"', '"instagram"')):
+        if host not in asrc or f"return {ch};" not in asrc:
+            errors.append(f"19d: analytics.js chatChannel does not map {host} to {ch}")
+    if asrc.count('gtag("event"') != 2:
+        errors.append("19d: analytics.js must call gtag only from send() and the ready flush")
+    chat_links = [a for _p, a, _i in tracked
+                  if re.match(r"https://(wa\.me|www\.instagram\.com)/", a.get("href", ""))]
+    if not chat_links or any(a.get("data-ga") != "contact" or a.get("data-ga-channel")
+                             not in ("whatsapp", "instagram") for a in chat_links):
+        errors.append("19d: WhatsApp/Instagram links must carry data-ga=contact with a channel")
+
     # 17i is the freeze gate (freeze_check, after run_gates) against a snapshot
     # regenerated from the LIVE build.
 
@@ -4150,6 +4268,9 @@ def run_gates(cat, written):
           "whitelist + preselect on /contact/ only; 18d monthly review copy; 18e CTA order; "
           "18f privacy; 18g description length; 18h minimum term on /coached/ and /coaching/; "
           "18i Wales posts link Block Coaching first")
+    print(f"  - Gate 19 (sport pages convert): 19a {len(sport_pages)} sport pages + female hero "
+          f"to ?option=plan-only, price, panel lines, rating; 19b contact form first; "
+          f"19c rating beside Apply on /coached/; 19d chat_click on {len(chat_links)} chat links")
     print(f"  - zero client surnames across all generated output (first name + initial policy)")
     ld_total = sum(len(re.findall(r'application/ld\+json', v)) for v in html_pages.values())
     print(f"  - SEO/AEO: 1 h1 + canonical(prod host) + OG/Twitter + parsing JSON-LD per page "

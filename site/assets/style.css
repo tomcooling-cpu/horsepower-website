@@ -180,6 +180,21 @@ a { color: var(--teal-dark); }
 .hero .lede { font-size: var(--step-lede); max-width: 60ch; color: #E7E7E7; }
 .hero .cta-row { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 28px; }
 
+/* WS-SITE29: Google rating line beside a Block Coaching CTA, and the offer panel
+   under the sport landing heroes. */
+.rating a { color: inherit; text-decoration: none; }
+.rating a:hover strong, .rating a:focus-visible strong { text-decoration: underline; }
+.rating .stars { color: #E0A400; letter-spacing: 2px; }
+.hero .cta-row .rating { margin: 0; align-self: center; color: #E7E7E7; }
+.hero .cta-row .rating .stars { color: #F5B301; }
+.plan-panel { padding: 28px 0 30px; background: var(--grey-bg); border-bottom: 1px solid var(--rule); }
+.plan-panel .eyebrow { margin-bottom: 4px; }
+.plan-panel-price { font-family: 'Oswald', sans-serif; font-size: 1.6rem; font-weight: 600;
+  color: var(--black); margin: 0 0 12px; }
+.plan-panel-list { margin: 0 0 14px; padding-left: 1.2em; max-width: 62ch; color: var(--grey-dark); }
+.plan-panel-list li { margin: 0 0 6px; }
+.plan-panel .rating { margin: 0; color: var(--grey-dark); }
+
 /* ---- Sections ---- */
 section { padding: 56px 0; }
 section.alt { background: var(--grey-bg); }
@@ -737,6 +752,8 @@ section { padding: 64px 0; }
 /* Contact page: channels beside a Netlify form. */
 .contact-grid { display: grid; gap: 40px; grid-template-columns: 1fr; align-items: start; }
 @media (min-width: 820px) { .contact-grid { grid-template-columns: 0.9fr 1.1fr; } }
+/* WS-SITE29: the form leads the source (first on a phone); desktop keeps it on the right. */
+@media (min-width: 820px) { .contact-intro { order: -1; } }
 .contact-channels { list-style: none; margin: 18px 0 0; padding: 0; display: grid; gap: 12px; }
 .contact-channels a { display: flex; align-items: center; gap: 14px; text-decoration: none;
   border: 1px solid var(--rule); border-radius: 11px; padding: 14px 16px; color: var(--black);

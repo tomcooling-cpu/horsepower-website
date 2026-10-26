@@ -47,6 +47,13 @@
     return PAGE_TYPE;
   }
 
+  function chatChannel(a) {
+    var host = (a.hostname || "").toLowerCase();
+    if (host === "wa.me" || host === "api.whatsapp.com") return "whatsapp";
+    if (host === "instagram.com" || host === "www.instagram.com") return "instagram";
+    return "";
+  }
+
   function text60(el) {
     return (el.textContent || el.getAttribute("aria-label") || "").replace(/\s+/g, " ").trim().slice(0, 60);
   }
@@ -73,6 +80,9 @@
 
     var a = t.closest("a[href]");
     if (!a) return;
+    // WS-SITE29: any WhatsApp or Instagram link, wherever it sits, also sends chat_click.
+    var chat = chatChannel(a);
+    if (chat) send("chat_click", { channel: chat, page_type: PAGE_TYPE });
     var kind = a.getAttribute("data-ga");
     var url = a.href;
     var item;
