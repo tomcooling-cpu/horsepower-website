@@ -676,7 +676,7 @@ def person_node():
         "worksFor": _org_provider(),
         "url": prod_url("/about/"),
         "image": og_image_url("tom-portrait"),
-        "description": ("Ex-elite triathlete, ultra-bike racer and FKT holder with over a "
+        "description": ("Elite-level triathlete, ultra-bike racer and FKT holder with over a "
                         "decade coaching athletes from complete beginners to world-tour level "
                         "professionals, with a particular emphasis on female-specific "
                         "performance development."),
@@ -1912,7 +1912,7 @@ def render_about(cat) -> str:
       <p class="eyebrow" style="color:var(--teal-soft)">About Us</p>
       <h1>The coach behind Horsepower</h1>
       <p class="lede">I'm Tom Cooling, Founder and Head Coach at Horsepower Coaching, and I
-      bring a rare blend of lived experience and academic expertise. An ex-elite triathlete,
+      bring a rare blend of lived experience and academic expertise. An elite-level triathlete,
       seasoned ultra-bike racer and FKT holder, with a first-class degree and a master's in
       sport science behind everything I coach.</p>
     </div>
@@ -1930,7 +1930,8 @@ def render_about(cat) -> str:
       middle-distance triathlon, ultra-bike events and Haute Route-style races.</p>
 
       <h2>Where it comes from</h2>
-      <p>It comes from my own racing, including FKT performances and ultra wins, from
+      <p>It comes from my own racing, including elite-wave starts at large gran fondos,
+      county-level running, FKT performances and ultra wins, from
       training alongside Royal Marines and UKSF, and from coaching elite performers. I
       know first-hand what the hard days actually take, and that goes into how I build
       and read every athlete's training.</p>
@@ -2002,7 +2003,7 @@ def render_about(cat) -> str:
 </section>
 {quote_block("about")}
 </main>"""
-    desc = ("Tom Cooling: ex-elite triathlete, ultra-bike racer and FKT holder coaching "
+    desc = ("Tom Cooling: elite-level triathlete, ultra-bike racer and FKT holder coaching "
             "triathlon, cycling and endurance athletes from first-timers to world-tour pros.")
     extra = ld_script([
         breadcrumb_node([("Home", "/"), ("About Us", None)]),
